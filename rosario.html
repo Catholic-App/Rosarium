@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rosário Completo - Rosarium</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <button class="btn-back" onclick="goBack()">← Voltar</button>
+      <div class="header-title">
+        <div class="header-logo">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </div>
+        <span>Rosário Completo</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo -->
+  <div class="page-container">
+    <div class="page-content container-sm">
+      <!-- Contador -->
+      <div class="terco-counter">
+        <div class="counter-display" id="counter">0</div>
+        <p class="counter-label">Contas rezadas</p>
+
+        <!-- Bolinhas de Progresso -->
+        <div class="beads-container" id="beads-container">
+          <!-- Gerado por JavaScript -->
+        </div>
+
+        <!-- Barra de Progresso -->
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+        </div>
+        <p class="progress-label" id="progress-label">0%</p>
+
+        <!-- Botões de Controle -->
+        <div class="counter-buttons">
+          <button class="btn" onclick="incrementarTerco('rosario')">+ Próxima</button>
+          <button class="btn btn-outline" onclick="resetarTerco('rosario')">Resetar</button>
+          <a href="calendario-terco.html" class="btn btn-secondary">Calendário</a>
+        </div>
+      </div>
+
+      <!-- Instruções -->
+      <div class="card" style="margin-top: 2rem;">
+        <h3 class="card-title">Rosário Completo (20 contas)</h3>
+        <div class="card-content">
+          <p><strong>Mistérios Gozosos (2ª e 4ª feira):</strong></p>
+          <ol style="margin-left: 1.5rem; margin-bottom: 1rem;">
+            <li>Anunciação do Anjo</li>
+            <li>Visitação de Maria a Isabel</li>
+            <li>Nascimento de Jesus</li>
+            <li>Apresentação de Jesus no Templo</li>
+            <li>Perda e Encontro de Jesus no Templo</li>
+          </ol>
+          
+          <p><strong>Mistérios Dolorosos (3ª e 6ª feira):</strong></p>
+          <ol style="margin-left: 1.5rem; margin-bottom: 1rem;">
+            <li>Agonia de Jesus no Horto</li>
+            <li>Flagelação de Jesus</li>
+            <li>Coroação de Espinhos</li>
+            <li>Carregamento da Cruz</li>
+            <li>Crucifixão e Morte de Jesus</li>
+          </ol>
+
+          <p><strong>Mistérios Gloriosos (domingo, 1ª e 5ª feira):</strong></p>
+          <ol style="margin-left: 1.5rem;">
+            <li>Ressurreição de Jesus</li>
+            <li>Ascensão de Jesus</li>
+            <li>Descida do Espírito Santo</li>
+            <li>Assunção de Maria</li>
+            <li>Coroação de Maria</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    const MAX_BEADS = 20;
+    const TERCO_TYPE = 'rosario';
+
+    function initBeads() {
+      const container = document.getElementById('beads-container');
+      container.innerHTML = '';
+      
+      for (let i = 1; i <= MAX_BEADS; i++) {
+        const bead = document.createElement('div');
+        bead.className = 'bead';
+        bead.textContent = i;
+        bead.onclick = () => selectBead(i);
+        container.appendChild(bead);
+      }
+      
+      updateBeads();
+    }
+
+    function updateBeads() {
+      const progress = Terco.getTercoProgress(TERCO_TYPE);
+      const beads = document.querySelectorAll('.bead');
+      
+      beads.forEach((bead, index) => {
+        if (index < progress.count) {
+          bead.classList.add('filled');
+        } else {
+          bead.classList.remove('filled');
+        }
+      });
+      
+      updateCounter(progress.count);
+    }
+
+    function updateCounter(count) {
+      document.getElementById('counter').textContent = count;
+      
+      const percentage = (count / MAX_BEADS) * 100;
+      document.getElementById('progress-fill').style.width = percentage + '%';
+      document.getElementById('progress-label').textContent = Math.round(percentage) + '%';
+    }
+
+    function incrementarTerco(type) {
+      const progress = Terco.incrementTerco(type);
+      updateBeads();
+      
+      if (progress.completed) {
+        alert('Parabéns! Você completou o Rosário Completo!');
+      }
+    }
+
+    function resetarTerco(type) {
+      if (confirm('Deseja resetar o contador?')) {
+        Terco.resetTerco(type);
+        updateBeads();
+      }
+    }
+
+    function selectBead(number) {
+      const progress = Terco.getTercoProgress(TERCO_TYPE);
+      progress.count = number;
+      Terco.saveTercoProgress(TERCO_TYPE, progress);
+      updateBeads();
+    }
+
+    // Inicializar
+    document.addEventListener('DOMContentLoaded', initBeads);
+  </script>
+</body>
+</html>

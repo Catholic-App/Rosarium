@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terço Mariano - Rosarium</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <button class="btn-back" onclick="goBack()">← Voltar</button>
+      <div class="header-title">
+        <div class="header-logo">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </div>
+        <span>Terço Mariano</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo -->
+  <div class="page-container">
+    <div class="page-content container-sm">
+      <!-- Contador -->
+      <div class="terco-counter">
+        <div class="counter-display" id="counter">0</div>
+        <p class="counter-label">Ave-Marias rezadas</p>
+
+        <!-- Bolinhas de Progresso -->
+        <div class="beads-container" id="beads-container">
+          <!-- Gerado por JavaScript -->
+        </div>
+
+        <!-- Barra de Progresso -->
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+        </div>
+        <p class="progress-label" id="progress-label">0%</p>
+
+        <!-- Botões de Controle -->
+        <div class="counter-buttons">
+          <button class="btn" onclick="incrementarTerco('mariano')">+ Próxima</button>
+          <button class="btn btn-outline" onclick="resetarTerco('mariano')">Resetar</button>
+          <a href="calendario-terco.html" class="btn btn-secondary">Calendário</a>
+        </div>
+      </div>
+
+      <!-- Orações -->
+      <div class="card" style="margin-top: 2rem;">
+        <h3 class="card-title">Orações do Terço Mariano</h3>
+        <div class="card-content">
+          <div style="margin-bottom: 1.5rem;">
+            <h4 style="font-weight: 600; margin-bottom: 0.5rem;">Pai Nosso</h4>
+            <p style="font-size: 0.95rem; line-height: 1.6; color: var(--muted-foreground);">Pai nosso, que estais nos céus, santificado seja o vosso nome, venha a nós o vosso reino, seja feita a vossa vontade, assim na terra como no céu. O pão nosso de cada dia nos dai hoje, perdoai-nos as nossas dívidas, assim como nós perdoamos aos nossos devedores, e não nos deixeis cair em tentação, mas livrai-nos do mal. Amém.</p>
+          </div>
+          <div style="margin-bottom: 1.5rem;">
+            <h4 style="font-weight: 600; margin-bottom: 0.5rem;">Ave Maria</h4>
+            <p style="font-size: 0.95rem; line-height: 1.6; color: var(--muted-foreground);">Ave Maria, cheia de graça, o Senhor é convosco, bendita sois vós entre as mulheres, e bendito é o fruto do vosso ventre, Jesus. Santa Maria, Mãe de Deus, rogai por nós pecadores, agora e na hora da nossa morte. Amém.</p>
+          </div>
+          <div>
+            <h4 style="font-weight: 600; margin-bottom: 0.5rem;">Glória Seja</h4>
+            <p style="font-size: 0.95rem; line-height: 1.6; color: var(--muted-foreground);">Glória seja ao Pai, e ao Filho, e ao Espírito Santo. Como era no princípio, agora e sempre, por todos os séculos dos séculos. Amém.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Instruções -->
+      <div class="card" style="margin-top: 1.5rem;">
+        <h3 class="card-title">Como rezar o Terço Mariano</h3>
+        <div class="card-content">
+          <ol style="margin-left: 1.5rem; line-height: 1.8;">
+            <li>Comece com o Sinal da Cruz</li>
+            <li>Reze um Credo</li>
+            <li>Reze um Pai-Nosso</li>
+            <li>Reze três Ave-Marias</li>
+            <li>Reze um Glória Seja</li>
+            <li>Reze 15 Ave-Marias (5 grupos de 3)</li>
+            <li>Termine com o Sinal da Cruz</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    const MAX_BEADS = 15;
+    const TERCO_TYPE = 'mariano';
+
+    function initBeads() {
+      const container = document.getElementById('beads-container');
+      container.innerHTML = '';
+      
+      for (let i = 1; i <= MAX_BEADS; i++) {
+        const bead = document.createElement('div');
+        bead.className = 'bead';
+        bead.textContent = i;
+        bead.onclick = () => selectBead(i);
+        container.appendChild(bead);
+      }
+      
+      updateBeads();
+    }
+
+    function updateBeads() {
+      const progress = Terco.getTercoProgress(TERCO_TYPE);
+      const beads = document.querySelectorAll('.bead');
+      
+      beads.forEach((bead, index) => {
+        if (index < progress.count) {
+          bead.classList.add('filled');
+        } else {
+          bead.classList.remove('filled');
+        }
+      });
+      
+      updateCounter(progress.count);
+    }
+
+    function updateCounter(count) {
+      document.getElementById('counter').textContent = count;
+      
+      const percentage = (count / MAX_BEADS) * 100;
+      document.getElementById('progress-fill').style.width = percentage + '%';
+      document.getElementById('progress-label').textContent = Math.round(percentage) + '%';
+    }
+
+    function incrementarTerco(type) {
+      const progress = Terco.incrementTerco(type);
+      updateBeads();
+      
+      if (progress.completed) {
+        alert('Parabéns! Você completou o Terço Mariano!');
+      }
+    }
+
+    function resetarTerco(type) {
+      if (confirm('Deseja resetar o contador?')) {
+        Terco.resetTerco(type);
+        updateBeads();
+      }
+    }
+
+    function selectBead(number) {
+      const progress = Terco.getTercoProgress(TERCO_TYPE);
+      progress.count = number;
+      Terco.saveTercoProgress(TERCO_TYPE, progress);
+      updateBeads();
+    }
+
+    // Inicializar
+    document.addEventListener('DOMContentLoaded', initBeads);
+  </script>
+</body>
+</html>
