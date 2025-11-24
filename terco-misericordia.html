@@ -1,166 +1,276 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Terço da Misericórdia - Rosarium</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Ajustes visuais locais - mantém a estética Rosarium */
+    body { background: var(--bg, #FCFAFB); color: var(--text-dark,#121212); font-family: Inter, system-ui, -apple-system, "Helvetica Neue", Arial; }
+    .page-container { max-width:800px; margin:1.25rem auto; padding:0 1rem; }
+    .card { background: var(--card,#FFFFFF); border-radius:12px; padding:1rem; box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
+    .header { padding:.6rem 1rem; display:flex; align-items:center; gap:.6rem; }
+    .header .btn-back { background:transparent; border:none; font-size:1rem; cursor:pointer; color:var(--text-dark); }
+    .header-title { display:flex; align-items:center; gap:.6rem; font-weight:700; }
+    .misterio-box, .prayer-card { border-radius:10px; padding:.9rem; }
+    .prayer-card { background: linear-gradient(180deg, #fff 0%, #fbfbff 100%); border-left:4px solid #E8EAF6; margin-bottom:1rem; }
+    .prayer-card h3 { margin:0 0 .4rem 0; font-size:1rem; }
+    .prayer-card p { margin:0; line-height:1.6; font-size:1rem; color:var(--text-dark); }
+    .prayer-card .sub { color: #666; margin-top:.5rem; font-size:.95rem; }
+    .misterio-box { background:#eef6ff; border-left:4px solid #4360C6; margin-bottom:1rem; display:none; }
+    .misterio-box strong { display:block; margin-bottom:.25rem; }
+    .terco-counter { text-align:center; margin-bottom:1rem; }
+    .counter-display { font-size:1.55rem; font-weight:700; color:var(--text-dark); }
+    .small-muted { color:#666; font-size:.95rem; }
+    .beads-container { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:1rem 0; }
+    .bead { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#fbfbfb; color:#4D3E43; cursor:pointer; user-select:none; font-weight:600; box-shadow:0 1px 3px rgba(0,0,0,0.04); }
+    .bead.filled { background:#4360C6; color:#fff; box-shadow:0 6px 14px rgba(67,96,198,0.18); }
+    .progress-bar { height:8px; background:#eee; border-radius:999px; overflow:hidden; margin:0.5rem 1.5rem; }
+    .progress-fill { height:100%; width:0%; background:#4360C6; transition:width .25s ease; }
+    .counter-buttons { display:flex; gap:.6rem; justify-content:center; margin-top:1rem; flex-wrap:wrap; }
+    .btn { padding:10px 14px; border-radius:10px; background:#4360C6; color:#fff; border:none; cursor:pointer; font-weight:600; }
+    .btn-outline { background:transparent; color:var(--text-dark); border:1px solid #ddd; }
+    .btn-secondary { background:#fff; color:var(--text-dark); border:1px solid #eee; padding:8px 12px; border-radius:8px; text-decoration:none; display:inline-block; }
+    @media (max-width:480px){ .bead{ width:32px; height:32px; font-size:.9rem } .counter-display{ font-size:1.25rem } }
+  </style>
 </head>
 <body>
-  <!-- Header -->
   <header class="header">
-    <div class="header-content">
-      <button class="btn-back" onclick="goBack()">← Voltar</button>
-      <div class="header-title">
-        <div class="header-logo">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-          </svg>
-        </div>
-        <span>Terço da Misericórdia</span>
-      </div>
+    <button class="btn-back" onclick="history.back()">← Voltar</button>
+    <div class="header-title">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Terço da Misericórdia</span>
     </div>
   </header>
 
-  <!-- Conteúdo -->
-  <div class="page-container">
-    <div class="page-content container-sm">
-      <!-- Contador -->
-      <div class="terco-counter">
-        <div class="counter-display" id="counter">0</div>
-        <p class="counter-label">Contas rezadas</p>
+  <main class="page-container">
+    <div class="page-content" style="max-width:760px;margin:0 auto;">
 
-        <!-- Bolinhas de Progresso -->
-        <div class="beads-container" id="beads-container">
-          <!-- Gerado por JavaScript -->
+      <!-- Caixa grande de oração (estilo C) -->
+      <div id="prayerCard" class="card prayer-card">
+        <h3 id="prayerTitle">Oração atual</h3>
+        <p id="prayerText">Carregando...</p>
+        <div class="sub" id="prayerMeta"></div>
+      </div>
+
+      <!-- Caixa do tipo (ex.: Conta Grande / Conta Pequena) - aparecendo quando apropriado -->
+      <div id="typeBox" class="misterio-box" style="display:none;">
+        <strong id="typeTitle"></strong>
+        <div id="typeText"></div>
+      </div>
+
+      <!-- Contador / Bolinhas -->
+      <div class="card terco-counter">
+        <div class="counter-display" id="counterDisplay">0 / 0</div>
+        <div class="small-muted" style="margin-bottom:.6rem;">Progresso do Terço da Misericórdia</div>
+
+        <div class="beads-container" id="beadsContainer" aria-hidden="false"></div>
+
+        <div class="progress-bar" aria-hidden="false">
+          <div id="progressFill" class="progress-fill"></div>
         </div>
+        <p id="progressLabel" class="small-muted" style="margin-top:.5rem;">0%</p>
 
-        <!-- Barra de Progresso -->
-        <div class="progress-bar">
-          <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
-        </div>
-        <p class="progress-label" id="progress-label">0%</p>
-
-        <!-- Botões de Controle -->
-        <div class="counter-buttons">
-          <button class="btn" onclick="incrementarTerco('misericordia')">+ Próxima</button>
-          <button class="btn btn-outline" onclick="resetarTerco('misericordia')">Resetar</button>
-          <a href="calendario-terco.html" class="btn btn-secondary">Calendário</a>
+        <div class="counter-buttons" style="margin-top:1rem;">
+          <button class="btn" id="btnNext">+ Próxima</button>
+          <button class="btn btn-outline" id="btnReset">Resetar</button>
+          <a href="calendario-terco.html" class="btn-secondary">Calendário</a>
         </div>
       </div>
 
-      <!-- Orações -->
-      <div class="card" style="margin-top: 2rem;">
-        <h3 class="card-title">Orações do Terço da Misericórdia</h3>
-        <div class="card-content">
-          <div style="margin-bottom: 1.5rem;">
-            <h4 style="font-weight: 600; margin-bottom: 0.5rem;">Na Conta Grande</h4>
-            <p style="font-size: 0.95rem; line-height: 1.6; color: var(--muted-foreground);">Pai Eterno, ofereço-vos o Corpo e o Sangue, a Alma e a Divindade de Nosso Senhor Jesus Cristo, em expiation pelos nossos pecados e pelos do mundo inteiro.</p>
-          </div>
-          <div style="margin-bottom: 1.5rem;">
-            <h4 style="font-weight: 600; margin-bottom: 0.5rem;">Nas Contas Pequenas (repetir 10 vezes)</h4>
-            <p style="font-size: 0.95rem; line-height: 1.6; color: var(--muted-foreground);">Por sua dolorosa Paixão, tende misericórdia de nós e do mundo inteiro.</p>
-          </div>
-          <div>
-            <h4 style="font-weight: 600; margin-bottom: 0.5rem;">Oração Final</h4>
-            <p style="font-size: 0.95rem; line-height: 1.6; color: var(--muted-foreground);">Deus Santo, Deus Forte, Deus Imortal, tende misericórdia de nós e do mundo inteiro. Amém.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Instruções -->
-      <div class="card" style="margin-top: 1.5rem;">
-        <h3 class="card-title">Terço da Misericórdia</h3>
-        <div class="card-content">
-          <p style="margin-bottom: 1rem;">
-            Revelado a Santa Faustina Kowalska, o Terço da Misericórdia é uma poderosa devoção para invocar a misericórdia de Deus.
-          </p>
-          
-          <p><strong>Como rezar:</strong></p>
-          <ol style="margin-left: 1.5rem; line-height: 1.8;">
-            <li><strong>Sinal da Cruz</strong></li>
-            <li><strong>Credo</strong></li>
-            <li><strong>Pai-Nosso</strong></li>
-            <li><strong>Ave-Maria</strong></li>
-            <li><strong>Glória Seja</strong></li>
-            <li><strong>Na conta grande:</strong> "Pai Eterno, ofereço-vos o Corpo e o Sangue, a Alma e a Divindade de Nosso Senhor Jesus Cristo"</li>
-            <li><strong>Nas contas pequenas (10 vezes):</strong> "Por sua dolorosa Paixão, tende misericórdia de nós e do mundo inteiro"</li>
-            <li>Repetir até completar as 15 contas</li>
-            <li><strong>Terminar com:</strong> "Deus Santo, Deus Forte, Deus Imortal, tende misericórdia de nós e do mundo inteiro"</li>
-          </ol>
-        </div>
-      </div>
     </div>
-  </div>
+  </main>
 
-  <script src="app.js"></script>
   <script>
-    const MAX_BEADS = 15;
-    const TERCO_TYPE = 'misericordia';
+  /* ========== ORAÇÕES ========== */
+  const ORACOES = {
+    sinal_da_cruz: "Em nome do Pai, do Filho e do Espírito Santo. Amém.",
+    credo: "Creio em Deus Pai todo-poderoso, criador do céu e da terra; e em Jesus Cristo, seu único Filho, nosso Senhor, que foi concebido pelo poder do Espírito Santo, nasceu da Virgem Maria; padeceu sob Pôncio Pilatos; foi crucificado, morto e sepultado; desceu à mansão dos mortos; ressuscitou ao terceiro dia; subiu aos céus; está sentado à direita de Deus Pai todo-poderoso; donde há de vir a julgar os vivos e os mortos. Creio no Espírito Santo, na santa Igreja Católica, na comunhão dos santos, na remissão dos pecados, na ressurreição da carne e na vida eterna. Amém.",
+    pai_nosso: "Pai nosso, que estais nos céus, santificado seja o vosso nome; venha a nós o vosso reino; seja feita a vossa vontade, assim na terra como no céu. O pão nosso de cada dia nos dai hoje; perdoai-nos as nossas dívidas, assim como nós perdoamos aos nossos devedores; e não nos deixeis cair em tentação; mas livrai-nos do mal. Amém.",
+    ave_maria: "Ave Maria, cheia de graça, o Senhor é convosco; bendita sois vós entre as mulheres, e bendito é o fruto do vosso ventre, Jesus. Santa Maria, Mãe de Deus, rogai por nós, pecadores, agora e na hora da nossa morte. Amém.",
+    eterno_pai: "Eterno Pai, ofereço-vos o Corpo e o Sangue, a Alma e a Divindade de Nosso Senhor Jesus Cristo, em expiação pelos nossos pecados e pelos do mundo inteiro.",
+    pela_sua_dolorosa_paixao: "Pela sua dolorosa Paixão, tende misericórdia de nós e do mundo inteiro.",
+    santo_deus: "Santo Deus, Santo Forte, Santo Imortal, tende misericórdia de nós e do mundo inteiro.",
+    o_sangue_e_agua: "Ó Sangue e Água, que brotastes do Coração de Jesus como fonte de misericórdia para nós, confio em Vós. Amém."
+  };
 
-    function initBeads() {
-      const container = document.getElementById('beads-container');
-      container.innerHTML = '';
-      
-      for (let i = 1; i <= MAX_BEADS; i++) {
-        const bead = document.createElement('div');
-        bead.className = 'bead';
-        bead.textContent = i;
-        bead.onclick = () => selectBead(i);
-        container.appendChild(bead);
+  /* ========== SEQUENCE ========== 
+     Estrutura:
+     0: sinal_da_cruz
+     1: pai_nosso (inicial)
+     2: ave_maria (inicial)
+     3: credo (inicial)
+     depois: 5 ciclos -> ['grande','pequena'*10] x5
+     ao final: 'final' (santo_deus + o_sangue_e_agua)
+  ==================================*/
+  const SEQUENCE = (function build(){
+    const seq = [];
+    seq.push('sinal');
+    seq.push('pn_initial');
+    seq.push('am_initial');
+    seq.push('credo_initial');
+    for (let d=0; d<5; d++) {
+      seq.push('grande'); // Eterno Pai - conta grande
+      for (let i=0;i<10;i++) seq.push('pequena'); // Pela sua dolorosa Paixão
+    }
+    seq.push('final'); // orações finais
+    return seq;
+  })();
+
+  const STORAGE_KEY = 'rosarium_terco_misericordia_v1';
+
+  /* ========== ESTADO ========== */
+  let state = { stepIndex: 0, grandeCount: 0, pequenaCount: 0 };
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw) state = JSON.parse(raw);
+    }catch(e){ console.warn('loadState',e); }
+  }
+  function saveState(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e){ console.warn('saveState',e); }
+  }
+
+  /* ========== RENDER ======== */
+  function render(){
+    const step = SEQUENCE[state.stepIndex];
+    const prayerTextEl = document.getElementById('prayerText');
+    const prayerTitleEl = document.getElementById('prayerTitle');
+    const prayerMeta = document.getElementById('prayerMeta');
+    const typeBox = document.getElementById('typeBox');
+    const typeTitle = document.getElementById('typeTitle');
+    const typeText = document.getElementById('typeText');
+
+    // hide type box by default
+    typeBox.style.display = 'none';
+    typeTitle.innerText = '';
+    typeText.innerText = '';
+
+    // set prayer based on step
+    if (step === 'sinal') {
+      prayerTitleEl.innerText = 'Sinal da Cruz';
+      prayerTextEl.innerText = ORACOES.sinal_da_cruz;
+      prayerMeta.innerText = '';
+    } else if (step === 'pn_initial') {
+      prayerTitleEl.innerText = 'Pai-Nosso (inicial)';
+      prayerTextEl.innerText = ORACOES.pai_nosso;
+      prayerMeta.innerText = '';
+    } else if (step === 'am_initial') {
+      prayerTitleEl.innerText = 'Ave-Maria (inicial)';
+      prayerTextEl.innerText = ORACOES.ave_maria;
+      prayerMeta.innerText = '';
+    } else if (step === 'credo_initial') {
+      prayerTitleEl.innerText = 'Credo';
+      prayerTextEl.innerText = ORACOES.credo;
+      prayerMeta.innerText = '';
+    } else if (step === 'grande') {
+      prayerTitleEl.innerText = 'Conta Grande';
+      prayerTextEl.innerText = ORACOES.eterno_pai;
+      prayerMeta.innerText = `Dezena ${state.grandeCount + 1} de 5`;
+      // show type box with label
+      typeBox.style.display = 'block';
+      typeTitle.innerText = 'Conta Grande';
+      typeText.innerText = 'Reze: "Eterno Pai, ofereço-vos..."';
+    } else if (step === 'pequena') {
+      prayerTitleEl.innerText = 'Conta Pequena';
+      prayerTextEl.innerText = ORACOES.pela_sua_dolorosa_paixao;
+      prayerMeta.innerText = `Ave-Maria ${state.pequenaCount} da dezena ${state.grandeCount}`;
+      // hide type box (not needed)
+      typeBox.style.display = 'none';
+    } else if (step === 'final') {
+      prayerTitleEl.innerText = 'Orações Finais';
+      prayerTextEl.innerText = ORACOES.santo_deus + " " + ORACOES.o_sangue_e_agua;
+      prayerMeta.innerText = 'Repita "Santo Deus" 3 vezes e, em seguida, "Ó Sangue e Água"';
+    } else {
+      prayerTitleEl.innerText = '';
+      prayerTextEl.innerText = '';
+      prayerMeta.innerText = '';
+    }
+
+    // counter display
+    document.getElementById('counterDisplay').innerText = `${state.stepIndex + 1} / ${SEQUENCE.length}`;
+
+    // beads render
+    const beads = document.getElementById('beadsContainer');
+    beads.innerHTML = '';
+    SEQUENCE.forEach((it, idx) => {
+      const div = document.createElement('div');
+      div.className = 'bead' + (idx <= state.stepIndex ? ' filled' : '');
+      div.textContent = idx + 1;
+      div.title = it.toUpperCase();
+      div.onclick = () => jumpTo(idx);
+      beads.appendChild(div);
+    });
+
+    // progress
+    const pct = Math.round( ((state.stepIndex + 1) / SEQUENCE.length) * 100 );
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressLabel').innerText = pct + '%';
+  }
+
+  /* ========== CONTROLE ========= */
+  function nextStep(){
+    if (state.stepIndex >= SEQUENCE.length - 1) {
+      alert('Terço da Misericórdia concluído. Glória a Deus!');
+      return;
+    }
+    state.stepIndex++;
+    const step = SEQUENCE[state.stepIndex];
+
+    if (step === 'grande') {
+      // entering a new grande
+      state.grandeCount = Math.min(state.grandeCount + 1, 5);
+      state.pequenaCount = 0;
+    } else if (step === 'pequena') {
+      state.pequenaCount = Math.min(state.pequenaCount + 1, 10);
+    }
+    saveState();
+    render();
+  }
+
+  function resetTerco(){
+    if (!confirm('Deseja resetar o Terço da Misericórdia?')) return;
+    state = { stepIndex: 0, grandeCount: 0, pequenaCount: 0 };
+    saveState();
+    render();
+  }
+
+  function jumpTo(index){
+    if (index < 0 || index >= SEQUENCE.length) return;
+    // recompute grandeCount and pequenaCount up to index
+    let grande = 0, pequena = 0;
+    for (let i=0;i<=index;i++){
+      if (SEQUENCE[i] === 'grande') grande++;
+      if (SEQUENCE[i] === 'pequena') pequena++;
+      if (SEQUENCE[i] === 'pequena' && SEQUENCE[i-1] === 'grande') {
+        // handle boundary - included in loop anyway
       }
-      
-      updateBeads();
     }
-
-    function updateBeads() {
-      const progress = Terco.getTercoProgress(TERCO_TYPE);
-      const beads = document.querySelectorAll('.bead');
-      
-      beads.forEach((bead, index) => {
-        if (index < progress.count) {
-          bead.classList.add('filled');
-        } else {
-          bead.classList.remove('filled');
-        }
-      });
-      
-      updateCounter(progress.count);
+    // pequenaCount should be count of pequenas in current decade up to index
+    // compute pequenaCount relative to current grande
+    let currentGrandeIndex = -1, countPeqInCurrentGrande = 0, runningGrande = 0;
+    for (let i=0;i<=index;i++){
+      if (SEQUENCE[i] === 'grande') { runningGrande++; currentGrandeIndex = i; countPeqInCurrentGrande = 0; }
+      else if (SEQUENCE[i] === 'pequena') { countPeqInCurrentGrande++; }
     }
+    state.stepIndex = index;
+    state.grandeCount = Math.max(0, runningGrande);
+    state.pequenaCount = countPeqInCurrentGrande;
+    saveState();
+    render();
+  }
 
-    function updateCounter(count) {
-      document.getElementById('counter').textContent = count;
-      
-      const percentage = (count / MAX_BEADS) * 100;
-      document.getElementById('progress-fill').style.width = percentage + '%';
-      document.getElementById('progress-label').textContent = Math.round(percentage) + '%';
-    }
-
-    function incrementarTerco(type) {
-      const progress = Terco.incrementTerco(type);
-      updateBeads();
-      
-      if (progress.completed) {
-        alert('Parabéns! Você completou o Terço da Misericórdia!');
-      }
-    }
-
-    function resetarTerco(type) {
-      if (confirm('Deseja resetar o contador?')) {
-        Terco.resetTerco(type);
-        updateBeads();
-      }
-    }
-
-    function selectBead(number) {
-      const progress = Terco.getTercoProgress(TERCO_TYPE);
-      progress.count = number;
-      Terco.saveTercoProgress(TERCO_TYPE, progress);
-      updateBeads();
-    }
-
-    // Inicializar
-    document.addEventListener('DOMContentLoaded', initBeads);
+  /* ========== INIT ========= */
+  document.addEventListener('DOMContentLoaded', function(){
+    loadState();
+    // ensure bounds valid
+    if (typeof state.stepIndex !== 'number' || state.stepIndex < 0 || state.stepIndex >= SEQUENCE.length) state.stepIndex = 0;
+    render();
+    document.getElementById('btnNext').addEventListener('click', nextStep);
+    document.getElementById('btnReset').addEventListener('click', resetTerco);
+  });
   </script>
 </body>
 </html>
