@@ -6,6 +6,7 @@
   <title>Terço Mariano - Rosarium</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <!-- Header -->
   <header class="header">
@@ -14,7 +15,8 @@
       <div class="header-title">
         <div class="header-logo">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
           </svg>
         </div>
         <span>Terço Mariano</span>
@@ -25,135 +27,207 @@
   <!-- Conteúdo -->
   <div class="page-container">
     <div class="page-content container-sm">
+
+      <!-- Oração Atual -->
+      <div id="prayer-box" class="card" style="margin-bottom: 1rem;">
+        <h3 class="card-title">Oração</h3>
+        <div class="card-content">
+          <p id="prayer-text" style="font-size: 1rem; line-height: 1.7;">
+            <!-- preenchido via JS -->
+          </p>
+        </div>
+      </div>
+
+      <!-- Mistério Atual (só aparece no Pai Nosso) -->
+      <div id="misterio-box" class="card" style="display: none; margin-bottom: 1.5rem;">
+        <h3 class="card-title">Mistério Atual</h3>
+        <div class="card-content">
+          <p id="misterio-text" style="font-size: 1rem; line-height: 1.7;"></p>
+        </div>
+      </div>
+
       <!-- Contador -->
       <div class="terco-counter">
         <div class="counter-display" id="counter">0</div>
-        <p class="counter-label">Ave-Marias rezadas</p>
+        <p class="counter-label">Progresso do Terço</p>
 
-        <!-- Bolinhas de Progresso -->
-        <div class="beads-container" id="beads-container">
-          <!-- Gerado por JavaScript -->
-        </div>
+        <!-- Bolinhas -->
+        <div class="beads-container" id="beads-container"></div>
 
         <!-- Barra de Progresso -->
         <div class="progress-bar">
-          <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+          <div class="progress-fill" id="progress-fill"></div>
         </div>
         <p class="progress-label" id="progress-label">0%</p>
 
-        <!-- Botões de Controle -->
+        <!-- Botões -->
         <div class="counter-buttons">
-          <button class="btn" onclick="incrementarTerco('mariano')">+ Próxima</button>
-          <button class="btn btn-outline" onclick="resetarTerco('mariano')">Resetar</button>
+          <button class="btn" onclick="nextStep()">+ Próxima</button>
+          <button class="btn btn-outline" onclick="resetTerco()">Resetar</button>
           <a href="calendario-terco.html" class="btn btn-secondary">Calendário</a>
         </div>
       </div>
 
-      <!-- Orações -->
-      <div class="card" style="margin-top: 2rem;">
-        <h3 class="card-title">Orações do Terço Mariano</h3>
-        <div class="card-content">
-          <div style="margin-bottom: 1.5rem;">
-            <h4 style="font-weight: 600; margin-bottom: 0.5rem;">Pai Nosso</h4>
-            <p style="font-size: 0.95rem; line-height: 1.6; color: var(--muted-foreground);">Pai nosso, que estais nos céus, santificado seja o vosso nome, venha a nós o vosso reino, seja feita a vossa vontade, assim na terra como no céu. O pão nosso de cada dia nos dai hoje, perdoai-nos as nossas dívidas, assim como nós perdoamos aos nossos devedores, e não nos deixeis cair em tentação, mas livrai-nos do mal. Amém.</p>
-          </div>
-          <div style="margin-bottom: 1.5rem;">
-            <h4 style="font-weight: 600; margin-bottom: 0.5rem;">Ave Maria</h4>
-            <p style="font-size: 0.95rem; line-height: 1.6; color: var(--muted-foreground);">Ave Maria, cheia de graça, o Senhor é convosco, bendita sois vós entre as mulheres, e bendito é o fruto do vosso ventre, Jesus. Santa Maria, Mãe de Deus, rogai por nós pecadores, agora e na hora da nossa morte. Amém.</p>
-          </div>
-          <div>
-            <h4 style="font-weight: 600; margin-bottom: 0.5rem;">Glória Seja</h4>
-            <p style="font-size: 0.95rem; line-height: 1.6; color: var(--muted-foreground);">Glória seja ao Pai, e ao Filho, e ao Espírito Santo. Como era no princípio, agora e sempre, por todos os séculos dos séculos. Amém.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Instruções -->
-      <div class="card" style="margin-top: 1.5rem;">
-        <h3 class="card-title">Como rezar o Terço Mariano</h3>
-        <div class="card-content">
-          <ol style="margin-left: 1.5rem; line-height: 1.8;">
-            <li>Comece com o Sinal da Cruz</li>
-            <li>Reze um Credo</li>
-            <li>Reze um Pai-Nosso</li>
-            <li>Reze três Ave-Marias</li>
-            <li>Reze um Glória Seja</li>
-            <li>Reze 15 Ave-Marias (5 grupos de 3)</li>
-            <li>Termine com o Sinal da Cruz</li>
-          </ol>
-        </div>
-      </div>
     </div>
   </div>
 
   <script src="app.js"></script>
+
   <script>
-    const MAX_BEADS = 15;
-    const TERCO_TYPE = 'mariano';
+    /*
+     * ===============================
+     *  CONFIGURAÇÃO REAL DO TERÇO
+     * ===============================
+     */
+
+    const PRAYERS = {
+      credo: "Creio em Deus Pai todo-poderoso, criador do céu e da terra... (completo aqui)",
+      paiNosso: "Pai nosso, que estais nos céus...",
+      aveMaria: "Ave Maria, cheia de graça...",
+      gloria: "Glória ao Pai, ao Filho e ao Espírito Santo...",
+      jaculatoria: "Ó meu Jesus, perdoai-nos..."
+    };
+
+    // Mistérios completos — Categoria C (detalhado/catequético)
+    const MISTERIOS = {
+      gozosos: [
+        "1º Mistério Gozoso — A Anunciação: O Verbo se fez carne e habitou entre nós.",
+        "2º Mistério Gozoso — A Visitação: Maria visita Isabel e leva Cristo consigo.",
+        "3º Mistério Gozoso — O Nascimento de Jesus: Deus nasce entre nós.",
+        "4º Mistério Gozoso — A Apresentação: Jesus é apresentado no Templo.",
+        "5º Mistério Gozoso — O Encontro no Templo: Jesus é encontrado entre os doutores."
+      ],
+      luminosos: [
+        "1º Mistério Luminoso — O Batismo no Jordão...",
+        "2º Mistério Luminoso — As Bodas de Caná...",
+        "3º Mistério Luminoso — O Anúncio do Reino...",
+        "4º Mistério Luminoso — A Transfiguração...",
+        "5º Mistério Luminoso — A Instituição da Eucaristia..."
+      ],
+      dolorosos: [
+        "1º Mistério Doloroso — A Agonia no Horto...",
+        "2º Mistério Doloroso — A Flagelação...",
+        "3º Mistério Doloroso — A Coroação de Espinhos...",
+        "4º Mistério Doloroso — O Caminho do Calvário...",
+        "5º Mistério Doloroso — A Crucifixão..."
+      ],
+      gloriosos: [
+        "1º Mistério Glorioso — A Ressurreição...",
+        "2º Mistério Glorioso — A Ascensão...",
+        "3º Mistério Glorioso — Pentecostes...",
+        "4º Mistério Glorioso — A Assunção de Maria...",
+        "5º Mistério Glorioso — A Coroação de Maria..."
+      ]
+    };
+
+    function getMisteriosDoDia() {
+      const d = new Date().getDay();
+      if (d === 0 || d === 3) return MISTERIOS.gloriosos;
+      if (d === 1 || d === 6) return MISTERIOS.gozosos;
+      if (d === 2 || d === 5) return MISTERIOS.dolorosos;
+      return MISTERIOS.luminosos; // quinta
+    }
+
+    // ORDEM REAL DO TERÇO (1 CREEDO, 1 PN, 3 AM, 1 GLÓRIA, 5 MISTÉRIOS)
+    const SEQUENCE = [
+      "credo",
+      "pn",
+      "am", "am", "am",
+      "gloria",
+
+      // Mistério 1
+      "pn", "m1",
+      "am","am","am","am","am","am","am","am","am","am",
+      "gloria",
+
+      // Mistério 2
+      "pn", "m2",
+      "am","am","am","am","am","am","am","am","am","am",
+      "gloria",
+
+      // Mistério 3
+      "pn", "m3",
+      "am","am","am","am","am","am","am","am","am","am",
+      "gloria",
+
+      // Mistério 4
+      "pn", "m4",
+      "am","am","am","am","am","am","am","am","am","am",
+      "gloria",
+
+      // Mistério 5
+      "pn", "m5",
+      "am","am","am","am","am","am","am","am","am","am",
+      "gloria"
+    ];
+
+    let step = 0;
+    let misteriosHoje = getMisteriosDoDia();
+
+    function updateUI() {
+      const elemPrayer = document.getElementById("prayer-text");
+      const elemMist = document.getElementById("misterio-box");
+      const mistText = document.getElementById("misterio-text");
+
+      const item = SEQUENCE[step];
+
+      // Oração
+      if (item === "credo") elemPrayer.innerText = PRAYERS.credo;
+      else if (item === "pn") elemPrayer.innerText = PRAYERS.paiNosso;
+      else if (item === "am") elemPrayer.innerText = PRAYERS.aveMaria;
+      else if (item === "gloria") elemPrayer.innerText = PRAYERS.gloria;
+      else if (item.startsWith("m")) {
+        elemPrayer.innerText = ""; // o mistério substitui
+      }
+
+      // Mistério
+      if (item.startsWith("m")) {
+        const index = Number(item.replace("m","")) - 1;
+        mistText.innerText = misteriosHoje[index];
+        elemMist.style.display = "block";
+      } else {
+        elemMist.style.display = "none";
+      }
+
+      // Atualiza beads e barra
+      document.getElementById("counter").innerText = step + 1;
+      const percent = ((step+1) / SEQUENCE.length) * 100;
+      document.getElementById("progress-fill").style.width = percent + "%";
+      document.getElementById("progress-label").innerText = Math.round(percent) + "%";
+    }
+
+    function nextStep() {
+      if (step < SEQUENCE.length - 1) {
+        step++;
+        updateUI();
+      } else {
+        alert("Terço completo!");
+      }
+    }
+
+    function resetTerco() {
+      if (confirm("Deseja resetar o terço?")) {
+        step = 0;
+        updateUI();
+      }
+    }
 
     function initBeads() {
-      const container = document.getElementById('beads-container');
-      container.innerHTML = '';
-      
-      for (let i = 1; i <= MAX_BEADS; i++) {
-        const bead = document.createElement('div');
-        bead.className = 'bead';
+      const container = document.getElementById("beads-container");
+      container.innerHTML = "";
+      for (let i = 1; i <= SEQUENCE.length; i++) {
+        const bead = document.createElement("div");
+        bead.className = "bead";
         bead.textContent = i;
-        bead.onclick = () => selectBead(i);
         container.appendChild(bead);
       }
-      
-      updateBeads();
     }
 
-    function updateBeads() {
-      const progress = Terco.getTercoProgress(TERCO_TYPE);
-      const beads = document.querySelectorAll('.bead');
-      
-      beads.forEach((bead, index) => {
-        if (index < progress.count) {
-          bead.classList.add('filled');
-        } else {
-          bead.classList.remove('filled');
-        }
-      });
-      
-      updateCounter(progress.count);
-    }
-
-    function updateCounter(count) {
-      document.getElementById('counter').textContent = count;
-      
-      const percentage = (count / MAX_BEADS) * 100;
-      document.getElementById('progress-fill').style.width = percentage + '%';
-      document.getElementById('progress-label').textContent = Math.round(percentage) + '%';
-    }
-
-    function incrementarTerco(type) {
-      const progress = Terco.incrementTerco(type);
-      updateBeads();
-      
-      if (progress.completed) {
-        alert('Parabéns! Você completou o Terço Mariano!');
-      }
-    }
-
-    function resetarTerco(type) {
-      if (confirm('Deseja resetar o contador?')) {
-        Terco.resetTerco(type);
-        updateBeads();
-      }
-    }
-
-    function selectBead(number) {
-      const progress = Terco.getTercoProgress(TERCO_TYPE);
-      progress.count = number;
-      Terco.saveTercoProgress(TERCO_TYPE, progress);
-      updateBeads();
-    }
-
-    // Inicializar
-    document.addEventListener('DOMContentLoaded', initBeads);
+    document.addEventListener("DOMContentLoaded", () => {
+      initBeads();
+      updateUI();
+    });
   </script>
+
 </body>
 </html>
