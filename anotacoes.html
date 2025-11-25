@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Anotações - Rosarium</title>
+  <link rel="stylesheet" href="style.css" />
   <style>
+    /* estilo mínimo embutido (se preferir, mantenha style.css) */
     body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f4f4f4; }
     .hidden { display: none; }
     .header { background: #800000; color: #fff; padding: 1rem; display:flex; align-items:center; }
@@ -16,31 +18,28 @@
     .card { background:#fff; padding:1rem 2rem; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
     .pin-input input { width:2rem; text-align:center; font-size:1.5rem; margin:0.25rem; }
     .items-list .item { background:#fff; margin-bottom:0.5rem; padding:0.5rem; border-radius:4px; display:flex; justify-content:space-between; align-items:center; }
-    .item-actions button { margin-left:0.5rem; }
     .input, textarea { width:100%; padding:0.5rem; margin-top:0.25rem; margin-bottom:0.5rem; border:1px solid #ccc; border-radius:4px; }
     .form-group { margin-bottom:1rem; }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
   <header class="header">
     <button class="btn" onclick="goBack()">← Voltar</button>
     <div class="header-title">Anotações</div>
   </header>
 
   <div class="container-md">
-
     <!-- PIN SCREEN -->
     <div id="pin-screen">
       <div class="card">
         <h2>Anotações Privadas</h2>
         <p>Digite seu PIN de 4 dígitos</p>
-        <div class="pin-input">
-          <input type="text" maxlength="1" onkeyup="handlePinInput(event,0)">
-          <input type="text" maxlength="1" onkeyup="handlePinInput(event,1)">
-          <input type="text" maxlength="1" onkeyup="handlePinInput(event,2)">
-          <input type="text" maxlength="1" onkeyup="handlePinInput(event,3)">
+        <div class="pin-input" aria-label="PIN">
+          <input type="text" inputmode="numeric" maxlength="1" onkeyup="handlePinInput(event,0)" />
+          <input type="text" inputmode="numeric" maxlength="1" onkeyup="handlePinInput(event,1)" />
+          <input type="text" inputmode="numeric" maxlength="1" onkeyup="handlePinInput(event,2)" />
+          <input type="text" inputmode="numeric" maxlength="1" onkeyup="handlePinInput(event,3)" />
         </div>
         <button class="btn" onclick="verifyPin()">Entrar</button>
         <p>PIN padrão: 1234</p>
@@ -63,7 +62,7 @@
         <h2 id="form-title">Nova Anotação</h2>
         <div class="form-group">
           <label>Título:</label>
-          <input type="text" id="anotacao-titulo" placeholder="Título da anotação">
+          <input type="text" id="anotacao-titulo" placeholder="Título da anotação" />
         </div>
         <div class="form-group">
           <label>Conteúdo:</label>
@@ -75,12 +74,8 @@
         </div>
       </div>
     </div>
-
   </div>
 
-  <!-- Carrega o JavaScript externo -->
   <script src="app.js"></script>
-
 </body>
 </html>
-
