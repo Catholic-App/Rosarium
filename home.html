@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Rosarium - Página inicial">
+  <title>Rosarium - Home</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <button class="btn-back" onclick="goBack()" style="visibility: hidden;">← Voltar</button>
+      <div class="header-title">
+        <div class="header-logo">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+        </div>
+        <span>Rosarium</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo -->
+  <div class="home-container">
+    <div class="home-content">
+      <!-- Seção de Boas-vindas -->
+      <div class="home-welcome">
+        <h2 class="home-welcome-title">Bem-vindo(a)</h2>
+        <p class="home-welcome-subtitle">Escolha uma das opções abaixo para começar sua jornada espiritual</p>
+      </div>
+
+      <!-- Grid de Funcionalidades -->
+      <div class="features-grid">
+        <!-- Terço -->
+        <a href="terco.html" class="feature-card">
+          <div class="feature-card-icon bg-primary">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </div>
+          <h3 class="feature-card-title">Terço</h3>
+        </a>
+
+        <!-- Bíblia -->
+        <a href="biblia.html" class="feature-card">
+          <div class="feature-card-icon bg-accent">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+          </div>
+          <h3 class="feature-card-title">Bíblia</h3>
+        </a>
+
+        <!-- Liturgia Diária -->
+        <a href="liturgia.html" class="feature-card">
+          <div class="feature-card-icon bg-primary">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h3 class="feature-card-title">Liturgia Diária</h3>
+        </a>
+
+        <!-- Lectio Divina -->
+        <a href="liturgia.html?lectio=true" class="feature-card">
+          <div class="feature-card-icon bg-accent">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+          </div>
+          <h3 class="feature-card-title">Lectio Divina</h3>
+        </a>
+
+        <!-- Anotações -->
+        <a href="anotacoes.html" class="feature-card">
+          <div class="feature-card-icon bg-primary">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <h3 class="feature-card-title">Anotações</h3>
+        </a>
+
+        <!-- Santo do Dia -->
+        <a href="santo-do-dia.html" class="feature-card">
+          <div class="feature-card-icon bg-accent">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m6.364 1.636l-.707-.707M21 12h-1m1.364 6.364l-.707.707M12 21v1m-6.364-1.636l.707.707M3 12h1M4.636 4.636l.707.707" />
+            </svg>
+          </div>
+          <h3 class="feature-card-title">Santo do Dia</h3>
+        </a>
+
+        <!-- Confissão -->
+        <a href="confissao.html" class="feature-card">
+          <div class="feature-card-icon bg-primary">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5.581m0 0H9.581m5.419 0C13.798 16.435 11.722 14 9 14c-2.722 0-4.798 2.435-5.581 5" />
+            </svg>
+          </div>
+          <h3 class="feature-card-title">Confissão</h3>
+        </a>
+      </div>
+
+      <!-- Versículo do Dia -->
+      <div class="daily-verse">
+        <p class="daily-verse-label">Versículo do Dia</p>
+        <blockquote class="daily-verse-text">"Tudo posso naquele que me fortalece."</blockquote>
+        <cite class="daily-verse-author">— Filipenses 4:13</cite>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

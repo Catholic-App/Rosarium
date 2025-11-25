@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendário de Terços - Rosarium</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <button class="btn-back" onclick="goBack()">← Voltar</button>
+      <div class="header-title">
+        <div class="header-logo">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <span>Calendário de Terços</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo -->
+  <div class="page-container">
+    <div class="page-content container-md">
+      <h1 class="page-title">Histórico de Terços Rezados</h1>
+
+      <!-- Calendário -->
+      <div class="calendar">
+        <div class="calendar-header">
+          <h3 class="calendar-title" id="calendar-title">Dezembro 2024</h3>
+          <div class="calendar-nav">
+            <button onclick="previousMonth()">← Anterior</button>
+            <button onclick="nextMonth()">Próximo →</button>
+          </div>
+        </div>
+
+        <!-- Grid do Calendário -->
+        <div class="calendar-grid" id="calendar-grid">
+          <!-- Gerado por JavaScript -->
+        </div>
+      </div>
+
+      <!-- Estatísticas -->
+      <div class="card" style="margin-top: 2rem;">
+        <h3 class="card-title">Estatísticas do Mês</h3>
+        <div class="card-content">
+          <p><strong>Total de terços rezados:</strong> <span id="total-tercos">0</span></p>
+          <p><strong>Dias com terço:</strong> <span id="days-with-terco">0</span></p>
+          <p><strong>Sequência atual:</strong> <span id="current-streak">0</span> dias</p>
+        </div>
+      </div>
+
+      <!-- Histórico -->
+      <div class="card" style="margin-top: 2rem;">
+        <h3 class="card-title">Últimos Terços Rezados</h3>
+        <div class="items-list" id="history-list">
+          <!-- Gerado por JavaScript -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    let currentDate = new Date();
+
+    function renderCalendar() {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      
+      // Atualizar título
+      document.getElementById('calendar-title').textContent = 
+        `${App.Calendar.getMonthName(month)} ${year}`;
+      
+      // Limpar grid
+      const grid = document.getElementById('calendar-grid');
+      grid.innerHTML = '';
+      
+      // Adicionar cabeçalhos dos dias
+      const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab'];
+      dayNames.forEach(day => {
+        const header = document.createElement('div');
+        header.className = 'calendar-day-header';
+        header.textContent = day;
+        grid.appendChild(header);
+      });
+      
+      // Adicionar dias vazios no início
+      const firstDay = App.Calendar.getFirstDayOfMonth(year, month);
+      for (let i = 0; i < firstDay; i++) {
+        const emptyDay = document.createElement('div');
+        emptyDay.className = 'calendar-day other-month';
+        grid.appendChild(emptyDay);
+      }
+      
+      // Adicionar dias do mês
+      const daysInMonth = App.Calendar.getDaysInMonth(year, month);
+      const calendar = App.Terco.getTercoCalendar();
+      const today = new Date();
+      
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dayElement = document.createElement('div');
+        dayElement.className = 'calendar-day';
+        dayElement.textContent = day;
+        
+        // Verificar se é hoje
+        if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+          dayElement.classList.add('today');
+        }
+        
+        // Verificar se tem terço marcado
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        if (calendar[dateStr]) {
+          dayElement.classList.add('marked');
+        }
+        
+        grid.appendChild(dayElement);
+      }
+      
+      updateStatistics();
+    }
+
+    function updateStatistics() {
+      const calendar = App.Terco.getTercoCalendar();
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      
+      let totalTercos = 0;
+      let daysWithTerco = 0;
+      
+      for (const date in calendar) {
+        const [y, m] = date.split('-');
+        if (parseInt(y) === year && parseInt(m) === month + 1) {
+          totalTercos += calendar[date].length;
+          daysWithTerco++;
+        }
+      }
+      
+      document.getElementById('total-tercos').textContent = totalTercos;
+      document.getElementById('days-with-terco').textContent = daysWithTerco;
+      
+      // Calcular sequência
+      let streak = 0;
+      const today = new Date();
+      let checkDate = new Date(today);
+      
+      while (true) {
+        const dateStr = checkDate.toISOString().split('T')[0];
+        if (calendar[dateStr]) {
+          streak++;
+          checkDate.setDate(checkDate.getDate() - 1);
+        } else {
+          break;
+        }
+      }
+      
+      document.getElementById('current-streak').textContent = streak;
+      
+      // Atualizar histórico
+      updateHistory();
+    }
+
+    function updateHistory() {
+      const calendar = App.Terco.getTercoCalendar();
+      const historyList = document.getElementById('history-list');
+      historyList.innerHTML = '';
+      
+      const dates = Object.keys(calendar).sort().reverse().slice(0, 10);
+      
+      if (dates.length === 0) {
+        historyList.innerHTML = '<p style="padding: 1rem; text-align: center; color: var(--muted-foreground);">Nenhum terço rezado ainda</p>';
+        return;
+      }
+      
+      dates.forEach(date => {
+        const types = calendar[date];
+        const typeNames = types.map(t => {
+          if (t === 'mariano') return 'Terço Mariano';
+          if (t === 'rosario') return 'Rosário';
+          if (t === 'misericordia') return 'Terço da Misericórdia';
+          return t;
+        }).join(', ');
+        
+        const item = document.createElement('div');
+        item.className = 'item';
+        item.innerHTML = `
+          <div class="item-content">
+            <div class="item-title">${new Date(date + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+            <div class="item-description">${typeNames}</div>
+          </div>
+        `;
+        historyList.appendChild(item);
+      });
+    }
+
+    function previousMonth() {
+      currentDate.setMonth(currentDate.getMonth() - 1);
+      renderCalendar();
+    }
+
+    function nextMonth() {
+      currentDate.setMonth(currentDate.getMonth() + 1);
+      renderCalendar();
+    }
+
+    // Inicializar
+    document.addEventListener('DOMContentLoaded', renderCalendar);
+  </script>
+</body>
+</html>
