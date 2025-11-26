@@ -231,10 +231,11 @@
 
     beadSteps.forEach((b, idx) => {
       const div = document.createElement('div');
-      div.className = 'bead ' + (b.type === 'pn' ? 'pn' : 'am');
+      div.className = 'bead ' + (b.type === 'pn' ? 'pn pai-nosso-bead' : 'am');
       if(b.stepIndex <= lastFilledGlobal) div.classList.add('filled');
       div.title = `${b.type === 'pn' ? 'Pai-Nosso' : 'Ave-Maria'} — passo ${b.stepIndex + 1}`;
       div.onclick = () => jumpTo(b.stepIndex);
+      if(b.type === 'pn') div.innerText = 'P';
       beadsContainer.appendChild(div);
     });
 
