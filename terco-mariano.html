@@ -163,6 +163,8 @@
   function countAMUpTo(stepIndex){
     let c = 0;
     for(let i=0;i<=stepIndex;i++) if(SEQUENCE[i] === 'am') c++;
+    // O Terço Mariano tem 50 Ave-Marias. As 3 primeiras são para as virtudes.
+    // O Terço Mariano tem 53 Ave-Marias (3 iniciais + 50 das dezenas).
     return c;
   }
 
@@ -225,7 +227,7 @@
       prayerTitleEl.innerText = 'Ave-Maria';
       prayerTextEl.innerText = ORACOES.ave_maria;
       const amSoFar = countAMUpTo(state.stepIndex);
-      prayerMetaEl.innerText = `Ave-Maria ${amSoFar} de 50`;
+      prayerMetaEl.innerText = `Ave-Maria ${amSoFar} de 53`;
     } else if(step === 'gl'){
       prayerTitleEl.innerText = 'Glória ao Pai';
       prayerTextEl.innerText = ORACOES.gloria;
