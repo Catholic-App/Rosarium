@@ -20,15 +20,14 @@
   .bead{display:inline-flex;align-items:center;justify-content:center;user-select:none;cursor:pointer;background:#fbfbfb;color:var(--icon);box-shadow:0 1px 3px rgba(0,0,0,0.04)}
   .bead.am{width:34px;height:34px;border-radius:50%;font-weight:600}
   .bead.pn{width:44px;height:44px;border-radius:50%;font-weight:700}
+  .bead.credo{width:44px;height:44px;border-radius:50%;font-weight:700;font-size:1.2rem}
   .bead.filled{background:var(--primary);color:#fff;box-shadow:0 6px 14px rgba(67,96,198,0.18)}
-  .cross{width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;background:#fff;color:var(--icon);box-shadow:0 1px 3px rgba(0,0,0,0.04);cursor:pointer}
-  .cross.filled{background:var(--primary);color:#fff}
   .progress{height:8px;background:#eee;border-radius:999px;overflow:hidden;margin:8px 18px}
   .progress > div{height:100%;width:0;background:var(--primary);transition:width .25s}
   .controls{display:flex;gap:.6rem;justify-content:center;margin-top:10px;flex-wrap:wrap}
   .btn{padding:10px 14px;border-radius:10px;border:none;background:var(--primary);color:#fff;cursor:pointer;font-weight:700}
-  .btn-outline{background:transparent;border:1px solid #ddd;color:var(--text)}
-  @media (max-width:420px){ .bead.am{width:30px;height:30px} .bead.pn{width:38px;height:38px} .cross{width:38px;height:38px} }
+  .btn-outline{background:transparent;border:1px solid #ddd;color:var(--text);border-radius:10px}
+  @media (max-width:420px){ .bead.am{width:30px;height:30px} .bead.pn{width:38px;height:38px} .bead.credo{width:38px;height:38px} }
 </style>
 </head>
 <body>
@@ -51,7 +50,7 @@
 
     <section class="card">
       <div style="display:flex;justify-content:center;margin-bottom:10px">
-        <div id="credoCross" class="cross" title="Ir para o Credo">✝</div>
+        <div id="credoCross" class="bead credo" title="Ir para o Credo">✝</div>
       </div>
 
       <div id="beads" class="beads" aria-hidden="false"></div>
@@ -62,11 +61,11 @@
       <div class="controls">
         <button id="nextBtn" class="btn">+ Próxima</button>
         <button id="resetBtn" class="btn-outline">Resetar</button>
-        <a class="btn-outline" href="calendario-terco.html">Calendário</a>
       </div>
     </section>
   </main>
 
+<script src="app.js"></script>
 <script>
 /* Terço da Misericórdia — completo (5 grandes + 50 pequenas) */
 /* Oracoes */
@@ -81,13 +80,12 @@ const ORACOES = {
   o_sangue_e_agua:'Ó Sangue e Água, que brotastes do Coração de Jesus como fonte de misericórdia para nós, confio em Vós. Amém.'
 };
 
-/* Sequência: sinal, pn init, am x1, credo, (ajustado para o formato que você aprovou no Mariano) */
-/* Vou estruturar assim (global step array): sinal, pn_initial, am_initial, credo, depois 5*(grande + 10*pequena), final (santo_deus + o_sangue) */
+/* Sequência: sinal, pn init, am x1, credo, depois 5*(grande + 10*pequena), final (santo_deus + o_sangue) */
 const SEQ = (function(){
   const s = [];
   s.push('sinal');          // 0
   s.push('pn_init');        // 1
-  s.push('am_init');        // 2  (we'll consider this as group of 3 in UI below)
+  s.push('am_init');        // 2
   s.push('am_init');        // 3
   s.push('am_init');        // 4
   s.push('credo');          // 5
@@ -205,20 +203,51 @@ function countPequenasUpTo(globalIndex){
   return count;
 }
 
+function onTercoComplete(){
+  // registra no calendário usando a função global do app.js
+  try {
+    if (typeof registrarTercoRezados === 'function') {
+      registrarTercoRezados('misericordia');
+    } else if (window.Terco && window.Terco.record) {
+      window.Terco.record('misericordia');
+    } else {
+      console.warn('Nenhuma função de registro disponível.');
+    }
+  } catch (e) {
+    console.error('Erro ao registrar terço completo', e);
+  }
+}
+
 function next(){
-  if(state.stepIndex >= SEQ.length -1){ alert('Terço completo.'); return; }
+  if(state.stepIndex >= SEQ.length -1){
+    alert('Terço completo — Glória a Deus!');
+    
+    // registrar antes do reset
+    onTercoComplete();
+    
+    setTimeout(() => {
+      state = { stepIndex: 0 };
+      save();
+      render();
+    }, 750);
+    
+    return;
+  }
   state.stepIndex++;
   save();
   render();
 }
+
 function reset(){
   if(!confirm('Resetar Terço da Misericórdia?')) return;
   state = { stepIndex: 0 }; save(); render();
 }
+
 function jumpTo(global){
   if(global < 0 || global >= SEQ.length) return;
   state.stepIndex = global; save(); render();
 }
+
 document.addEventListener('DOMContentLoaded', ()=>{
   try{ const raw=localStorage.getItem(STORAGE); if(raw) state = JSON.parse(raw);}catch(e){console.warn(e)}
   render();
