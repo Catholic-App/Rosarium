@@ -333,21 +333,6 @@
   // move to next step (user pressed Next)
   function nextStep(){
     if(state.stepIndex >= SEQUENCE.length - 1){
-      // Marcar terço como completo no calendário
-      const today = new Date();
-      const dateStr = today.toISOString().split('T')[0];
-      const calendar = Terco.getTercoCalendar();
-      
-      if (!calendar[dateStr]) {
-        calendar[dateStr] = [];
-      }
-      
-      if (!calendar[dateStr].includes('mariano')) {
-        calendar[dateStr].push('mariano');
-        Storage.set('terco_calendar', calendar);
-        console.log('Terço Mariano registrado para:', dateStr);
-      }
-      
       alert('Terço completo — Glória a Deus!');
       
       // Resetar para próximo terço
