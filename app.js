@@ -612,3 +612,92 @@ window.App = window.App || {};
   App.TercoMisericordia = TercoMisericordia;
 
 })(window.App);
+/* ============================================
+   SISTEMA DE REGISTRO DO CALENDÁRIO DE TERÇOS
+   ============================================ */
+
+const CAL_KEY = "rosarium_calendario_tercos_v2";
+
+/*
+Formato salvo:
+
+{
+  "2025-02-14": {
+      quantidade: 3,
+      tipos: ["mariano","misericordia","mariano"]
+  },
+  "2025-02-15": {
+      quantidade: 1,
+      tipos: ["mariano"]
+  }
+}
+*/
+
+function loadCalendario() {
+  const raw = localStorage.getItem(CAL_KEY);
+  if (!raw) return {};
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return {};
+  }
+}
+
+function saveCalendario(data) {
+  localStorage.setItem(CAL_KEY, JSON.stringify(data));
+}
+
+/**
+ * Registrar um terço rezado
+ * tipo = 'mariano' | 'misericordia' | 'rosario'
+ */
+window.registrarTercoRezados = function (tipo) {
+  const hoje = new Date();
+  const dataStr = hoje.toISOString().split("T")[0]; // formato YYYY-MM-DD
+
+  const cal = loadCalendario();
+
+  if (!cal[dataStr]) {
+    cal[dataStr] = { quantidade: 0, tipos: [] };
+  }
+
+  cal[dataStr].quantidade++;
+  cal[dataStr].tipos.push(tipo);
+
+  saveCalendario(cal);
+};
+
+
+/* ============================================
+   FUNÇÕES PARA O ARQUIVO calendario-terco.html
+   ============================================ */
+
+window.Calendario = {
+  getDiasDoMes(ano, mes) {
+    const dias = [];
+    const ultimoDia = new Date(ano, mes + 1, 0).getDate();
+
+    for (let i = 1; i <= ultimoDia; i++) {
+      dias.push(i);
+    }
+    return dias;
+  },
+
+  getRegistrosDoMes(ano, mes) {
+    const cal = loadCalendario();
+    const dados = [];
+
+    for (const data in cal) {
+      const d = new Date(data);
+      if (d.getFullYear() === ano && d.getMonth() === mes) {
+        dados.push({
+          dia: d.getDate(),
+          quantidade: cal[data].quantidade,
+          tipos: cal[data].tipos
+        });
+      }
+    }
+
+    return dados;
+  }
+};
