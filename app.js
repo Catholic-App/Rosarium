@@ -1,454 +1,614 @@
-/* ============================================
-   ROSARIUM - APP.JS VERSÃO CORRIGIDA
-   Lógica completa do aplicativo
-   ============================================ */
+/* ============================================================
+   app.js - Rosarium (versão integrada)
+   Contém:
+    - Storage util
+    - PIN simples
+    - Anotações (localStorage)
+    - Confissão (localStorage)
+    - Lectio Divina (localStorage)
+    - Terços (estrutura + funções para vincular UI)
+    - Registro / Calendário de terços (localStorage)
+    - Santo do Dia loader (busca JSONs: oficiais + fallback)
+    - Liturgia do Dia (fetch API externa com fallback)
+   ============================================================ */
 
-// ============================================
-// ORAÇÕES OFICIAIS COMPLETAS (Fontes Católicas)
-// ============================================
+window.App = window.App || {};
 
-const ORACOES = {
-  sinal_da_cruz: "Em nome do Pai, do Filho e do Espírito Santo. Amém.",
-  
-  creio: "Creio em Deus Pai todo-poderoso, criador do céu e da terra; e em Jesus Cristo, seu único Filho, nosso Senhor, que foi concebido pelo poder do Espírito Santo, nasceu da Virgem Maria, padeceu sob Pôncio Pilatos, foi crucificado, morto e sepultado; desceu à mansão dos mortos; ressuscitou ao terceiro dia; subiu aos céus, e está sentado à direita de Deus Pai todo-poderoso, donde há de vir a julgar os vivos e os mortos. Creio no Espírito Santo, na santa Igreja Católica, na comunhão dos santos, na remissão dos pecados, na ressurreição da carne, na vida eterna. Amém.",
-  
-  pai_nosso: "Pai nosso, que estais nos céus, santificado seja o vosso nome, venha a nós o vosso reino, seja feita a vossa vontade, assim na terra como no céu. O pão nosso de cada dia nos dai hoje, perdoai-nos as nossas dívidas, assim como nós perdoamos aos nossos devedores, e não nos deixeis cair em tentação, mas livrai-nos do mal. Amém.",
-  
-  ave_maria: "Ave Maria, cheia de graça, o Senhor é convosco, bendita sois vós entre as mulheres, e bendito é o fruto do vosso ventre, Jesus. Santa Maria, Mãe de Deus, rogai por nós pecadores, agora e na hora da nossa morte. Amém.",
-  
-  gloria_ao_pai: "Glória seja ao Pai, e ao Filho, e ao Espírito Santo. Como era no princípio, agora e sempre, por todos os séculos dos séculos. Amém.",
-  
-  o_meu_jesus: "Ó meu Jesus, perdoai-nos, livrai-nos do fogo do inferno, levai as almas todas ao céu, especialmente as que mais precisarem da vossa misericórdia. Amém.",
-  
-  eterno_pai: "Eterno Pai, ofereço-vos o Corpo e o Sangue, a Alma e a Divindade de Nosso Senhor Jesus Cristo, em reparação dos nossos pecados e pelos do mundo inteiro.",
-  
-  pela_sua_dolorosa_paixao: "Pela sua dolorosa Paixão, tende misericórdia de nós e do mundo inteiro.",
-  
-  santo_deus: "Santo Deus, Santo Forte, Santo Imortal, tende misericórdia de nós e do mundo inteiro.",
-  
-  o_sangue_e_agua: "Ó Sangue e Água, que brotastes do Coração de Jesus como fonte de misericórdia para nós, confio em Vós. Amém."
-};
+(function (App) {
+  'use strict';
 
-// ============================================
-// FRASES DE SANTOS
-// ============================================
-
-const SAINT_QUOTES = [
-  { quote: "Não tenhas medo. A partir de agora serás pescador de homens.", saint: "Jesus Cristo (Lucas 5:10)" },
-  { quote: "Tudo posso naquele que me fortalece.", saint: "São Paulo (Filipenses 4:13)" },
-  { quote: "Reze, espere e não se preocupe.", saint: "São Padre Pio" },
-  { quote: "Deus não exige de nós que tenhamos sucesso, mas que sejamos fiéis.", saint: "Madre Teresa de Calcutá" },
-  { quote: "A oração é a chave da manhã e o ferrolho da noite.", saint: "Santo Agostinho" },
-  { quote: "Quem canta, ora duas vezes.", saint: "Santo Agostinho" },
-  { quote: "Deus escreve certo por linhas tortas.", saint: "Provérbio Popular" },
-  { quote: "Confia sempre na misericórdia de Deus.", saint: "Santa Faustina" },
-  { quote: "O Rosário é a arma mais poderosa.", saint: "São Padre Pio" },
-  { quote: "Não se turbe o vosso coração.", saint: "Jesus Cristo (João 14:1)" }
-];
-
-// ============================================
-// MISTÉRIOS DO ROSÁRIO
-// ============================================
-
-const MISTERIOS = {
-  gozosos: [
-    { numero: 1, nome: "Anunciação", descricao: "O Anjo Gabriel anuncia à Virgem Maria que será a Mãe de Deus.", virtude: "Humildade" },
-    { numero: 2, nome: "Visita a Isabel", descricao: "Maria visita sua prima Isabel e a saúda com alegria.", virtude: "Caridade" },
-    { numero: 3, nome: "Nascimento de Jesus", descricao: "Jesus nasce em Belém e é colocado numa manjedoura.", virtude: "Pobreza" },
-    { numero: 4, nome: "Apresentação no Templo", descricao: "Jesus é apresentado no Templo e reconhecido como Messias.", virtude: "Obediência" },
-    { numero: 5, nome: "Encontro no Templo", descricao: "Jesus é encontrado no Templo entre os doutores da Lei.", virtude: "Devoção" }
-  ],
-  dolorosos: [
-    { numero: 1, nome: "Agonia no Horto", descricao: "Jesus reza no Horto das Oliveiras e sua alma fica triste até à morte.", virtude: "Contrição" },
-    { numero: 2, nome: "Flagelação", descricao: "Jesus é flagelado e coberto de feridas por nossos pecados.", virtude: "Pureza" },
-    { numero: 3, nome: "Coroação de Espinhos", descricao: "Jesus é coroado de espinhos e zombado pelos soldados.", virtude: "Paciência" },
-    { numero: 4, nome: "Caminho do Calvário", descricao: "Jesus carrega a Cruz até o Calvário, caindo três vezes.", virtude: "Perseverança" },
-    { numero: 5, nome: "Crucifixão", descricao: "Jesus é crucificado no Calvário e morre pela salvação do mundo.", virtude: "Sacrifício" }
-  ],
-  gloriosos: [
-    { numero: 1, nome: "Ressurreição", descricao: "Jesus ressuscita glorioso no terceiro dia, vencendo a morte.", virtude: "Fé" },
-    { numero: 2, nome: "Ascensão", descricao: "Jesus sobe aos céus e senta-se à direita de Deus Pai.", virtude: "Esperança" },
-    { numero: 3, nome: "Pentecostes", descricao: "O Espírito Santo desce sobre os apóstolos em forma de línguas de fogo.", virtude: "Amor do Espírito Santo" },
-    { numero: 4, nome: "Assunção", descricao: "Maria é assunta aos céus em corpo e alma.", virtude: "Devoção a Maria" },
-    { numero: 5, nome: "Coroação de Maria", descricao: "Maria é coroada Rainha do Céu e da Terra.", virtude: "Confiança em Maria" }
-  ],
-  luminosos: [
-    { numero: 1, nome: "Batismo no Jordão", descricao: "Jesus é batizado por João Batista e o Espírito Santo desce sobre Ele.", virtude: "Abertura ao Espírito Santo" },
-    { numero: 2, nome: "Bodas de Caná", descricao: "Jesus realiza seu primeiro milagre, transformando água em vinho.", virtude: "Fé em Jesus" },
-    { numero: 3, nome: "Anúncio do Reino", descricao: "Jesus proclama a chegada do Reino de Deus e convida à conversão.", virtude: "Conversão" },
-    { numero: 4, nome: "Transfiguração", descricao: "Jesus é transfigurado no monte Tabor e sua divindade é revelada.", virtude: "Desejo de Deus" },
-    { numero: 5, nome: "Eucaristia", descricao: "Jesus institui a Eucaristia como memorial de sua Paixão e Morte.", virtude: "Adoração" }
-  ]
-};
-
-// ============================================
-// SANTOS DO MÊS
-// ============================================
-
-const SANTOS = [
-  { dia: 1, nome: "Santo André", oração: "Santo André, apóstolo de Jesus, roga por nós.", biografia: "Santo André foi um dos primeiros apóstolos de Jesus. Irmão de São Pedro, foi pescador no mar da Galileia." },
-  { dia: 2, nome: "Santa Cecília", oração: "Santa Cecília, padroeira dos músicos, roga por nós.", biografia: "Santa Cecília é a padroeira dos músicos e da música, venerada desde os primeiros séculos do cristianismo." },
-  { dia: 3, nome: "São Francisco Xavier", oração: "São Francisco Xavier, apóstolo das Índias, roga por nós.", biografia: "São Francisco Xavier foi um missionário jesuíta que levou a fé cristã para a Ásia." },
-  { dia: 4, nome: "Santa Bárbara", oração: "Santa Bárbara, protetora contra raios, roga por nós.", biografia: "Santa Bárbara é uma mártir cristã venerada desde os primeiros séculos." },
-  { dia: 5, nome: "Santo Estêvão", oração: "Santo Estêvão, primeiro mártir, roga por nós.", biografia: "Santo Estêvão foi o primeiro mártir cristão (protomártir)." },
-  { dia: 6, nome: "São Nicolau", oração: "São Nicolau, protetor das crianças, roga por nós.", biografia: "São Nicolau foi um bispo cristão conhecido por sua generosidade e amor pelas crianças." },
-  { dia: 7, nome: "Santo Amaro", oração: "Santo Amaro, protetor dos navegantes, roga por nós.", biografia: "Santo Amaro é um santo português venerado como protetor dos navegantes." },
-  { dia: 8, nome: "Imaculada Conceição", oração: "Virgem Imaculada, Mãe de Deus, roga por nós.", biografia: "A Imaculada Conceição refere-se à concepção de Maria sem a mancha do pecado original." },
-  { dia: 9, nome: "Santa Joana d'Arc", oração: "Santa Joana, padroeira da França, roga por nós.", biografia: "Santa Joana d'Arc foi uma heroína francesa que liderou as forças militares francesas." },
-  { dia: 10, nome: "Nossa Senhora de Loreto", oração: "Nossa Senhora de Loreto, protetora dos viajantes, roga por nós.", biografia: "Nossa Senhora de Loreto é venerada como protetora dos viajantes e aviadores." },
-  { dia: 11, nome: "São Martinho", oração: "São Martinho, padroeiro dos pobres, roga por nós.", biografia: "São Martinho foi um soldado romano que se converteu ao cristianismo." },
-  { dia: 12, nome: "Nossa Senhora de Guadalupe", oração: "Nossa Senhora de Guadalupe, mãe da América, roga por nós.", biografia: "Nossa Senhora de Guadalupe é uma aparição de Maria venerada principalmente no México." }
-];
-
-// ============================================
-// LIVROS DA BÍBLIA
-// ============================================
-
-const BIBLIA_LIVROS = [
-  { nome: "Gênesis", abreviacao: "Gn", capitulos: 50 },
-  { nome: "Êxodo", abreviacao: "Ex", capitulos: 40 },
-  { nome: "Levítico", abreviacao: "Lv", capitulos: 27 },
-  { nome: "Números", abreviacao: "Nm", capitulos: 36 },
-  { nome: "Deuteronômio", abreviacao: "Dt", capitulos: 34 },
-  { nome: "Josué", abreviacao: "Js", capitulos: 24 },
-  { nome: "Juízes", abreviacao: "Jz", capitulos: 21 },
-  { nome: "Rute", abreviacao: "Rt", capitulos: 4 },
-  { nome: "1 Samuel", abreviacao: "1Sm", capitulos: 31 },
-  { nome: "2 Samuel", abreviacao: "2Sm", capitulos: 24 },
-  { nome: "1 Reis", abreviacao: "1Rs", capitulos: 22 },
-  { nome: "2 Reis", abreviacao: "2Rs", capitulos: 25 },
-  { nome: "1 Crônicas", abreviacao: "1Cr", capitulos: 29 },
-  { nome: "2 Crônicas", abreviacao: "2Cr", capitulos: 36 },
-  { nome: "Esdras", abreviacao: "Esd", capitulos: 10 },
-  { nome: "Neemias", abreviacao: "Ne", capitulos: 13 },
-  { nome: "Tobias", abreviacao: "Tb", capitulos: 14 },
-  { nome: "Judite", abreviacao: "Jdt", capitulos: 16 },
-  { nome: "Ester", abreviacao: "Est", capitulos: 10 },
-  { nome: "1 Macabeus", abreviacao: "1Mc", capitulos: 16 },
-  { nome: "2 Macabeus", abreviacao: "2Mc", capitulos: 15 },
-  { nome: "Jó", abreviacao: "Jó", capitulos: 42 },
-  { nome: "Salmos", abreviacao: "Sl", capitulos: 150 },
-  { nome: "Provérbios", abreviacao: "Pr", capitulos: 31 },
-  { nome: "Eclesiastes", abreviacao: "Ec", capitulos: 12 },
-  { nome: "Cântico dos Cânticos", abreviacao: "Ct", capitulos: 8 },
-  { nome: "Sabedoria", abreviacao: "Sb", capitulos: 19 },
-  { nome: "Eclesiástico", abreviacao: "Eclo", capitulos: 51 },
-  { nome: "Isaías", abreviacao: "Is", capitulos: 66 },
-  { nome: "Jeremias", abreviacao: "Jr", capitulos: 52 },
-  { nome: "Lamentações", abreviacao: "Lm", capitulos: 5 },
-  { nome: "Baruc", abreviacao: "Br", capitulos: 6 },
-  { nome: "Ezequiel", abreviacao: "Ez", capitulos: 48 },
-  { nome: "Daniel", abreviacao: "Dn", capitulos: 14 },
-  { nome: "Oséias", abreviacao: "Os", capitulos: 14 },
-  { nome: "Joel", abreviacao: "Jl", capitulos: 3 },
-  { nome: "Amós", abreviacao: "Am", capitulos: 9 },
-  { nome: "Abdias", abreviacao: "Abd", capitulos: 1 },
-  { nome: "Jonas", abreviacao: "Jn", capitulos: 4 },
-  { nome: "Miquéias", abreviacao: "Mq", capitulos: 7 },
-  { nome: "Naum", abreviacao: "Na", capitulos: 3 },
-  { nome: "Habacuc", abreviacao: "Hab", capitulos: 3 },
-  { nome: "Sofonias", abreviacao: "Sf", capitulos: 3 },
-  { nome: "Ageu", abreviacao: "Ag", capitulos: 2 },
-  { nome: "Zacarias", abreviacao: "Zc", capitulos: 14 },
-  { nome: "Malaquias", abreviacao: "Ml", capitulos: 4 },
-  { nome: "Mateus", abreviacao: "Mt", capitulos: 28 },
-  { nome: "Marcos", abreviacao: "Mc", capitulos: 16 },
-  { nome: "Lucas", abreviacao: "Lc", capitulos: 24 },
-  { nome: "João", abreviacao: "Jo", capitulos: 21 },
-  { nome: "Atos dos Apóstolos", abreviacao: "At", capitulos: 28 },
-  { nome: "Romanos", abreviacao: "Rm", capitulos: 16 },
-  { nome: "1 Coríntios", abreviacao: "1Cor", capitulos: 16 },
-  { nome: "2 Coríntios", abreviacao: "2Cor", capitulos: 13 },
-  { nome: "Gálatas", abreviacao: "Gl", capitulos: 6 },
-  { nome: "Efésios", abreviacao: "Ef", capitulos: 6 },
-  { nome: "Filipenses", abreviacao: "Fl", capitulos: 4 },
-  { nome: "Colossenses", abreviacao: "Cl", capitulos: 4 },
-  { nome: "1 Tessalonicenses", abreviacao: "1Ts", capitulos: 5 },
-  { nome: "2 Tessalonicenses", abreviacao: "2Ts", capitulos: 3 },
-  { nome: "1 Timóteo", abreviacao: "1Tm", capitulos: 6 },
-  { nome: "2 Timóteo", abreviacao: "2Tm", capitulos: 4 },
-  { nome: "Tito", abreviacao: "Tt", capitulos: 3 },
-  { nome: "Filemom", abreviacao: "Fm", capitulos: 1 },
-  { nome: "Hebreus", abreviacao: "Hb", capitulos: 13 },
-  { nome: "Tiago", abreviacao: "Tg", capitulos: 5 },
-  { nome: "1 Pedro", abreviacao: "1Pd", capitulos: 5 },
-  { nome: "2 Pedro", abreviacao: "2Pd", capitulos: 3 },
-  { nome: "1 João", abreviacao: "1Jo", capitulos: 5 },
-  { nome: "2 João", abreviacao: "2Jo", capitulos: 1 },
-  { nome: "3 João", abreviacao: "3Jo", capitulos: 1 },
-  { nome: "Judas", abreviacao: "Jd", capitulos: 1 },
-  { nome: "Apocalipse", abreviacao: "Ap", capitulos: 22 }
-];
-
-// ============================================
-// FUNÇÕES UTILITÁRIAS
-// ============================================
-
-function getRandomQuote() {
-  return SAINT_QUOTES[Math.floor(Math.random() * SAINT_QUOTES.length)];
-}
-
-function goBack() {
-  window.history.back();
-}
-
-function navigateTo(page) {
-  window.location.href = page;
-}
-
-function formatDate(date) {
-  return date.toLocaleDateString('pt-BR', { year: 'numeric', month: 'long', day: 'numeric' });
-}
-
-function getTodayDate() {
-  return new Date().toISOString().split('T')[0];
-}
-
-function getMisteriosDoDia() {
-  const dia = new Date().getDay();
-  switch(dia) {
-    case 0: case 3: return MISTERIOS.gloriosos;
-    case 1: case 6: return MISTERIOS.gozosos;
-    case 2: case 5: return MISTERIOS.dolorosos;
-    case 4: return MISTERIOS.luminosos;
-    default: return MISTERIOS.gloriosos;
-  }
-}
-
-function getNomeMisterios() {
-  const dia = new Date().getDay();
-  switch(dia) {
-    case 0: case 3: return "Mistérios Gloriosos";
-    case 1: case 6: return "Mistérios Gozosos";
-    case 2: case 5: return "Mistérios Dolorosos";
-    case 4: return "Mistérios Luminosos";
-    default: return "Mistérios Gloriosos";
-  }
-}
-
-function getSantoDoDia() {
-  const dia = new Date().getDate();
-  return SANTOS.find(s => s.dia === dia) || SANTOS[0];
-}
-
-// ============================================
-// LOCALSTORAGE
-// ============================================
-
-const Storage = {
-  set: (key, value) => {
-    try {
-      localStorage.setItem(key, JSON.stringify(value));
-      return true;
-    } catch (e) {
-      console.error('Erro ao salvar:', e);
-      return false;
-    }
-  },
-
-  get: (key, defaultValue = null) => {
-    try {
-      const item = localStorage.getItem(key);
-      return item ? JSON.parse(item) : defaultValue;
-    } catch (e) {
-      console.error('Erro ao ler:', e);
-      return defaultValue;
-    }
-  },
-
-  remove: (key) => {
-    try {
-      localStorage.removeItem(key);
-      return true;
-    } catch (e) {
-      console.error('Erro ao remover:', e);
-      return false;
-    }
-  }
-};
-
-// ============================================
-// PIN
-// ============================================
-
-const PIN = {
-  defaultPin: '1234',
-
-  getPin: () => Storage.get('app_pin', PIN.defaultPin),
-
-  setPin: (pin) => Storage.set('app_pin', pin),
-
-  verify: (pin) => pin === PIN.getPin(),
-
-  changePin: (oldPin, newPin) => {
-    if (PIN.verify(oldPin)) {
-      PIN.setPin(newPin);
-      return true;
-    }
-    return false;
-  },
-
-  resetPin: () => PIN.setPin(PIN.defaultPin)
-};
-
-// ============================================
-// TERÇO
-// ============================================
-
-const Terco = {
-  getTercoProgress: (type) => {
-    return Storage.get(`terco_${type}`, { count: 0, date: null, completed: false });
-  },
-
-  saveTercoProgress: (type, progress) => {
-    Storage.set(`terco_${type}`, progress);
-  },
-
-  incrementTerco: (type) => {
-    const progress = Terco.getTercoProgress(type);
-    const maxCount = type === 'mariano' ? 53 : 50;
-    
-    if (progress.count < maxCount) {
-      progress.count++;
-      progress.date = new Date().toISOString();
-      
-      if (progress.count === maxCount) {
-        progress.completed = true;
-        Terco.markTercoDay(type);
+  /* ============================
+     STORAGE UTIL
+  ============================ */
+  const Storage = {
+    set(key, val) {
+      try {
+        localStorage.setItem(key, JSON.stringify(val));
+      } catch (e) {
+        console.error('Storage.set error', e);
       }
-      
-      Terco.saveTercoProgress(type, progress);
+    },
+    get(key, def = null) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : def;
+      } catch (e) {
+        console.error('Storage.get error', e);
+        return def;
+      }
+    },
+    remove(key) {
+      try {
+        localStorage.removeItem(key);
+      } catch (e) {
+        console.error('Storage.remove error', e);
+      }
     }
-    return progress;
-  },
+  };
 
-  resetTerco: (type) => {
-    Terco.saveTercoProgress(type, { count: 0, date: null, completed: false });
-  },
+  /* ============================
+     PIN (simples)
+  ============================ */
+  const PIN = {
+    key: 'rosarium_pin',
+    defaultPin: '1234',
+    getPin() {
+      return Storage.get(this.key, this.defaultPin) || this.defaultPin;
+    },
+    setPin(pin) {
+      Storage.set(this.key, String(pin).slice(0, 4));
+    },
+    verify(pin) {
+      return String(pin) === this.getPin();
+    }
+  };
 
-  markTercoDay: (type) => {
-    const today = getTodayDate();
-    const calendar = Storage.get('terco_calendar', {});
-    
-    if (!calendar[today]) calendar[today] = [];
-    if (!calendar[today].includes(type)) calendar[today].push(type);
-    
-    Storage.set('terco_calendar', calendar);
-  },
+  App.PIN = PIN;
 
-  getTercoCalendar: () => Storage.get('terco_calendar', {}),
-
-  isTercoDayMarked: (type, date) => {
-    const calendar = Terco.getTercoCalendar();
-    return calendar[date] && calendar[date].includes(type);
-  }
-};
-
-// ============================================
-// ANOTAÇÕES
-// ============================================
-
-const Anotacoes = {
-  getAnotacoes: () => {
-    const data = Storage.get('anotacoes_data', []);
-    return Array.isArray(data) ? data : [];
-  },
-
-  saveAnotacoes: (anotacoes) => {
-    Storage.set('anotacoes_data', anotacoes);
-  },
-
-  addAnotacao: (titulo, conteudo) => {
-    const anotacoes = Anotacoes.getAnotacoes();
-    anotacoes.push({
-      id: Date.now(),
-      titulo: titulo || 'Sem título',
-      conteudo: conteudo || '',
-      data: new Date().toISOString()
-    });
-    Anotacoes.saveAnotacoes(anotacoes);
-    return anotacoes[anotacoes.length - 1];
-  },
-
-  deleteAnotacao: (id) => {
-    let anotacoes = Anotacoes.getAnotacoes();
-    anotacoes = anotacoes.filter(a => a.id !== id);
-    Anotacoes.saveAnotacoes(anotacoes);
-  },
-
-  updateAnotacao: (id, titulo, conteudo) => {
-    const anotacoes = Anotacoes.getAnotacoes();
-    const anotacao = anotacoes.find(a => a.id === id);
-    
-    if (anotacao) {
-      anotacao.titulo = titulo || 'Sem título';
-      anotacao.conteudo = conteudo || '';
-      Anotacoes.saveAnotacoes(anotacoes);
+  /* ============================
+     ANOTAÇÕES
+  ============================ */
+  const Anotacoes = {
+    key: 'rosarium_anotacoes',
+    getAll() {
+      return Storage.get(this.key, []);
+    },
+    saveAll(arr) {
+      Storage.set(this.key, arr || []);
+    },
+    add(titulo, conteudo) {
+      const arr = this.getAll();
+      const item = {
+        id: Date.now(),
+        titulo: titulo || 'Sem título',
+        conteudo: conteudo || '',
+        data: new Date().toISOString()
+      };
+      arr.push(item);
+      this.saveAll(arr);
+      return item;
+    },
+    update(id, titulo, conteudo) {
+      const arr = this.getAll();
+      const i = arr.findIndex(x => x.id === id);
+      if (i === -1) return false;
+      arr[i].titulo = titulo || arr[i].titulo;
+      arr[i].conteudo = conteudo || arr[i].conteudo;
+      arr[i].data = new Date().toISOString();
+      this.saveAll(arr);
       return true;
+    },
+    delete(id) {
+      let arr = this.getAll();
+      arr = arr.filter(x => x.id !== id);
+      this.saveAll(arr);
     }
-    return false;
+  };
+
+  App.Anotacoes = Anotacoes;
+
+  /* ============================
+     CONFISSÃO
+  ============================ */
+  const Confissao = {
+    key: 'rosarium_confissoes',
+    getAll() {
+      return Storage.get(this.key, []);
+    },
+    save(item) {
+      const arr = this.getAll();
+      arr.push(Object.assign({ id: Date.now(), data_registro: new Date().toISOString() }, item));
+      Storage.set(this.key, arr);
+    },
+    clearAll() {
+      Storage.remove(this.key);
+    }
+  };
+
+  App.Confissao = Confissao;
+
+  /* ============================
+     LECTIO DIVINA
+  ============================ */
+  const LectioDivina = {
+    key: 'rosarium_lectio',
+    get() {
+      return Storage.get(this.key, { leitura: '', meditacao: '', oracao: '', contemplacao: '' });
+    },
+    save(obj) {
+      Storage.set(this.key, obj);
+    }
+  };
+
+  App.LectioDivina = LectioDivina;
+
+  /* ============================
+     TERÇOS (infra)
+     - fornece helpers para qualquer terço
+     - cada terço pode criar sua própria SEQ e renderização
+  ============================ */
+  const Terco = {
+    // salvar estado de um terço (por id chave)
+    saveState(key, stateObj) {
+      Storage.set('terco_state_' + key, stateObj);
+    },
+    loadState(key, def = { stepIndex: 0 }) {
+      return Storage.get('terco_state_' + key, def);
+    },
+
+    // Gera beads array a partir de uma SEQ (array de strings) - decide quais passos têm bead
+    buildBeadsFromSEQ(SEQ) {
+      const arr = [];
+      for (let i = 0; i < SEQ.length; i++) {
+        const t = SEQ[i];
+        // quais tipos viram beads? pn_init, am_init, credo_init, grande, pequena
+        if (['pn_init', 'am_init', 'credo_init', 'grande', 'pequena'].includes(t)) {
+          arr.push({ step: i, type: t });
+        }
+      }
+      return arr;
+    },
+
+    // calcula percent
+    pctForStep(stepIndex, seqLen) {
+      return Math.round(((stepIndex + 1) / seqLen) * 100);
+    },
+
+    // função padrão para registrar terço completo (usa Calendar module)
+    onTercoComplete(tipo) {
+      try {
+        registrarTercoRezados(tipo); // função global definida abaixo
+      } catch (e) {
+        console.warn('registrarTercoRezados não disponível', e);
+      }
+    }
+  };
+
+  App.Terco = Terco;
+
+  /* ============================
+     CALENDÁRIO / REGISTRO DE TERÇOS (LOCAL)
+     Schema (localStorage key 'rosarium_calendar'):
+     {
+       "YYYY-MM-DD": [
+         { tipo: "misericordia"|"mariano"|..., count:1, hora: "ISO", meta: {...} }
+       ],
+       ...
+     }
+  ============================ */
+  const Calendar = {
+    key: 'rosarium_calendar',
+
+    _load() {
+      return Storage.get(this.key, {});
+    },
+    _save(obj) {
+      Storage.set(this.key, obj);
+    },
+
+    registrar(tipo, meta = {}) {
+      const data = new Date();
+      const dayKey = data.toISOString().slice(0, 10); // YYYY-MM-DD
+      const store = this._load();
+      store[dayKey] = store[dayKey] || [];
+      store[dayKey].push({
+        tipo: tipo || 'terco',
+        hora: data.toISOString(),
+        meta
+      });
+      this._save(store);
+      return true;
+    },
+
+    // retorna vetor de registros entre datas (inclusive). Params as ISO 'YYYY-MM-DD' or Date
+    queryRange(from, to) {
+      const store = this._load();
+      const fromISO = (from instanceof Date) ? from.toISOString().slice(0, 10) : from;
+      const toISO = (to instanceof Date) ? to.toISOString().slice(0, 10) : to;
+      const out = [];
+      for (const k of Object.keys(store)) {
+        if (k >= fromISO && k <= toISO) {
+          out.push({ dia: k, entries: store[k] });
+        }
+      }
+      out.sort((a, b) => a.dia.localeCompare(b.dia));
+      return out;
+    },
+
+    // retorna registros de um mês (year, monthNumber 1-12)
+    getMonth(year, month) {
+      const store = this._load();
+      const mm = String(month).padStart(2, '0');
+      const prefix = year + '-' + mm + '-';
+      const out = [];
+      for (const k of Object.keys(store)) {
+        if (k.startsWith(prefix)) out.push({ dia: k, entries: store[k] });
+      }
+      out.sort((a, b) => a.dia.localeCompare(b.dia));
+      return out;
+    },
+
+    clearAll() {
+      Storage.remove(this.key);
+    }
+  };
+
+  App.Calendar = Calendar;
+
+  // função global usada por terços
+  function registrarTercoRezados(tipo = 'terco', meta = {}) {
+    return Calendar.registrar(tipo, meta);
   }
-};
+  App.registrarTercoRezados = registrarTercoRezados;
+  window.registrarTercoRezados = registrarTercoRezados;
 
-// ============================================
-// CONFISSÃO
-// ============================================
+  /* ============================
+     TERÇO MARIANO (exemplo de implementação)
+     - SEQ definida conforme rosário tradicional:
+       sinal, credo (or other initial sequence depends on your config),
+       then 5*(grande + 10*pequena + gloria)
+  ============================ */
+  const TercoMariano = (function () {
+    const ORACOES = {
+      sinal: 'Em nome do Pai, do Filho e do Espírito Santo. Amém.',
+      credo: 'Creio em Deus Pai todo-poderoso, criador do céu e da terra; e em Jesus Cristo, seu único Filho, nosso Senhor... Amém.',
+      pn: 'Pai nosso, que estais nos céus, santificado seja o vosso nome; venha a nós o vosso reino... Amém.',
+      am: 'Ave Maria, cheia de graça, o Senhor é convosco... Amém.',
+      gloria: 'Glória ao Pai, ao Filho e ao Espírito Santo. Amém.'
+    };
 
-const Confissao = {
-  getConfissoes: () => {
-    const data = Storage.get('confissao_data', []);
-    return Array.isArray(data) ? data : [];
-  },
+    const SEQ = (function () {
+      const s = [];
+      s.push('sinal');
+      s.push('credo');
+      s.push('pn_init'); // pai-nosso inicial
+      s.push('am_init'); // ave inicial 1
+      s.push('am_init'); // ave inicial 2
+      s.push('am_init'); // ave inicial 3
+      s.push('gloria_init'); // glória inicial (opcional)
 
-  saveConfissao: (confissao) => {
-    const confissoes = Confissao.getConfissoes();
-    confissoes.push({
-      id: Date.now(),
-      data: new Date().toISOString(),
-      ...confissao
+      for (let d = 0; d < 5; d++) {
+        s.push('grande'); // conta grande - Eterno Pai (or Fn)
+        for (let i = 0; i < 10; i++) s.push('pequena');
+        s.push('gloria');
+      }
+      return s;
+    })();
+
+    const key = 'terco_mariano';
+
+    function loadState() {
+      return Terco.loadState(key, { stepIndex: 0 });
+    }
+    function saveState(s) {
+      Terco.saveState(key, s);
+    }
+
+    function getCurrentStep(state) {
+      return SEQ[state.stepIndex];
+    }
+
+    return {
+      key,
+      SEQ,
+      ORACOES,
+      loadState,
+      saveState,
+      getCurrentStep,
+      advance(state) {
+        if (state.stepIndex >= SEQ.length - 1) {
+          Terco.onTercoComplete('mariano');
+          state.stepIndex = 0;
+          saveState(state);
+          return state;
+        }
+        state.stepIndex++;
+        saveState(state);
+        return state;
+      },
+      reset(state) {
+        state.stepIndex = 0;
+        saveState(state);
+        return state;
+      }
+    };
+  })();
+
+  App.TercoMariano = TercoMariano;
+
+  /* ============================
+     TERÇO DA MISERICÓRDIA (exemplo)
+     SEQ conforme acordado: sinal, pn_init, am_init, credo_init, 5*(grande + 10*pequena + gloria), santo_deus, o_sangue
+  ============================ */
+  const TercoMisericordia = (function () {
+    const ORACOES = {
+      sinal: 'Em nome do Pai, do Filho e do Espírito Santo. Amém.',
+      pai_nosso: 'Pai nosso, que estais nos céus, santificado seja o vosso nome; venha a nós o vosso reino... Amém.',
+      ave: 'Ave Maria, cheia de graça, o Senhor é convosco... Amém.',
+      credo: 'Creio em Deus Pai todo-poderoso, criador do céu e da terra; e em Jesus Cristo, seu único Filho, nosso Senhor... Amém.',
+      eterno_pai: 'Eterno Pai, ofereço-vos o Corpo e o Sangue, a Alma e a Divindade de Nosso Senhor Jesus Cristo, em expiação pelos nossos pecados e pelos do mundo inteiro.',
+      pela_paixao: 'Pela sua dolorosa Paixão, tende misericórdia de nós e do mundo inteiro.',
+      gloria: 'Glória ao Pai. Amém.',
+      santo_deus: 'Santo Deus, Santo Forte, Santo Imortal, tende misericórdia de nós e do mundo inteiro.',
+      o_sangue_e_agua: 'Ó Sangue e Água, que brotastes do Coração de Jesus como fonte de misericórdia para nós, confio em Vós. Amém.'
+    };
+
+    const SEQ = (function () {
+      const s = [];
+      s.push('sinal');       // 0
+      s.push('pn_init');     // 1
+      s.push('am_init');     // 2
+      s.push('credo_init');  // 3 (bolinha com cruz - grande)
+      for (let d = 0; d < 5; d++) {
+        s.push('grande'); // Eterno Pai
+        for (let i = 0; i < 10; i++) s.push('pequena');
+        s.push('gloria');
+      }
+      s.push('santo_deus');
+      s.push('o_sangue');
+      return s;
+    })();
+
+    const key = 'terco_misericordia';
+
+    function loadState() { return Terco.loadState(key, { stepIndex: 0 }); }
+    function saveState(s) { Terco.saveState(key, s); }
+
+    return {
+      key,
+      SEQ,
+      ORACOES,
+      loadState,
+      saveState,
+      advance(state) {
+        if (state.stepIndex >= SEQ.length - 1) {
+          Terco.onTercoComplete('misericordia');
+          state.stepIndex = 0;
+          saveState(state);
+          return state;
+        }
+        state.stepIndex++;
+        saveState(state);
+        return state;
+      },
+      reset(state) {
+        state.stepIndex = 0;
+        saveState(state);
+        return state;
+      }
+    };
+  })();
+
+  App.TercoMisericordia = TercoMisericordia;
+
+  /* ============================
+     SANTO DO DIA LOADER
+     - carrega data/santos_oficiais.json e data/santos_fallback.json
+     - expõe App.SantoDoDia API (async)
+  ============================ */
+  (function SantoDoDiaLoader() {
+    const PATH_OFICIAIS = '/data/santos_oficiais.json';
+    const PATH_EXTRA = '/data/santos_fallback.json';
+    let memory = { oficiais: {}, extra: {}, indexOficiais: {}, indexExtra: {} };
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+    function keyForDate(d) {
+      const dt = d ? new Date(d) : new Date();
+      return pad(dt.getMonth() + 1) + '-' + pad(dt.getDate());
+    }
+
+    async function fetchJson(url) {
+      try {
+        const r = await fetch(url, { cache: 'no-cache' });
+        if (!r.ok) throw new Error('fetch failed ' + url);
+        return await r.json();
+      } catch (e) {
+        console.warn('fetchJson failed', url, e);
+        return null;
+      }
+    }
+
+    function buildIndex(obj) {
+      const out = {};
+      if (!obj) return out;
+      for (const k of Object.keys(obj)) {
+        const v = obj[k];
+        // normalize: if array, copy; if single, wrap
+        if (Array.isArray(v)) out[k] = v.map(x => Object.assign({}, x, { _key: k }));
+        else out[k] = [Object.assign({}, v, { _key: k })];
+      }
+      return out;
+    }
+
+    async function ensureLoaded() {
+      if (ensureLoaded._promise) return ensureLoaded._promise;
+      ensureLoaded._promise = Promise.allSettled([fetchJson(PATH_OFICIAIS), fetchJson(PATH_EXTRA)])
+        .then(results => {
+          const [r1, r2] = results;
+          memory.oficiais = (r1.status === 'fulfilled' && r1.value) ? r1.value : {};
+          memory.extra = (r2.status === 'fulfilled' && r2.value) ? r2.value : {};
+          memory.indexOficiais = buildIndex(memory.oficiais);
+          memory.indexExtra = buildIndex(memory.extra);
+          return memory;
+        });
+      return ensureLoaded._promise;
+    }
+
+    function generateGeneric(key) {
+      return {
+        nome: 'Santo(a) não listado(a)',
+        bio: 'Hoje não há um santo específico cadastrado neste aplicativo para a data selecionada.',
+        oracao: 'Senhor, que a intercessão dos santos nos acompanhe sempre. Amém.',
+        img: '/img/santos/placeholder.jpg',
+        _key: key,
+        _generated: true
+      };
+    }
+
+    App.SantoDoDia = {
+      // retorna array (pode ser vazio)
+      async getSantosByDate(dateArg) {
+        await ensureLoaded();
+        const key = keyForDate(dateArg);
+
+        const oficiais = memory.indexOficiais[key] || [];
+        const extras = memory.indexExtra[key] || [];
+
+        if (oficiais.length === 0 && extras.length === 0) {
+          return [generateGeneric(key)];
+        }
+        if (oficiais.length > 0) return oficiais.concat(extras);
+        return extras;
+      },
+
+      async getSantoDoDia(dateArg) {
+        const arr = await this.getSantosByDate(dateArg);
+        return arr.length ? arr[0] : generateGeneric(keyForDate(dateArg));
+      },
+
+      async getSantosDoMes(yearArg, monthArg) {
+        await ensureLoaded();
+        const today = new Date();
+        const year = (typeof yearArg === 'number') ? yearArg : today.getFullYear();
+        const month = (typeof monthArg === 'number') ? monthArg : today.getMonth(); // 0-based
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const out = [];
+        for (let d = 1; d <= daysInMonth; d++) {
+          const k = pad(month + 1) + '-' + pad(d);
+          const oficiais = memory.indexOficiais[k] || [];
+          const extras = memory.indexExtra[k] || [];
+          if (oficiais.length === 0 && extras.length === 0) out.push({ dia: d, entries: [generateGeneric(k)] });
+          else if (oficiais.length > 0) out.push({ dia: d, entries: oficiais.concat(extras) });
+          else out.push({ dia: d, entries: extras });
+        }
+        return out;
+      },
+
+      // adiciona santo extra persistente (localStorage)
+      async setSanto(keyOrDate, data) {
+        await ensureLoaded();
+        let key = keyOrDate;
+        if (keyOrDate instanceof Date) key = pad(keyOrDate.getMonth() + 1) + '-' + pad(keyOrDate.getDate());
+        if (!/^\d\d-\d\d$/.test(key)) throw new Error('Chave inválida');
+        memory.indexExtra[key] = memory.indexExtra[key] || [];
+        memory.indexExtra[key].push(Object.assign({}, data, { _key: key }));
+        // persistir extras customizados
+        try {
+          const flat = {};
+          for (const k of Object.keys(memory.indexExtra)) {
+            flat[k] = memory.indexExtra[k].map(x => {
+              const c = Object.assign({}, x); delete c._key; return c;
+            });
+          }
+          localStorage.setItem('app_santos_custom', JSON.stringify(flat));
+        } catch (e) {
+          console.warn('não foi possível salvar santos customizados', e);
+        }
+      },
+
+      // carregar custom caso exista (chamado ao init)
+      _loadCustom() {
+        try {
+          const raw = localStorage.getItem('app_santos_custom');
+          if (!raw) return;
+          const parsed = JSON.parse(raw);
+          for (const k of Object.keys(parsed)) {
+            memory.indexExtra[k] = memory.indexExtra[k] || [];
+            const arr = parsed[k].map(item => Object.assign({}, item, { _key: k }));
+            memory.indexExtra[k] = memory.indexExtra[k].concat(arr);
+          }
+        } catch (e) { /* ignore */ }
+      }
+    };
+
+    // auto load
+    ensureLoaded().then(() => {
+      App.SantoDoDia._loadCustom();
+    }).catch(e => {
+      console.warn('SantoDoDia load error', e);
+      App.SantoDoDia._loadCustom();
     });
-    Storage.set('confissao_data', confissoes);
+
+  })();
+
+  /* ============================
+     LITURGIA DO DIA (exemplo de fetch)
+     - função util que pode ser chamada pelas páginas
+  ============================ */
+  async function getLiturgia(dia, mes, ano) {
+    try {
+      const url = `https://liturgia.acolitos.com.br/api/liturgia?dia=${dia}&mes=${mes}&ano=${ano}`;
+      const r = await fetch(url);
+      if (!r.ok) throw new Error('Liturgia API não disponível');
+      const data = await r.json();
+      return {
+        titulo: data.titulo || 'Liturgia do Dia',
+        leituras: data.leituras || [],
+        evangelho: data.evangelho || ''
+      };
+    } catch (e) {
+      console.warn('getLiturgia error', e);
+      return { titulo: 'Liturgia do Dia', leituras: [], evangelho: '' };
+    }
   }
-};
 
-// ============================================
-// LECTIO DIVINA
-// ============================================
+  App.getLiturgia = getLiturgia;
 
-const LectioDivina = {
-  getLectio: () => Storage.get('lectio_data', { leitura: '', meditacao: '', oracao: '', contemplacao: '' }),
-
-  saveLectio: (lectio) => Storage.set('lectio_data', lectio)
-};
-
-// ============================================
-// APIS
-// ============================================
-
-async function getLiturgia(day, month, year) {
-  try {
-    const response = await fetch(`https://liturgia.acolitos.com.br/api/liturgia?dia=${day}&mes=${month}&ano=${year}`);
-    if (!response.ok) throw new Error('API error');
-    const data = await response.json();
-    return {
-      titulo: data.titulo || 'Liturgia do Dia',
-      leituras: data.leituras || 'Não disponível',
-      evangelho: data.evangelho || ''
-    };
-  } catch (error) {
-    console.error('Erro ao carregar liturgia:', error);
-    return {
-      titulo: 'Liturgia do Dia',
-      leituras: 'Conexão indisponível. Verifique sua internet.',
-      evangelho: ''
-    };
+  /* ============================
+     UTIL - formato data legível pt-BR
+  ============================ */
+  function formatDateBR(isoOrDate) {
+    const d = (isoOrDate instanceof Date) ? isoOrDate : new Date(isoOrDate);
+    return d.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   }
-}
 
-// ============================================
-// INICIALIZAÇÃO
-// ============================================
+  App.formatDateBR = formatDateBR;
 
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('Rosarium carregado com sucesso');
-});
+  /* ============================
+     INICIALIZAÇÃO GERAL (opcional)
+  ============================ */
+  function initApp() {
+    console.info('App Rosarium inicializado (app.js integrado)');
+    // pré-carregar santo do dia em background (não bloqueante)
+    if (App.SantoDoDia && App.SantoDoDia.getSantoDoDia) {
+      App.SantoDoDia.getSantoDoDia().catch(() => { /* ignore */ });
+    }
+  }
+
+  // start
+  document.addEventListener('DOMContentLoaded', initApp);
+
+  /* ============================
+     EXPOR NO APP
+  ============================ */
+  App.Storage = Storage;
+  App.PIN = PIN;
+  App.Calendar = Calendar;
+  App.Terco = Terco;
+  App.Confissao = Confissao;
+  App.Anotacoes = Anotacoes;
+  App.LectioDivina = LectioDivina;
+  App.TercoMariano = TercoMariano;
+  App.TercoMisericordia = TercoMisericordia;
+
+})(window.App);
