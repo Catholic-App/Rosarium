@@ -67,7 +67,7 @@
         month: 'long',
         day: 'numeric'
       });
-      document.getElementById('santo-oracao').textContent = santo.oração;
+      document.getElementById('santo-oracao').textContent = santo.oracao;
       
       loadSantosDoDia();
     }
@@ -97,7 +97,10 @@
     }
 
     // Inicializar
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', async () => {
+      await App.SantoDoDia.loadData();
+      init();
+    });
   </script>
 </body>
 </html>
