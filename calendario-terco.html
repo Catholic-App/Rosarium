@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
   <!-- Header -->
   <header class="header">
     <div class="header-content">
@@ -30,14 +31,14 @@
       <!-- Calendário -->
       <div class="calendar">
         <div class="calendar-header">
-          <h3 class="calendar-title" id="calendar-title">Dezembro 2024</h3>
+          <h3 class="calendar-title" id="calendar-title"></h3>
           <div class="calendar-nav">
             <button onclick="previousMonth()">← Anterior</button>
             <button onclick="nextMonth()">Próximo →</button>
           </div>
         </div>
 
-        <!-- Grid do Calendário -->
+        <!-- Grid -->
         <div class="calendar-grid" id="calendar-grid"></div>
       </div>
 
@@ -62,27 +63,30 @@
   <script src="app.js"></script>
 
   <script>
+
     let currentDate = new Date();
 
     function renderCalendar() {
       const year = currentDate.getFullYear();
       const month = currentDate.getMonth();
 
+      // título
       document.getElementById("calendar-title").textContent =
         `${App.Calendar.getMonthName(month)} ${year}`;
 
       const grid = document.getElementById("calendar-grid");
       grid.innerHTML = "";
 
-      const days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"];
-      days.forEach(d => {
+      // cabeçalho semana
+      ["Dom","Seg","Ter","Qua","Qui","Sex","Sab"].forEach(d => {
         const el = document.createElement("div");
         el.className = "calendar-day-header";
         el.textContent = d;
         grid.appendChild(el);
       });
 
-      const firstDay = App.Calendar.getFirstDayOfMonth(year, month);
+      // preenchimento antes do dia 1
+      const firstDay = new Date(year, month, 1).getDay();
       for (let i = 0; i < firstDay; i++) {
         const empty = document.createElement("div");
         empty.className = "calendar-day other-month";
@@ -90,7 +94,7 @@
       }
 
       const daysInMonth = App.Calendar.getDaysInMonth(year, month);
-      const calendar = App.Terco.getTercoCalendar();
+      const all = App.Calendar.getAll();
       const today = new Date();
 
       for (let d = 1; d <= daysInMonth; d++) {
@@ -98,49 +102,47 @@
         el.className = "calendar-day";
         el.textContent = d;
 
-        if (d === today.getDate() &&
-            month === today.getMonth() &&
-            year === today.getFullYear()) {
-          el.classList.add("today");
-        }
+        if (
+          d === today.getDate() &&
+          month === today.getMonth() &&
+          year === today.getFullYear()
+        ) el.classList.add("today");
 
         const dateStr = `${year}-${String(month+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
 
-        if (calendar[dateStr]) {
-          el.classList.add("marked");
-        }
+        if (all[dateStr]) el.classList.add("marked");
 
         grid.appendChild(el);
       }
 
-      updateStatistics();
+      updateStats();
     }
 
-    function updateStatistics() {
-      const calendar = App.Terco.getTercoCalendar();
+    function updateStats() {
       const year = currentDate.getFullYear();
       const month = currentDate.getMonth();
+      const all = App.Calendar.getAll();
 
       let total = 0;
-      let daysCount = 0;
+      let days = 0;
 
-      for (const date in calendar) {
-        const [y, m] = date.split("-");
-        if (+y === year && +m === (month + 1)) {
-          total += calendar[date].total;
-          daysCount++;
+      for (const date in all) {
+        const [y,m] = date.split("-");
+        if (+y === year && +m === month+1) {
+          total += all[date].length;
+          days++;
         }
       }
 
       document.getElementById("total-tercos").textContent = total;
-      document.getElementById("days-with-terco").textContent = daysCount;
+      document.getElementById("days-with-terco").textContent = days;
 
       // streak
       let streak = 0;
       let check = new Date();
       while (true) {
         const ds = check.toISOString().split("T")[0];
-        if (calendar[ds]) {
+        if (all[ds]) {
           streak++;
           check.setDate(check.getDate() - 1);
         } else break;
@@ -151,34 +153,34 @@
     }
 
     function updateHistory() {
-      const calendar = App.Terco.getTercoCalendar();
       const history = document.getElementById("history-list");
       history.innerHTML = "";
 
-      const dates = Object.keys(calendar).sort().reverse().slice(0, 10);
+      const all = App.Calendar.getAll();
+      const dates = Object.keys(all).sort().reverse().slice(0,10);
 
-      if (dates.length === 0) {
-        history.innerHTML =
-          '<p style="padding: 1rem; text-align: center; color: var(--muted-foreground);">Nenhum terço rezado ainda</p>';
+      if (!dates.length) {
+        history.innerHTML = `<p style="text-align:center;padding:1rem;color:var(--muted-foreground)">Nenhum terço rezado</p>`;
         return;
       }
 
       for (const date of dates) {
-        const info = calendar[date];
-        const types = info.tipos;
-
-        const readable = types.map(t => {
-          if (t === "mariano") return "Terço Mariano";
-          if (t === "misericordia") return "Terço da Misericórdia";
-          if (t === "rosario") return "Rosário";
-          return t;
-        }).join(", ");
+        const items = all[date];
+        const readable = items
+          .map(i =>
+            i.tipo === "mariano" ? "Terço Mariano" :
+            i.tipo === "misericordia" ? "Terço da Misericórdia" :
+            i.tipo === "rosario" ? "Rosário" :
+            i.tipo
+          ).join(", ");
 
         const card = document.createElement("div");
         card.className = "item";
         card.innerHTML = `
           <div class="item-content">
-            <div class="item-title">${new Date(date).toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</div>
+            <div class="item-title">
+              ${new Date(date).toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}
+            </div>
             <div class="item-description">${readable}</div>
           </div>
         `;
@@ -190,12 +192,15 @@
       currentDate.setMonth(currentDate.getMonth() - 1);
       renderCalendar();
     }
+
     function nextMonth() {
       currentDate.setMonth(currentDate.getMonth() + 1);
       renderCalendar();
     }
 
     document.addEventListener("DOMContentLoaded", renderCalendar);
+
   </script>
+
 </body>
 </html>
