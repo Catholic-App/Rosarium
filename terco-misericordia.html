@@ -84,11 +84,11 @@ const ORACOES = {
 const SEQ = (function(){
   const s = [];
   s.push('sinal');          // 0
-  s.push('credo');        // 1
+  s.push('pn_init');        // 1
   s.push('am_init');        // 2
   s.push('am_init');        // 3
   s.push('am_init');        // 4
-  s.push('pn_init');          // 5
+  s.push('credo');          // 5
   for(let d=0; d<5; d++){
     s.push('grande'); // Eterno Pai (big)
     for(let i=0;i<10;i++) s.push('pequena'); // 10 pequenas
@@ -184,7 +184,7 @@ function render(){
   // creed cross fill
   const cross = document.getElementById('credoCross');
   const creedIdx = SEQ.indexOf('credo');
-  if(state.stepIndex > creedIdx) cross.classList.add('filled'); else cross.classList.remove('filled');
+  if(state.stepIndex >= creedIdx) cross.classList.add('filled'); else cross.classList.remove('filled');
 }
 
 function computeDezenaIndex(globalIndex){
