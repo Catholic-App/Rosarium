@@ -5,7 +5,7 @@ Aplicativo web de devoção católica 100% em HTML, CSS e JavaScript puros. Sem 
 ## 📁 Estrutura do Projeto
 
 ```
-rosarium/
+misericordia-html/
 ├── index.html                    # Splash Screen
 ├── home.html                     # Página Principal
 ├── terco.html                    # Seleção de Terço

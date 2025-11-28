@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terço de São José - Rosarium</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <button class="btn-back" onclick="goBack()">← Voltar</button>
+      <div class="header-title">
+        <div class="header-logo">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z" />
+          </svg>
+        </div>
+        <span>Terço de São José</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <div class="page-container">
+    <div class="page-content container-md">
+      
+      <!-- Seção: Informações -->
+      <section class="terco-info">
+        <div class="info-card">
+          <h2 class="info-title">Terço de São José</h2>
+          <p class="info-description">O Terço de São José é uma devoção especial em honra do grande patriarca. Composto de 15 dezenas (60 contas), representa os 60 anos de vida de São José na Terra.</p>
+          <p class="info-description" style="margin-top: 1rem; font-size: 0.95rem; color: var(--text-secondary);">Nas contas grandes, reza-se a oração específica de São José. Nas contas pequenas, reza-se "Valei-me, São José".</p>
+        </div>
+      </section>
+
+      <!-- Seção: Instruções -->
+      <section class="terco-instructions">
+        <h3 class="section-title">Como Rezar</h3>
+        <div class="instruction-card">
+          <div class="instruction-step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h4>Início</h4>
+              <p>Faça o Sinal da Cruz e reze o Credo</p>
+            </div>
+          </div>
+          <div class="instruction-step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h4>Contas Grandes</h4>
+              <p>"Meu glorioso São José, nas vossas maiores aflições e tribulações, não vos valeu o anjo do Senhor? Valei-me, São José!"</p>
+            </div>
+          </div>
+          <div class="instruction-step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h4>Contas Pequenas</h4>
+              <p>"Valei-me, São José" (10 vezes em cada dezena)</p>
+            </div>
+          </div>
+          <div class="instruction-step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <h4>Oferecimento Final</h4>
+              <p>Reze o oferecimento ao final das 15 dezenas</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Seção: Contador de Dezenas -->
+      <section class="terco-counter">
+        <h3 class="section-title">Contador de Dezenas</h3>
+        <div class="counter-container">
+          <div class="dezena-display">
+            <div class="dezena-number" id="dezena-atual">1</div>
+            <div class="dezena-label">Dezena</div>
+          </div>
+          <div class="counter-buttons">
+            <button class="btn btn-secondary" onclick="dezenaAnterior()">← Anterior</button>
+            <button class="btn" onclick="proximaDezena()">Próxima →</button>
+          </div>
+          <button class="btn btn-outline" onclick="resetarDezenas()" style="width: 100%; margin-top: 1rem;">Recomeçar</button>
+        </div>
+      </section>
+
+      <!-- Seção: Orações Completas -->
+      <section class="terco-prayers">
+        <h3 class="section-title">Orações do Terço</h3>
+        
+        <!-- Oração da Conta Grande -->
+        <div class="prayer-card">
+          <h4 class="prayer-title">Oração da Conta Grande (15 vezes)</h4>
+          <p class="prayer-text">"Meu glorioso São José, nas vossas maiores aflições e tribulações, não vos valeu o anjo do Senhor? Valei-me, São José!"</p>
+        </div>
+
+        <!-- Oração da Conta Pequena -->
+        <div class="prayer-card">
+          <h4 class="prayer-title">Oração da Conta Pequena (10 vezes cada dezena)</h4>
+          <p class="prayer-text">"Valei-me, São José."</p>
+        </div>
+
+        <!-- Oferecimento Final -->
+        <div class="prayer-card">
+          <h4 class="prayer-title">Oferecimento Final</h4>
+          <p class="prayer-text">"A vós, glorioso São José, ofereço este terço em louvor e glória de Jesus e Maria, para que seja minha luz e guia, minha proteção e defesa, minha fortaleza e alegria em todos os meus trabalhos e tribulações, principalmente na hora da agonia.</p>
+          <p class="prayer-text">Pelo nome de Jesus, pela glória de Maria, imploro o vosso poderoso patrocínio, para que me alcanceis a graça que tanto desejo. Falai em meu favor, advogai a minha causa no Céu e na Terra, alegrai a minha alma para honra de Jesus, de Maria e vossa. Amém."</p>
+        </div>
+
+        <!-- Glória ao Pai -->
+        <div class="prayer-card">
+          <h4 class="prayer-title">Glória ao Pai (após cada dezena)</h4>
+          <p class="prayer-text">"Glória seja ao Pai, e ao Filho, e ao Espírito Santo. Como era no princípio, agora e sempre, por todos os séculos dos séculos. Amém."</p>
+        </div>
+      </section>
+
+      <!-- Seção: Sobre São José -->
+      <section class="terco-about">
+        <h3 class="section-title">Sobre São José</h3>
+        <div class="about-card">
+          <p>São José, o patriarca, é o protetor da Igreja e modelo de virtudes para todos os cristãos. Ele é venerado como protetor dos trabalhadores, das famílias e daqueles que enfrentam dificuldades.</p>
+          <p style="margin-top: 1rem;">Sua vida de fé, obediência e amor a Jesus e Maria o tornam um intercessor poderoso junto a Deus. Rezar o Terço de São José é buscar sua proteção e patrocínio nas nossas necessidades espirituais e materiais.</p>
+          <p style="margin-top: 1rem; font-style: italic; color: var(--text-secondary);">Festa de São José: 19 de março</p>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    let dezenaAtual = 1;
+    const totalDezenas = 15;
+
+    function init() {
+      atualizarDisplay();
+    }
+
+    function atualizarDisplay() {
+      document.getElementById('dezena-atual').textContent = dezenaAtual;
+    }
+
+    function proximaDezena() {
+      if (dezenaAtual < totalDezenas) {
+        dezenaAtual++;
+        atualizarDisplay();
+        scrollToCounter();
+      } else {
+        alert('Parabéns! Você completou o Terço de São José!');
+        resetarDezenas();
+      }
+    }
+
+    function dezenaAnterior() {
+      if (dezenaAtual > 1) {
+        dezenaAtual--;
+        atualizarDisplay();
+        scrollToCounter();
+      }
+    }
+
+    function resetarDezenas() {
+      dezenaAtual = 1;
+      atualizarDisplay();
+    }
+
+    function scrollToCounter() {
+      const counter = document.querySelector('.terco-counter');
+      counter.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function goBack() {
+      window.history.back();
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

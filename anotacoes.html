@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anotações - Rosarium</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <button class="btn-back" onclick="goBack()">← Voltar</button>
+      <div class="header-title">
+        <div class="header-logo">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        </div>
+        <span>Anotações</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo -->
+  <div class="page-container">
+    <div class="page-content container-md">
+      <!-- Tela de PIN -->
+      <div id="pin-screen" class="hidden">
+        <div style="max-width: 400px; margin: 4rem auto;">
+          <div class="card">
+            <h2 class="card-title" style="text-align: center; margin-bottom: 2rem;">Anotações Privadas</h2>
+            <p style="text-align: center; margin-bottom: 1.5rem; color: var(--muted-foreground);">Digite seu PIN de 4 dígitos</p>
+            
+            <div class="pin-input" id="pin-input">
+              <input type="text" class="pin-digit" maxlength="1" onkeyup="handlePinInput(event, 0)">
+              <input type="text" class="pin-digit" maxlength="1" onkeyup="handlePinInput(event, 1)">
+              <input type="text" class="pin-digit" maxlength="1" onkeyup="handlePinInput(event, 2)">
+              <input type="text" class="pin-digit" maxlength="1" onkeyup="handlePinInput(event, 3)">
+            </div>
+            
+            <button class="btn" onclick="verifyPin()" style="width: 100%; margin-top: 1.5rem;">Entrar</button>
+            
+            <p style="text-align: center; margin-top: 1rem; font-size: var(--font-size-sm); color: var(--muted-foreground);">
+              PIN padrão: 1234
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tela de Anotações -->
+      <div id="anotacoes-screen" class="hidden">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+          <h1 class="page-title" style="margin: 0;">Minhas Anotações</h1>
+          <button class="btn btn-secondary" onclick="showNewAnotacao()">+ Nova</button>
+        </div>
+
+        <!-- Lista de Anotações -->
+        <div class="items-list" id="anotacoes-list">
+          <!-- Gerado por JavaScript -->
+        </div>
+
+        <!-- Botão Sair -->
+        <div style="text-align: center; margin-top: 2rem;">
+          <button class="btn btn-outline" onclick="logout()">Sair</button>
+        </div>
+      </div>
+
+      <!-- Formulário Nova Anotação -->
+      <div id="form-screen" class="hidden">
+        <div class="card" style="max-width: 600px; margin: 0 auto;">
+          <h2 class="card-title" id="form-title">Nova Anotação</h2>
+          
+          <div class="form-group">
+            <label class="label">Título:</label>
+            <input type="text" class="input" id="anotacao-titulo" placeholder="Título da anotação">
+          </div>
+          
+          <div class="form-group">
+            <label class="label">Conteúdo:</label>
+            <textarea class="input" id="anotacao-conteudo" placeholder="Escreva sua anotação..."></textarea>
+          </div>
+          
+          <div style="display: flex; gap: 1rem;">
+            <button class="btn" onclick="saveAnotacao()" style="flex: 1;">Salvar</button>
+            <button class="btn btn-outline" onclick="cancelForm()" style="flex: 1;">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    let isLoggedIn = false;
+    let editingId = null;
+
+    function init() {
+      showPinScreen();
+    }
+
+    function showPinScreen() {
+      document.getElementById('pin-screen').classList.remove('hidden');
+      document.getElementById('anotacoes-screen').classList.add('hidden');
+      document.getElementById('form-screen').classList.add('hidden');
+      isLoggedIn = false;
+    }
+
+    function handlePinInput(event, index) {
+      const inputs = document.querySelectorAll('.pin-digit');
+      const value = event.target.value;
+      
+      if (value.length > 1) {
+        event.target.value = value.slice(-1);
+      }
+      
+      if (value && index < 3) {
+        inputs[index + 1].focus();
+      }
+      
+      if (event.key === 'Backspace' && !value && index > 0) {
+        inputs[index - 1].focus();
+      }
+      
+      if (event.key === 'Enter') {
+        verifyPin();
+      }
+    }
+
+    function verifyPin() {
+      const inputs = document.querySelectorAll('.pin-digit');
+      const pin = Array.from(inputs).map(input => input.value).join('');
+      
+      if (pin.length !== 4) {
+        alert('Digite um PIN de 4 dígitos');
+        return;
+      }
+      
+      if (PIN.verify(pin)) {
+        isLoggedIn = true;
+        showAnotacoesScreen();
+      } else {
+        alert('PIN incorreto');
+        inputs.forEach(input => input.value = '');
+        inputs[0].focus();
+      }
+    }
+
+    function showAnotacoesScreen() {
+      document.getElementById('pin-screen').classList.add('hidden');
+      document.getElementById('anotacoes-screen').classList.remove('hidden');
+      document.getElementById('form-screen').classList.add('hidden');
+      loadAnotacoes();
+    }
+
+    function loadAnotacoes() {
+      const anotacoes = Anotacoes.getAnotacoes();
+      const list = document.getElementById('anotacoes-list');
+      list.innerHTML = '';
+      
+      if (anotacoes.length === 0) {
+        list.innerHTML = '<p style="padding: 2rem; text-align: center; color: var(--muted-foreground);">Nenhuma anotação ainda</p>';
+        return;
+      }
+      
+      anotacoes.forEach(anotacao => {
+        const item = document.createElement('div');
+        item.className = 'item';
+        item.innerHTML = `
+          <div class="item-content">
+            <div class="item-title">${anotacao.titulo}</div>
+            <div class="item-description">${new Date(anotacao.data).toLocaleDateString('pt-BR')}</div>
+          </div>
+          <div class="item-actions">
+            <button class="item-action-btn" onclick="editAnotacao(${anotacao.id})">Editar</button>
+            <button class="item-action-btn" onclick="deleteAnotacao(${anotacao.id})">Excluir</button>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function showNewAnotacao() {
+      editingId = null;
+      document.getElementById('form-title').textContent = 'Nova Anotação';
+      document.getElementById('anotacao-titulo').value = '';
+      document.getElementById('anotacao-conteudo').value = '';
+      
+      document.getElementById('anotacoes-screen').classList.add('hidden');
+      document.getElementById('form-screen').classList.remove('hidden');
+      
+      document.getElementById('anotacao-titulo').focus();
+    }
+
+    function editAnotacao(id) {
+      const anotacoes = Anotacoes.getAnotacoes();
+      const anotacao = anotacoes.find(a => a.id === id);
+      
+      if (!anotacao) return;
+      
+      editingId = id;
+      document.getElementById('form-title').textContent = 'Editar Anotação';
+      document.getElementById('anotacao-titulo').value = anotacao.titulo;
+      document.getElementById('anotacao-conteudo').value = anotacao.conteudo;
+      
+      document.getElementById('anotacoes-screen').classList.add('hidden');
+      document.getElementById('form-screen').classList.remove('hidden');
+    }
+
+    function saveAnotacao() {
+      const titulo = document.getElementById('anotacao-titulo').value.trim();
+      const conteudo = document.getElementById('anotacao-conteudo').value.trim();
+      
+      if (!titulo || !conteudo) {
+        alert('Preencha todos os campos');
+        return;
+      }
+      
+      if (editingId) {
+        Anotacoes.updateAnotacao(editingId, titulo, conteudo);
+      } else {
+        Anotacoes.addAnotacao(titulo, conteudo);
+      }
+      
+      cancelForm();
+    }
+
+    function deleteAnotacao(id) {
+      if (confirm('Deseja excluir esta anotação?')) {
+        Anotacoes.deleteAnotacao(id);
+        loadAnotacoes();
+      }
+    }
+
+    function cancelForm() {
+      editingId = null;
+      document.getElementById('form-screen').classList.add('hidden');
+      document.getElementById('anotacoes-screen').classList.remove('hidden');
+      loadAnotacoes();
+    }
+
+    function logout() {
+      isLoggedIn = false;
+      showPinScreen();
+    }
+
+    // Inicializar
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

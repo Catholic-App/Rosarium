@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ofício de Nossa Senhora - Rosarium</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <button class="btn-back" onclick="goBack()">← Voltar</button>
+      <div class="header-title">
+        <div class="header-logo">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m6.364 1.636l-.707-.707M21 12h-1m1.364 6.364l-.707.707M12 21v1m-6.364-1.636l.707.707M3 12h1M4.636 4.636l.707.707" />
+          </svg>
+        </div>
+        <span>Ofício de Nossa Senhora</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <div class="page-container">
+    <div class="page-content container-md">
+      
+      <!-- Seção: Informações -->
+      <section class="oficio-info">
+        <div class="info-card">
+          <h2 class="info-title">Ofício de Nossa Senhora</h2>
+          <p class="info-description">O Ofício de Nossa Senhora é uma devoção completa em honra da Mãe de Deus. Pode ser rezado todo de uma só vez ou dividido em suas oito horas litúrgicas ao longo do dia.</p>
+          <p class="info-description" style="margin-top: 1rem; font-size: 0.95rem; color: var(--text-secondary);">Cada hora contém um hino, uma oração e reflexões sobre a grandeza de Maria.</p>
+        </div>
+      </section>
+
+      <!-- Seletor de Horas -->
+      <section class="oficio-selector">
+        <h3 class="section-title">Escolha uma Hora</h3>
+        <div class="hours-grid">
+          <button class="hour-btn" onclick="selecionarHora(0)">Matinas</button>
+          <button class="hour-btn" onclick="selecionarHora(1)">Prima (6h)</button>
+          <button class="hour-btn" onclick="selecionarHora(2)">Terça (9h)</button>
+          <button class="hour-btn" onclick="selecionarHora(3)">Sexta (12h)</button>
+          <button class="hour-btn" onclick="selecionarHora(4)">Nona (15h)</button>
+          <button class="hour-btn" onclick="selecionarHora(5)">Vésperas (18h)</button>
+          <button class="hour-btn" onclick="selecionarHora(6)">Completas (21h)</button>
+          <button class="hour-btn" onclick="selecionarHora(7)">Ladainha</button>
+        </div>
+      </section>
+
+      <!-- Conteúdo da Hora Selecionada -->
+      <section id="hora-content" class="oficio-content">
+        <!-- Gerado por JavaScript -->
+      </section>
+
+      <!-- Seção: Sobre o Ofício -->
+      <section class="oficio-about">
+        <h3 class="section-title">Sobre o Ofício</h3>
+        <div class="about-card">
+          <p>O Ofício de Nossa Senhora é uma forma tradicional de oração à Mãe de Deus. Cada hora do dia é dedicada a uma reflexão especial sobre a vida, virtudes e intercessão de Maria.</p>
+          <p style="margin-top: 1rem;">Este ofício pode ser rezado:</p>
+          <ul style="margin-top: 0.5rem; margin-left: 1.5rem;">
+            <li>Completo, de uma só vez</li>
+            <li>Dividido ao longo do dia, em cada hora litúrgica</li>
+            <li>Parcialmente, para obter graças especiais</li>
+          </ul>
+          <p style="margin-top: 1rem; font-style: italic; color: var(--text-secondary);">O importante é rezar com devoção e confiança na intercessão de Nossa Senhora.</p>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    const horas = [
+      {
+        nome: "MATINAS",
+        horario: "(reza-se de madrugada)",
+        introducao: "Deus vos salve, Virgem, Filha de Deus Pai!\nDeus vos salve, Virgem, Mãe de Deus Filho!\nDeus vos salve, Virgem, Esposa do Divino Espírito Santo!\nDeus vos salve, Virgem, Templo e Sacrário da Santíssima Trindade!\nAgora lábios meus, dizei e anunciai\nos grandes louvores da Virgem Mãe de Deus.",
+        hino: "Deus vos salve, Virgem, Senhora do mundo,\nRainha dos céus e das virgens Virgem.\nEstrela da manhã, Deus vos salve,\ncheia de graça divina, formosa e louçã.\nDai pressa, Senhora, em favor do mundo\npois vos reconhece como defensora.\nDeus vos nomeou já lá \"ab æterno\",\npara Mãe do Verbo com o qual criou\nterra, mar e céus, e vos escolheu,\nquando Adão pecou por esposa de Deus.\nDeus a escolheu já muito dantes, em seu tabernáculo morada lhe deu.\nOuvi, Mãe de Deus, minha oração,\ntoquem vosso peito os clamores meus.",
+        oracao: "Santa Maria, Rainha dos céus, Mãe de nosso Senhor Jesus Cristo, Senhora do mundo, que a nenhum pecador desamparais nem desprezais: ponde, Senhora, em mim os olhos de Vossa piedade, e alcançai-me de vosso amado Filho o perdão de todos os meus pecados, para que eu, que agora venero com devoção vossa santa e imaculada Conceição, mereça, na outra vida, alcançar o prêmio da bem-aventurança por mercê de vosso benditíssimo Filho, Jesus Cristo, nosso Senhor, que com o Pai e o Espírito Santo vive e reina para sempre. Amém."
+      },
+      {
+        nome: "PRIMA",
+        horario: "(reza-se às 6 horas da manhã)",
+        introducao: "Sede em meu favor, Virgem Soberana,\nlivrai-me do inimigo com o vosso valor.\nGlória seja ao Pai, ao Filho, e ao Amor também,\nque é um só Deus em pessoas três,\nagora e sempre e sem fim. Amém",
+        hino: "Deus vos salve, mesa para Deus ornada,\ncoluna sagrada de grande firmeza.\nCasa dedicada a Deus sempiterno,\nsempre preservada Virgem do pecado.\nAntes que nascida fostes, Virgem santa,\nno ventre ditoso de Ana concebida.\nSois Mãe criadora dos mortais viventes,\nsois dos Santos porta, dos Anjos Senhora.\nSois forte esquadrão contra o inimigo,\nEstrela de Jacó, refúgio do cristão.\nA Virgem, a criou Deus no Espírito Santo,\ne todas as suas obras, com elas a ornou.\nOuvi, Mãe de Deus, minha oração,\ntoquem vosso peito os clamores meus.",
+        oracao: "Santa Maria, Rainha dos céus, Mãe de nosso Senhor Jesus Cristo, Senhora do mundo, que a nenhum pecador desamparais nem desprezais: ponde, Senhora, em mim os olhos de Vossa piedade, e alcançai-me de vosso amado Filho o perdão de todos os meus pecados, para que eu, que agora venero com devoção vossa santa e imaculada Conceição, mereça, na outra vida, alcançar o prêmio da bem-aventurança por mercê de vosso benditíssimo Filho, Jesus Cristo, nosso Senhor, que com o Pai e o Espírito Santo vive e reina para sempre. Amém."
+      },
+      {
+        nome: "TERÇA",
+        horario: "(reza-se às 9 horas da manhã)",
+        introducao: "Sede em meu favor, Virgem Soberana,\nlivrai-me do inimigo com o vosso valor.\nGlória seja ao Pai, ao Filho, e ao Amor também,\nque é um só Deus em pessoas três,\nagora e sempre e sem fim. Amém",
+        hino: "Deus vos salve, trono do grão Salomão,\nArca do concerto, Velo do Gedeão;\nÍris do céu clara, Sarça de visão.\nFavo de Sansão, florescente vara;\na qual escolheu para ser Mãe sua.\nE de vós nasceu o Filho de Deus.\nAssim vos livrou da culpa original,\nde nenhum pecado há em vós sinal.\nVós que habitais lá nas alturas,\ne tende vosso trono sobre nuvens puras.\nOuvi Mãe de Deus, minha oração,\ntoquem vosso peito os clamores meus.",
+        oracao: "Santa Maria, Rainha dos céus, Mãe de nosso Senhor Jesus Cristo, Senhora do mundo, que a nenhum pecador desamparais nem desprezais: ponde, Senhora, em mim os olhos de Vossa piedade, e alcançai-me de vosso amado Filho o perdão de todos os meus pecados, para que eu, que agora venero com devoção vossa santa e imaculada Conceição, mereça, na outra vida, alcançar o prêmio da bem-aventurança por mercê de vosso benditíssimo Filho, Jesus Cristo, nosso Senhor, que com o Pai e o Espírito Santo vive e reina para sempre. Amém."
+      },
+      {
+        nome: "SEXTA",
+        horario: "(reza-se ao meio-dia)",
+        introducao: "Sede em meu favor, Virgem Soberana,\nlivrai-me do inimigo com o vosso valor.\nGlória seja ao Pai, ao Filho, e ao Amor também,\nque é um só Deus em pessoas três,\nagora e sempre e sem fim. Amém",
+        hino: "Deus vos salve, Virgem, da Trindade templo,\nalegria dos Anjos, da pureza exemplo,\nque alegrais os tristes com vossa clemência,\nhorto de deleites, palma de paciência.\nSois terra bendita e sacerdotal,\nsois da castidade símbolo real.\nCidade do Altíssimo, porta oriental,\nsois a mesma graça, Virgem singular.\nQual lírio cheiroso entre espinhas duras,\nTal sois vós, Senhora, entre as criaturas.\nOuvi, Mãe de Deus, minha oração,\ntoquem vosso peito os clamores meus.",
+        oracao: "Santa Maria, Rainha dos céus, Mãe de nosso Senhor Jesus Cristo, Senhora do mundo, que a nenhum pecador desamparais nem desprezais: ponde, Senhora, em mim os olhos de Vossa piedade, e alcançai-me de vosso amado Filho o perdão de todos os meus pecados, para que eu, que agora venero com devoção vossa santa e imaculada Conceição, mereça, na outra vida, alcançar o prêmio da bem-aventurança por mercê de vosso benditíssimo Filho, Jesus Cristo, nosso Senhor, que com o Pai e o Espírito Santo vive e reina para sempre. Amém."
+      },
+      {
+        nome: "NONA",
+        horario: "(reza-se às 3 horas da tarde)",
+        introducao: "Sede em meu favor, Virgem Soberana,\nlivrai-me do inimigo com o vosso valor.\nGlória seja ao Pai, ao Filho, e ao Amor também,\nque é um só Deus em pessoas três,\nagora e sempre e sem fim. Amém",
+        hino: "Deus vos salve, cidade de torres guarnecida,\nde Davi com armas, bem fortalecida.\nDe suma caridade, sempre abrasada,\ndo dragão a força foi por vós prostrada.\nÓ mulher tão forte! Ó invicta Judite!\nVós acalentastes o Sumo Davi!\nDo Egito o curador de Raquel nasceu,\nDo mundo o Salvador Maria no-lo deu.\nToda é formosa minha companheira\nnela não há mácula da culpa primeira.\nOuvi, Mãe de Deus, minha oração,\ntoquem vosso peito os clamores meus.",
+        oracao: "Santa Maria, Rainha dos céus, Mãe de nosso Senhor Jesus Cristo, Senhora do mundo, que a nenhum pecador desamparais nem desprezais: ponde, Senhora, em mim os olhos de Vossa piedade, e alcançai-me de vosso amado Filho o perdão de todos os meus pecados, para que eu, que agora venero com devoção vossa santa e imaculada Conceição, mereça, na outra vida, alcançar o prêmio da bem-aventurança por mercê de vosso benditíssimo Filho, Jesus Cristo, nosso Senhor, que com o Pai e o Espírito Santo vive e reina para sempre. Amém."
+      },
+      {
+        nome: "VÉSPERAS",
+        horario: "(reza-se ao pôr-do-sol)",
+        introducao: "Sede em meu favor, Virgem Soberana,\nlivrai-me do inimigo com o vosso valor.\nGlória seja ao Pai, ao Filho, e ao Amor também,\nque é um só Deus em pessoas três,\nagora e sempre e sem fim. Amém",
+        hino: "Deus vos salve, relógio, que, andando atrasado,\nserviu de sinal ao Verbo encarnado.\nPara que o homem suba às sumas alturas\ndesce Deus dos céus para as criaturas.\nCom os raios claros do Sol da justiça\nresplandesce a Virgem, dando ao sol cobiça.\nSois lírio formoso, que cheiro respira,\nentre os espinhos da serpente a ira.\nVós a quebrantais com vosso poder;\nos cegos errados os alumiais.\nFizestes nascer sol tão fecundo,\ne, como com nuvens, cobristes o mundo.\nOuvi, Mãe de Deus, minha oração,\ntoquem vosso peito os clamores meus.",
+        oracao: "Santa Maria, Rainha dos céus, Mãe de nosso Senhor Jesus Cristo, Senhora do mundo, que a nenhum pecador desamparais nem desprezais: ponde, Senhora, em mim os olhos de Vossa piedade, e alcançai-me de vosso amado Filho o perdão de todos os meus pecados, para que eu, que agora venero com devoção vossa santa e imaculada Conceição, mereça, na outra vida, alcançar o prêmio da bem-aventurança por mercê de vosso benditíssimo Filho, Jesus Cristo, nosso Senhor, que com o Pai e o Espírito Santo vive e reina para sempre. Amém."
+      },
+      {
+        nome: "COMPLETAS",
+        horario: "(reza-se à noite, antes de dormir)",
+        introducao: "Rogai a Deus, vós, Virgem, nos converta,\nque a sua ira aparte de nós.\nSede em meu favor, Virgem Soberana,\nlivrai-me do inimigo com o vosso valor.\nGlória seja ao Pai, ao Filho, e ao Amor também,\nque é um só Deus em pessoas três,\nagora e sempre e sem fim. Amém",
+        hino: "Deus vos salve, Virgem, Mãe imaculada,\nRainha de clemência, de estrelas coroada.\nVós sobre os anjos sois purificada.\nDe Deus a mão direita estais de ouro ornada,\npor vós, Mãe de graça, mereçamos ver\na Deus nas alturas, com todo prazer.\nPois sois esperança dos pobres errantes,\ne seguro porto aos navegantes.\nEstrela do mar e saúde certa,\ne porta que estais, para o céu aberta.\nÉ óleo derramado, Virgem, vosso nome,\ne os vossos servos vos hão sempre amado.\nOuvi, Mãe de Deus, minha oração,\ntoquem vosso peito os clamores meus.",
+        oracao: "Santa Maria, Rainha dos céus, Mãe de nosso Senhor Jesus Cristo, Senhora do mundo, que a nenhum pecador desamparais nem desprezais: ponde, Senhora, em mim os olhos de Vossa piedade, e alcançai-me de vosso amado Filho o perdão de todos os meus pecados, para que eu, que agora venero com devoção vossa santa e imaculada Conceição, mereça, na outra vida, alcançar o prêmio da bem-aventurança por mercê de vosso benditíssimo Filho, Jesus Cristo, nosso Senhor, que com o Pai e o Espírito Santo vive e reina para sempre. Amém."
+      },
+      {
+        nome: "LADAINHA DE NOSSA SENHORA",
+        horario: "(Oração final)",
+        introducao: "Senhor, tende piedade de nós.\nJesus Cristo, tende piedade de nós.\nSenhor, tende piedade de nós.\nJesus Cristo, ouvi-nos.\nJesus Cristo, atendei-nos.",
+        hino: "Santa Maria, rogai por nós.\nSanta Mãe de Deus, rogai por nós.\nSanta Virgem das virgens, rogai por nós.\nMãe de Jesus Cristo, rogai por nós.\nMãe da divina graça, rogai por nós.\nMãe puríssima, rogai por nós.\nMãe castíssima, rogai por nós.\nMãe imaculada, rogai por nós.\nMãe intacta, rogai por nós.\nMãe amável, rogai por nós.\nMãe admirável, rogai por nós.\nMãe do bom conselho, rogai por nós.\nMãe do Criador, rogai por nós.\nMãe do Salvador, rogai por nós.\nMãe da Igreja, rogai por nós.",
+        oracao: "Rogai por nós, Santa Mãe de Deus, para que sejamos dignos das promessas de Cristo. Suplicantes vos rogamos, Senhor Deus, que concedais a vossos servos lograr perpétua saúde do corpo e da alma, e que, pela intercessão gloriosa da bem-aventurada sempre Virgem Maria, sejamos livres da presente tristeza e gozemos da eterna alegria. Por Cristo, nosso Senhor. Amém."
+      }
+    ];
+
+    function selecionarHora(index) {
+      const hora = horas[index];
+      const content = document.getElementById('hora-content');
+      
+      content.innerHTML = `
+        <div class="hora-card">
+          <h3 class="hora-title">${hora.nome}</h3>
+          <p class="hora-horario">${hora.horario}</p>
+          
+          <div class="hora-section">
+            <h4 class="hora-subtitle">Introdução</h4>
+            <p class="hora-text" style="white-space: pre-wrap;">${hora.introducao}</p>
+          </div>
+          
+          <div class="hora-section">
+            <h4 class="hora-subtitle">Hino</h4>
+            <p class="hora-text" style="white-space: pre-wrap;">${hora.hino}</p>
+          </div>
+          
+          <div class="hora-section">
+            <h4 class="hora-subtitle">Oração</h4>
+            <p class="hora-text" style="white-space: pre-wrap;">${hora.oracao}</p>
+          </div>
+        </div>
+      `;
+      
+      // Scroll para o conteúdo
+      content.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function goBack() {
+      window.history.back();
+    }
+
+    // Carregar primeira hora ao iniciar
+    document.addEventListener('DOMContentLoaded', () => {
+      selecionarHora(0);
+    });
+  </script>
+
+  <style>
+    .hours-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+
+    .hour-btn {
+      padding: 0.75rem 1rem;
+      background-color: var(--secondary);
+      color: var(--secondary-foreground);
+      border: 2px solid var(--secondary);
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .hour-btn:hover {
+      background-color: var(--primary);
+      border-color: var(--primary);
+      color: var(--primary-foreground);
+    }
+
+    .hora-card {
+      background-color: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .hora-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--foreground);
+      margin-bottom: 0.5rem;
+    }
+
+    .hora-horario {
+      color: var(--muted-foreground);
+      font-style: italic;
+      margin-bottom: 1.5rem;
+    }
+
+    .hora-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .hora-subtitle {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 0.75rem;
+    }
+
+    .hora-text {
+      line-height: 1.8;
+      color: var(--foreground);
+    }
+  </style>
+</body>
+</html>

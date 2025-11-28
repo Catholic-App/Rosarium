@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Terço da Misericórdia - Rosarium</title>
+<link rel="stylesheet" href="style.css">
+<style>
+  :root{ --primary:#4360C6; --bg:#FCFAFB; --text:#121212; --muted:#666; --icon:#4D3E43 }
+  body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg);color:var(--text)}
+  .header{display:flex;align-items:center;padding:12px 16px;gap:.6rem}
+  .btn-back{background:transparent;border:none;cursor:pointer;color:var(--text)}
+  .page{max-width:760px;margin:1.2rem auto;padding:0 16px}
+  .card{background:#fff;border-radius:12px;padding:14px;box-shadow:0 6px 18px rgba(0,0,0,0.04);margin-bottom:12px}
+  .prayer-card{padding:14px}
+  .prayer-card h3{margin:0 0 .5rem 0}
+  .prayer-meta{color:var(--muted);margin-top:.6rem;font-size:.95rem}
+  .misterio{background:#eef6ff;border-left:4px solid var(--primary);padding:10px;border-radius:8px;margin-bottom:12px;display:none}
+  .beads{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0}
+  .bead{display:inline-flex;align-items:center;justify-content:center;user-select:none;cursor:pointer;background:#fbfbfb;color:var(--icon);box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+  .bead.am{width:34px;height:34px;border-radius:50%;font-weight:600}
+  .bead.pn{width:44px;height:44px;border-radius:50%;font-weight:700;font-size:1.1rem}
+  .bead.credo{width:44px;height:44px;border-radius:50%;font-weight:700;font-size:1.3rem}
+  .bead.filled{background:var(--primary);color:#fff;box-shadow:0 6px 14px rgba(67,96,198,0.18)}
+  .progress{height:8px;background:#eee;border-radius:999px;overflow:hidden;margin:8px 18px}
+  .progress > div{height:100%;width:0;background:var(--primary);transition:width .25s}
+  .controls{display:flex;gap:.6rem;justify-content:center;margin-top:10px;flex-wrap:wrap}
+  .btn{padding:10px 14px;border-radius:10px;border:none;background:var(--primary);color:#fff;cursor:pointer;font-weight:700}
+  .btn-outline{background:transparent;border:1px solid #ddd;color:var(--text);border-radius:10px}
+  @media (max-width:420px){
+    .bead.am{width:30px;height:30px}
+    .bead.pn{width:38px;height:38px}
+    .bead.credo{width:38px;height:38px}
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <button class="btn-back" onclick="history.back()">← Voltar</button>
+  <div style="font-weight:700;display:flex;align-items:center;gap:.6rem">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    Terço da Misericórdia
+  </div>
+</header>
+
+<main class="page">
+  <section class="card prayer-card" id="prayerCard">
+    <h3 id="prayerTitle">Oração atual</h3>
+    <p id="prayerText">Carregando...</p>
+    <div class="prayer-meta" id="prayerMeta"></div>
+  </section>
+
+  <section id="misterio" class="misterio">
+    <strong id="misterioTitulo"></strong>
+    <div id="misterioTexto"></div>
+  </section>
+
+  <section class="card">
+
+    <div id="beads" class="beads"></div>
+
+    <div class="progress"><div id="progFill"></div></div>
+    <div style="text-align:center;color:var(--muted);margin-top:6px" id="progLabel">0%</div>
+
+    <div class="controls">
+      <button id="nextBtn" class="btn">+ Próxima</button>
+      <button id="resetBtn" class="btn-outline">Resetar</button>
+    </div>
+
+  </section>
+</main>
+
+<script src="app.js"></script>
+<script>
+/* --------------------------------------------------
+   ORAÇÕES
+-------------------------------------------------- */
+const ORACOES = {
+  sinal:'Em nome do Pai, do Filho e do Espírito Santo. Amém.',
+  pai_nosso:'Pai nosso, que estais nos céus, santificado seja o vosso nome; venha a nós o vosso reino... Amém.',
+  ave:'Ave Maria, cheia de graça, o Senhor é convosco... Amém.',
+  credo:'Creio em Deus Pai todo-poderoso, criador do céu e da terra... Amém.',
+  eterno_pai:'Eterno Pai, ofereço-vos o Corpo e o Sangue, a Alma e a Divindade de Nosso Senhor Jesus Cristo...',
+  pela_paixao:'Pela sua dolorosa Paixão, tende misericórdia de nós e do mundo inteiro.',
+  gloria:'Glória ao Pai, ao Filho e ao Espírito Santo. Como era no princípio...',
+  santo_deus:'Santo Deus, Santo Forte, Santo Imortal...',
+  o_sangue_e_agua:'Ó Sangue e Água, que brotastes do Coração de Jesus...'
+};
+
+/* --------------------------------------------------
+   SEQUÊNCIA CORRETA (ORDEM REAL)
+-------------------------------------------------- */
+const SEQ = (() => {
+  const s = [];
+
+  // Iniciais
+  s.push('sinal');       // sem bead
+  s.push('pn_init');     // bead PN
+  s.push('am_init');     // bead AM
+  s.push('credo_init');  // bead PN com cruz
+
+  // 5 dezenas
+  for (let d = 0; d < 5; d++) {
+    s.push('grande'); // Eterno Pai
+    for (let i = 0; i < 10; i++) s.push('pequena'); // 10 pequenas
+    s.push('gloria'); // sem bead
+  }
+
+  s.push('santo_deus');
+  s.push('o_sangue');
+
+  return s;
+})();
+
+/* --------------------------------------------------
+   STORAGE
+-------------------------------------------------- */
+const STORAGE = 'rosarium_misericordia_v2';
+let state = { stepIndex: 0 };
+
+function load(){ try{ const raw=localStorage.getItem(STORAGE); if(raw) state=JSON.parse(raw);}catch{} }
+function save(){ try{ localStorage.setItem(STORAGE, JSON.stringify(state)); }catch{} }
+
+/* --------------------------------------------------
+   BEADS
+-------------------------------------------------- */
+function buildBeads(){
+  const arr = [];
+
+  for (let i=0; i<SEQ.length; i++){
+    const t = SEQ[i];
+    if (t === 'pn_init' || t === 'am_init' || t === 'credo_init' || t === 'grande' || t === 'pequena'){
+      arr.push({step: i, type: t});
+    }
+  }
+  return arr;
+}
+
+/* --------------------------------------------------
+   RENDER
+-------------------------------------------------- */
+function render(){
+
+  const step = SEQ[state.stepIndex];
+
+  /* TÍTULOS */
+  const title = document.getElementById('prayerTitle');
+  const text  = document.getElementById('prayerText');
+  const meta  = document.getElementById('prayerMeta');
+
+  const mister = document.getElementById('misterio');
+  const mTit   = document.getElementById('misterioTitulo');
+  const mTxt   = document.getElementById('misterioTexto');
+
+  mister.style.display = 'none';
+  mTit.textContent = '';
+  mTxt.textContent = '';
+
+  switch(step){
+    case 'sinal':       title.textContent='Sinal da Cruz';         text.textContent=ORACOES.sinal; break;
+    case 'pn_init':     title.textContent='Pai-Nosso Inicial';     text.textContent=ORACOES.pai_nosso; break;
+    case 'am_init':     title.textContent='Ave-Maria Inicial';     text.textContent=ORACOES.ave; break;
+    case 'credo_init':  title.textContent='Creio';                 text.textContent=ORACOES.credo; break;
+    case 'grande':      title.textContent='Eterno Pai';            text.textContent=ORACOES.eterno_pai;
+                        mister.style.display='block';
+                        mTit.textContent='Dezena da Misericórdia';
+                        mTxt.textContent='Reze pedindo misericórdia pela humanidade.';
+                        break;
+    case 'pequena':     title.textContent='Pela Sua dolorosa Paixão'; text.textContent=ORACOES.pela_paixao; break;
+    case 'gloria':      title.textContent='Glória';                text.textContent=ORACOES.gloria; break;
+    case 'santo_deus':  title.textContent='Santo Deus';            text.textContent=ORACOES.santo_deus; break;
+    case 'o_sangue':    title.textContent='Ó Sangue e Água';       text.textContent=ORACOES.o_sangue_e_agua; break;
+  }
+
+  /* BEADS */
+  const bd = document.getElementById('beads');
+  bd.innerHTML = '';
+
+  const beads = buildBeads();
+
+  let lastFilled = -1;
+  for (let i=0; i<=state.stepIndex; i++){
+    const t = SEQ[i];
+    if (t === 'pn_init' || t === 'am_init' || t === 'credo_init' || t === 'grande' || t === 'pequena'){
+      lastFilled = i;
+    }
+  }
+
+  beads.forEach(b => {
+    const el = document.createElement('div');
+
+    // tipo visual
+    if (b.type === 'credo_init'){
+      el.className = 'bead credo';
+      el.textContent = '✝';
+    } else if (b.type === 'pn_init' || b.type === 'grande'){
+      el.className = 'bead pn';
+      el.textContent = 'P';
+    } else {
+      el.className = 'bead am';
+      el.textContent = '';
+    }
+
+    // preenchimento
+    if (b.step <= lastFilled) el.classList.add('filled');
+
+    el.onclick = ()=> jumpTo(b.step);
+
+    bd.appendChild(el);
+  });
+
+  /* PROGRESSO */
+  const pct = Math.round(((state.stepIndex+1) / SEQ.length)*100);
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progLabel').textContent = pct + '%';
+}
+
+/* --------------------------------------------------
+   AÇÕES
+-------------------------------------------------- */
+function next(){
+  if(state.stepIndex >= SEQ.length-1){
+    alert('Terço completo — Glória a Deus!');
+
+    try {
+      if (typeof registrarTercoRezados === 'function'){
+        registrarTercoRezados('misericordia');
+      }
+    }catch(e){}
+
+    state.stepIndex = 0;
+    save();
+    render();
+    return;
+  }
+
+  state.stepIndex++;
+  save();
+  render();
+}
+
+function reset(){
+  if(!confirm('Resetar Terço da Misericórdia?')) return;
+  state.stepIndex = 0;
+  save();
+  render();
+}
+
+function jumpTo(idx){
+  if(idx < 0 || idx >= SEQ.length) return;
+  state.stepIndex = idx;
+  save();
+  render();
+}
+
+/* --------------------------------------------------
+   START
+-------------------------------------------------- */
+document.addEventListener('DOMContentLoaded', ()=>{
+  load();
+  render();
+  document.getElementById('nextBtn').onclick = next;
+  document.getElementById('resetBtn').onclick = reset;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendário de Terços - Rosarium</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      margin-top: 1rem;
+    }
+
+    .day {
+      background: rgba(255,255,255,0.05);
+      padding: 12px;
+      border-radius: 10px;
+      text-align: center;
+      color: var(--muted-foreground);
+    }
+
+    .day.active {
+      background: var(--primary);
+      color: #fff !important;
+      font-weight: 700;
+    }
+
+    .day-label {
+      text-align: center;
+      color: var(--muted-foreground);
+      font-weight: 600;
+      margin-bottom: .5rem;
+    }
+
+    .month-nav {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .btn-nav {
+      padding: .6rem 1rem;
+      background: rgba(255,255,255,0.08);
+      border-radius: 10px;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* NOVA ÁREA ESPECIAL DO STREAK */
+    .streak-card {
+      padding: 1.5rem;
+      text-align: center;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), #2e4aa8);
+      color: white;
+      box-shadow: 0 6px 22px rgba(0,0,0,0.2);
+      margin-top: 1.5rem;
+    }
+
+    .streak-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-top: .5rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="header">
+    <div class="header-content">
+      <button class="btn-back" onclick="history.back()">← Voltar</button>
+      <div class="header-title">
+        <div class="header-logo">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M8 7V3m0 4a4 4 0 104 4M8 7a4 4 0 014 4m0 0h4m-4 0v4m-6 8h12a2 2 0 002-2v-3H4v3a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <span>Calendário de Terços</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="page-container">
+    <div class="page-content container-md">
+
+      <h1 class="page-title">Histórico de Terços Rezados</h1>
+
+      <!-- Seleção mês/ano -->
+      <div class="card">
+        <div class="month-nav">
+          <button class="btn-nav" id="prev-month">← Anterior</button>
+          <h2 id="month-label"></h2>
+          <button class="btn-nav" id="next-month">Próximo →</button>
+        </div>
+
+        <!-- Labels -->
+        <div class="calendar-grid" style="margin-bottom: .5rem;">
+          <div class="day-label">Dom</div>
+          <div class="day-label">Seg</div>
+          <div class="day-label">Ter</div>
+          <div class="day-label">Qua</div>
+          <div class="day-label">Qui</div>
+          <div class="day-label">Sex</div>
+          <div class="day-label">Sab</div>
+        </div>
+
+        <!-- Grid real -->
+        <div class="calendar-grid" id="calendar-grid"></div>
+      </div>
+
+      <!-- NOVO CARD EXCLUSIVO DO STREAK -->
+      <div class="streak-card">
+        <h3>🔥 Sequência de Dias Rezando</h3>
+        <div id="current-streak" class="streak-number">0</div>
+        <div style="margin-top:.5rem; opacity:.9;">
+          Dias consecutivos rezando o terço
+        </div>
+      </div>
+
+      <!-- Estatísticas -->
+      <div class="card" style="margin-top: 2rem;">
+        <h3 class="card-title">Estatísticas do Mês</h3>
+        <div class="card-content">
+          <p><strong>Total de terços rezados:</strong> <span id="total-tercos">0</span></p>
+          <p><strong>Dias com terço:</strong> <span id="days-with-terco">0</span></p>
+        </div>
+      </div>
+
+      <!-- Histórico -->
+      <div class="card" style="margin-top: 2rem;">
+        <h3 class="card-title">Últimos Terços Rezados</h3>
+        <div class="items-list" id="history-list"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+
+  <script>
+    function formatLocalDate(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
+    let currentMonth = new Date().getMonth();
+    let currentYear = new Date().getFullYear();
+
+    function loadCalendar() {
+      const grid = document.getElementById("calendar-grid");
+      grid.innerHTML = "";
+
+      const monthLabel = document.getElementById("month-label");
+      const date = new Date(currentYear, currentMonth);
+
+      const monthName = date.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+      monthLabel.textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+      const calendar = JSON.parse(localStorage.getItem("rosarium_calendar") || "{}");
+
+      for (let i = 0; i < firstDay; i++) {
+        const empty = document.createElement("div");
+        empty.className = "day empty";
+        grid.appendChild(empty);
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const cell = document.createElement("div");
+        cell.className = "day";
+
+        const ds = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+        if (calendar[ds]) cell.classList.add("active");
+
+        cell.textContent = day;
+        grid.appendChild(cell);
+      }
+
+      updateStatistics();
+      updateStreak();  // ← agora separado
+      updateHistory();
+    }
+
+    function updateStreak() {
+      const calendar = JSON.parse(localStorage.getItem("rosarium_calendar") || "{}");
+
+      let streak = 0;
+      let check = new Date();
+
+      while (true) {
+        const ds = formatLocalDate(check);
+        if (calendar[ds]) {
+          streak++;
+          check.setDate(check.getDate() - 1);
+        } else break;
+      }
+
+      document.getElementById("current-streak").textContent = streak;
+    }
+
+    function updateStatistics() {
+      const calendar = JSON.parse(localStorage.getItem("rosarium_calendar") || "{}");
+
+      let daysWithTerco = 0;
+      let totalTercoCount = 0;
+
+      for (const ds in calendar) {
+        const [year, month] = ds.split("-");
+        if (+year === currentYear && +month === currentMonth + 1) {
+          daysWithTerco++;
+          totalTercoCount += calendar[ds].length;
+        }
+      }
+
+      document.getElementById("total-tercos").textContent = totalTercoCount;
+      document.getElementById("days-with-terco").textContent = daysWithTerco;
+    }
+
+    function updateHistory() {
+      const calendar = JSON.parse(localStorage.getItem("rosarium_calendar") || "{}");
+      const list = document.getElementById("history-list");
+      list.innerHTML = "";
+
+      const entries = Object.entries(calendar)
+        .sort((a, b) => new Date(b[0]) - new Date(a[0]))
+        .slice(0, 10);
+
+      entries.forEach(([date, items]) => {
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `
+          <div class="item-content">
+            <div class="item-title">${new Date(date).toLocaleDateString("pt-BR")}</div>
+            <div class="item-description">${items.join(", ")}</div>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    document.getElementById("prev-month").onclick = () => {
+      currentMonth--;
+      if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+      loadCalendar();
+    };
+
+    document.getElementById("next-month").onclick = () => {
+      currentMonth++;
+      if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+      loadCalendar();
+    };
+
+    document.addEventListener("DOMContentLoaded", loadCalendar);
+  </script>
+
+</body>
+</html>
