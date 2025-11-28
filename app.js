@@ -190,8 +190,8 @@
       if (!type) return type;
       const m = {
         Mariano: 'Terço Mariano',
-        Misericordia: 'Terço da Misericórdia',
-        Rosario: 'Rosário'
+        Misericórdia: 'Terço da Misericórdia',
+        Rosário: 'Rosário'
       };
       return m[type] || type;
     },
