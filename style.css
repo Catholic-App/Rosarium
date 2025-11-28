@@ -1781,6 +1781,30 @@ textarea.input {
     border: 2px solid #800000;
     font-weight: bold;
 }
+/* Correção de Layout para o Leitor de Bíblia */
+.biblia-reader-header {
+  display: flex;
+  flex-direction: column; /* Altera para coluna para empilhar */
+  align-items: flex-start; /* Alinha o título à esquerda */
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.biblia-reader-title {
+  /* Mantém as propriedades originais e adiciona o margin-bottom */
+  font-size: var(--font-size-2xl);
+  font-weight: 600;
+  color: var(--foreground);
+  margin-bottom: 1rem; /* Adiciona espaço abaixo do título */
+}
+
+.biblia-reader-nav {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap; /* Permite que os botões quebrem a linha em telas pequenas */
+}
+
 /* ============================================
    FIM DO CSS
    ============================================ */
