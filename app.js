@@ -227,3 +227,24 @@
   });
 
 })();
+// === REGISTRO DE TERÇOS REZADOS ===
+// Salva dias e tipos de terços no localStorage em formato seguro
+
+function registrarTercoRezados(tipo) {
+  const key = "rosarium_calendar";
+  const today = new Date();
+  const ds = today.toISOString().split("T")[0]; // AAAA-MM-DD
+
+  let calendar = JSON.parse(localStorage.getItem(key) || "{}");
+
+  // Se não existe a data ainda, cria
+  if (!calendar[ds]) calendar[ds] = [];
+
+  // Adiciona o tipo do terço (mariano, misericordia, rosario etc)
+  calendar[ds].push(tipo);
+
+  // Salva
+  localStorage.setItem(key, JSON.stringify(calendar));
+
+  console.log("Terço registrado:", tipo, "em", ds);
+}
