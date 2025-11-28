@@ -5,16 +5,62 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Calendário de Terços - Rosarium</title>
   <link rel="stylesheet" href="style.css">
+
+  <style>
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      margin-top: 1rem;
+    }
+
+    .day {
+      background: rgba(255,255,255,0.05);
+      padding: 12px;
+      border-radius: 10px;
+      text-align: center;
+      color: var(--muted-foreground);
+    }
+
+    .day.active {
+      background: var(--primary);
+      color: #fff !important;
+      font-weight: 700;
+    }
+
+    .day-label {
+      text-align: center;
+      color: var(--muted-foreground);
+      font-weight: 600;
+      margin-bottom: .5rem;
+    }
+
+    .month-nav {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .btn-nav {
+      padding: .6rem 1rem;
+      background: rgba(255,255,255,0.08);
+      border-radius: 10px;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+  </style>
 </head>
+
 <body>
-  <!-- Header -->
+
   <header class="header">
     <div class="header-content">
-      <button class="btn-back" onclick="goBack()">← Voltar</button>
+      <button class="btn-back" onclick="history.back()">← Voltar</button>
       <div class="header-title">
         <div class="header-logo">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M8 7V3m0 4a4 4 0 104 4M8 7a4 4 0 014 4m0 0h4m-4 0v4m-6 8h12a2 2 0 002-2v-3H4v3a2 2 0 002 2z" />
           </svg>
         </div>
         <span>Calendário de Terços</span>
@@ -22,22 +68,31 @@
     </div>
   </header>
 
-  <!-- Conteúdo -->
   <div class="page-container">
     <div class="page-content container-md">
+
       <h1 class="page-title">Histórico de Terços Rezados</h1>
 
-      <!-- Calendário -->
-      <div class="calendar">
-        <div class="calendar-header">
-          <h3 class="calendar-title" id="calendar-title">Dezembro 2024</h3>
-          <div class="calendar-nav">
-            <button onclick="previousMonth()">← Anterior</button>
-            <button onclick="nextMonth()">Próximo →</button>
-          </div>
+      <!-- Seleção mês/ano -->
+      <div class="card">
+        <div class="month-nav">
+          <button class="btn-nav" id="prev-month">← Anterior</button>
+          <h2 id="month-label"></h2>
+          <button class="btn-nav" id="next-month">Próximo →</button>
         </div>
 
-        <!-- Grid do Calendário -->
+        <!-- Labels -->
+        <div class="calendar-grid" style="margin-bottom: .5rem;">
+          <div class="day-label">Dom</div>
+          <div class="day-label">Seg</div>
+          <div class="day-label">Ter</div>
+          <div class="day-label">Qua</div>
+          <div class="day-label">Qui</div>
+          <div class="day-label">Sex</div>
+          <div class="day-label">Sab</div>
+        </div>
+
+        <!-- Grid real -->
         <div class="calendar-grid" id="calendar-grid"></div>
       </div>
 
@@ -46,7 +101,9 @@
         <h3 class="card-title">Estatísticas do Mês</h3>
         <div class="card-content">
           <p><strong>Total de terços rezados:</strong> <span id="total-tercos">0</span></p>
+
           <p><strong>Dias com terço:</strong> <span id="days-with-terco">0</span></p>
+
           <p><strong>Sequência atual:</strong> <span id="current-streak">0</span> dias</p>
         </div>
       </div>
@@ -56,146 +113,132 @@
         <h3 class="card-title">Últimos Terços Rezados</h3>
         <div class="items-list" id="history-list"></div>
       </div>
+
     </div>
   </div>
 
   <script src="app.js"></script>
 
   <script>
-    let currentDate = new Date();
+    /* CORREÇÃO: função para pegar data local em AAAA-MM-DD */
+    function formatLocalDate(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
 
-    function renderCalendar() {
-      const year = currentDate.getFullYear();
-      const month = currentDate.getMonth();
+    let currentMonth = new Date().getMonth();
+    let currentYear = new Date().getFullYear();
 
-      document.getElementById("calendar-title").textContent =
-        `${App.Calendar.getMonthName(month)} ${year}`;
-
+    function loadCalendar() {
       const grid = document.getElementById("calendar-grid");
       grid.innerHTML = "";
 
-      const days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"];
-      days.forEach(d => {
-        const el = document.createElement("div");
-        el.className = "calendar-day-header";
-        el.textContent = d;
-        grid.appendChild(el);
-      });
+      const monthLabel = document.getElementById("month-label");
+      const date = new Date(currentYear, currentMonth);
 
-      const firstDay = App.Calendar.getFirstDayOfMonth(year, month);
+      const monthName = date.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+      monthLabel.textContent = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+      const calendar = JSON.parse(localStorage.getItem("rosarium_calendar") || "{}");
+
       for (let i = 0; i < firstDay; i++) {
         const empty = document.createElement("div");
-        empty.className = "calendar-day other-month";
+        empty.className = "day empty";
         grid.appendChild(empty);
       }
 
-      const daysInMonth = App.Calendar.getDaysInMonth(year, month);
-      const calendar = App.Terco.getTercoCalendar();
-      const today = new Date();
+      for (let day = 1; day <= daysInMonth; day++) {
+        const cell = document.createElement("div");
+        cell.className = "day";
 
-      for (let d = 1; d <= daysInMonth; d++) {
-        const el = document.createElement("div");
-        el.className = "calendar-day";
-        el.textContent = d;
+        const ds = `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 
-        if (d === today.getDate() &&
-            month === today.getMonth() &&
-            year === today.getFullYear()) {
-          el.classList.add("today");
-        }
+        if (calendar[ds]) cell.classList.add("active");
 
-        const dateStr = `${year}-${String(month+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
-
-        if (calendar[dateStr]) {
-          el.classList.add("marked");
-        }
-
-        grid.appendChild(el);
+        cell.textContent = day;
+        grid.appendChild(cell);
       }
 
       updateStatistics();
+      updateHistory();
     }
 
     function updateStatistics() {
-      const calendar = App.Terco.getTercoCalendar();
-      const year = currentDate.getFullYear();
-      const month = currentDate.getMonth();
+      const calendar = JSON.parse(localStorage.getItem("rosarium_calendar") || "{}");
 
-      let total = 0;
-      let daysCount = 0;
+      let totalDaysWithTerco = 0;
+      let totalTercoCount = 0;
 
-      for (const date in calendar) {
-        const [y, m] = date.split("-");
-        if (+y === year && +m === (month + 1)) {
-          total += calendar[date].total;
-          daysCount++;
-        }
+      for (const day in calendar) {
+        totalDaysWithTerco++;
+        totalTercoCount += calendar[day].length;
       }
 
-      document.getElementById("total-tercos").textContent = total;
-      document.getElementById("days-with-terco").textContent = daysCount;
+      document.getElementById("total-tercos").textContent = totalTercoCount;
+      document.getElementById("days-with-terco").textContent = totalDaysWithTerco;
 
-      // streak
+      /* CORREÇÃO DA SEQUÊNCIA (STREAK) */
       let streak = 0;
       let check = new Date();
+
       while (true) {
-        const ds = check.toISOString().split("T")[0];
+        const ds = formatLocalDate(check);
         if (calendar[ds]) {
           streak++;
           check.setDate(check.getDate() - 1);
         } else break;
       }
-      document.getElementById("current-streak").textContent = streak;
 
-      updateHistory();
+      document.getElementById("current-streak").textContent = streak;
     }
 
     function updateHistory() {
-      const calendar = App.Terco.getTercoCalendar();
-      const history = document.getElementById("history-list");
-      history.innerHTML = "";
+      const calendar = JSON.parse(localStorage.getItem("rosarium_calendar") || "{}");
+      const list = document.getElementById("history-list");
+      list.innerHTML = "";
 
-      const dates = Object.keys(calendar).sort().reverse().slice(0, 10);
+      const entries = Object.entries(calendar)
+        .sort((a, b) => new Date(b[0]) - new Date(a[0]))
+        .slice(0, 10);
 
-      if (dates.length === 0) {
-        history.innerHTML =
-          '<p style="padding: 1rem; text-align: center; color: var(--muted-foreground);">Nenhum terço rezado ainda</p>';
-        return;
-      }
-
-      for (const date of dates) {
-        const info = calendar[date];
-        const types = info.tipos;
-
-        const readable = types.map(t => {
-          if (t === "mariano") return "Terço Mariano";
-          if (t === "misericordia") return "Terço da Misericórdia";
-          if (t === "rosario") return "Rosário";
-          return t;
-        }).join(", ");
-
-        const card = document.createElement("div");
-        card.className = "item";
-        card.innerHTML = `
+      entries.forEach(([date, items]) => {
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `
           <div class="item-content">
-            <div class="item-title">${new Date(date).toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</div>
-            <div class="item-description">${readable}</div>
+            <div class="item-title">${new Date(date).toLocaleDateString("pt-BR")}</div>
+            <div class="item-description">${items.join(", ")}</div>
           </div>
         `;
-        history.appendChild(card);
+        list.appendChild(div);
+      });
+    }
+
+    document.getElementById("prev-month").onclick = () => {
+      currentMonth--;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
       }
-    }
+      loadCalendar();
+    };
 
-    function previousMonth() {
-      currentDate.setMonth(currentDate.getMonth() - 1);
-      renderCalendar();
-    }
-    function nextMonth() {
-      currentDate.setMonth(currentDate.getMonth() + 1);
-      renderCalendar();
-    }
+    document.getElementById("next-month").onclick = () => {
+      currentMonth++;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
+      loadCalendar();
+    };
 
-    document.addEventListener("DOMContentLoaded", renderCalendar);
+    document.addEventListener("DOMContentLoaded", loadCalendar);
   </script>
+
 </body>
 </html>
