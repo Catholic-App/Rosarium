@@ -1,10 +1,10 @@
-/* app.js - Final e completo
+/* app.js - Consolidado e compatível
    - Storage helper
    - PIN (simples)
    - Anotacoes (localStorage)
    - App.Terco (calendar registre por dia, tipos: mariano, misericordia, rosario)
    - App.Calendar helpers
-   - registrarTercoRezados(type) global
+   - registrarTercoRezados(type) global (compatível com rosarium_calendar legacy)
 */
 
 (function(){
@@ -107,28 +107,43 @@
   window.App.Calendar = Calendar;
 
   /* ---------------------------
-     Terço / Calendário (Formato A: por dia, somando)
+     Terço / Calendário
+     - primary storage: TERCO_STORAGE_KEY (rich format)
+     - legacy compatibility: LEGACY_KEY (simple array format)
   --------------------------- */
-  const TERCO_STORAGE_KEY = 'terco_calendar_v3'; // versão para futuras mudanças
+  const TERCO_STORAGE_KEY = 'terco_calendar_v3'; // primary, object map date -> { total, tipos: [] }
+  const LEGACY_KEY = 'rosarium_calendar';       // legacy, date -> [ 'mariano', ... ]
 
   const Terco = {
     allowedTypes: ['mariano', 'misericordia', 'rosario'],
 
-    // retorna o calendário como objeto { "YYYY-MM-DD": { total: N, tipos: [...] } }
+    // retorna o calendário rico
     getTercoCalendar() {
       return Storage.get(TERCO_STORAGE_KEY, {});
     },
 
-    // grava o objeto inteiro
+    // grava o objeto inteiro (rico)
     saveTercoCalendar(obj) {
-      return Storage.set(TERCO_STORAGE_KEY, obj);
+      const ok = Storage.set(TERCO_STORAGE_KEY, obj);
+      if (ok) {
+        // manter legacy sincronizado
+        Terco.syncToLegacy(obj);
+      }
+      return ok;
     },
 
     // normalize date to YYYY-MM-DD
     _toISODate(d) {
-      if (!d) return (new Date()).toISOString().split('T')[0];
-      if (typeof d === 'string') return d.split('T')[0];
-      return new Date(d).toISOString().split('T')[0];
+      if (!d) {
+        const now = new Date();
+        return now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+      }
+      if (typeof d === 'string') {
+        // accept YYYY-MM-DD or ISO-like; extract date part
+        return d.split('T')[0];
+      }
+      const dt = new Date(d);
+      return dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
     },
 
     // registra um terço do tipo 'type' no dia 'date' (ISO YYYY-MM-DD). date optional => today
@@ -160,6 +175,7 @@
     // remove calendário inteiro
     clearCalendar() {
       Storage.remove(TERCO_STORAGE_KEY);
+      Storage.remove(LEGACY_KEY);
     },
 
     // retorna se dia possui registros
@@ -178,15 +194,62 @@
         rosario: 'Rosário'
       };
       return m[type] || type;
+    },
+
+    // Convert rich format -> legacy array format and write to LEGACY_KEY
+    syncToLegacy(richObj) {
+      try {
+        const legacy = {};
+        for (const dateKey of Object.keys(richObj || {})) {
+          const entry = richObj[dateKey];
+          // entry.tipos may be array of strings
+          if (Array.isArray(entry.tipos) && entry.tipos.length) {
+            legacy[dateKey] = entry.tipos.slice();
+          } else {
+            // fallback: push empty marker if total exists
+            const arr = [];
+            for (let i=0;i<(entry.total||0);i++) arr.push('terco');
+            legacy[dateKey] = arr;
+          }
+        }
+        Storage.set(LEGACY_KEY, legacy);
+      } catch (e) {
+        console.warn('Terco.syncToLegacy error', e);
+      }
+    },
+
+    // Try to migrate legacy -> rich format (if primary missing)
+    migrateLegacyToRich() {
+      try {
+        const legacy = Storage.get(LEGACY_KEY, null);
+        if (!legacy) return false;
+        const rich = Storage.get(TERCO_STORAGE_KEY, null);
+        if (rich && Object.keys(rich).length) return false; // already have rich
+        const out = {};
+        for (const dateKey of Object.keys(legacy)) {
+          const arr = Array.isArray(legacy[dateKey]) ? legacy[dateKey] : [];
+          out[dateKey] = {
+            total: arr.length,
+            tipos: arr.map(x => (typeof x === 'string' ? x : (x.tipo || 'terco')))
+          };
+        }
+        Storage.set(TERCO_STORAGE_KEY, out);
+        return true;
+      } catch (e) {
+        console.warn('migrateLegacyToRich error', e);
+        return false;
+      }
     }
   };
 
   window.App.Terco = Terco;
 
-  // alias global para ser chamado pelos terços
+  // alias global para ser chamado pelos terços (preserve for existing code)
   window.registrarTercoRezados = function(type, date){
     try {
-      return Terco.record(type, date);
+      const ok = Terco.record(type, date);
+      if (!ok) console.warn('registrarTercoRezados: registro falhou para', type);
+      return ok;
     } catch (e) {
       console.error('registrarTercoRezados error', e);
       return false;
@@ -194,13 +257,13 @@
   };
 
   /* ---------------------------
-     Pequenos utilitários expostos globalmente
+     Small utilities
   --------------------------- */
   window.printTercoCalendar = function(){
-    console.log('Terco calendar:', Terco.getTercoCalendar());
+    console.log('Terco calendar (rich):', Terco.getTercoCalendar());
+    console.log('Terco calendar (legacy):', Storage.get(LEGACY_KEY));
   };
 
-  // pequena função de goBack (usada nos headers)
   function goBack() {
     if (document.referrer && history.length > 1) history.back();
     else window.location.href = 'home.html';
@@ -208,43 +271,32 @@
   window.goBack = goBack;
 
   /* ---------------------------
-     Inicialização mínima
-     - garante chave padrão se não existir (não sobrescreve)
+     Initialization: ensure storage keys & migration
   --------------------------- */
   document.addEventListener('DOMContentLoaded', () => {
-    // garante estrutura inicial (não substitui se já existir)
     try {
-      if (!localStorage.getItem(TERCO_STORAGE_KEY)) {
-        Storage.set(TERCO_STORAGE_KEY, {}); // vazio por padrão
+      // If legacy exists but rich doesn't, migrate
+      const rich = Storage.get(TERCO_STORAGE_KEY, null);
+      const legacy = Storage.get(LEGACY_KEY, null);
+
+      if ((!rich || Object.keys(rich).length === 0) && legacy && Object.keys(legacy).length) {
+        // migrate legacy -> rich
+        Terco.migrateLegacyToRich();
+      } else if (rich && Object.keys(rich).length) {
+        // ensure legacy synced as well
+        Terco.syncToLegacy(rich);
+      } else {
+        // both empty => ensure keys exist
+        Storage.set(TERCO_STORAGE_KEY, Storage.get(TERCO_STORAGE_KEY, {}));
+        Storage.set(LEGACY_KEY, Storage.get(LEGACY_KEY, {}));
       }
     } catch (e) {
-      // ignore
+      console.warn('Initialization error', e);
     }
-    // mantém retro-compatibilidade: se algum outro módulo espera App or Terco em window, já estão setados
+    // expose to App namespace
     window.App = window.App || {};
     window.App.Terco = Terco;
     window.App.Calendar = window.App.Calendar || Calendar;
   });
 
 })();
-// === REGISTRO DE TERÇOS REZADOS ===
-// Salva dias e tipos de terços no localStorage em formato seguro
-
-function registrarTercoRezados(tipo) {
-  const key = "rosarium_calendar";
-  const today = new Date();
-  const ds = today.toISOString().split("T")[0]; // AAAA-MM-DD
-
-  let calendar = JSON.parse(localStorage.getItem(key) || "{}");
-
-  // Se não existe a data ainda, cria
-  if (!calendar[ds]) calendar[ds] = [];
-
-  // Adiciona o tipo do terço (mariano, misericordia, rosario etc)
-  calendar[ds].push(tipo);
-
-  // Salva
-  localStorage.setItem(key, JSON.stringify(calendar));
-
-  console.log("Terço registrado:", tipo, "em", ds);
-}
