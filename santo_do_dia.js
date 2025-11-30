@@ -71,10 +71,6 @@ function displaySantoDoDia(date) {
                 <p class="text-sm text-muted-foreground">${dateText}</p>
             </div>
 
-            <div class="card-content">
-                <h4 class="card-title" style="margin-top: 1rem;">Oração:</h4>
-                <p class="text-italic">${santo.oracao || `Rogai por nós, ${santo.nome}, intercedei a Deus por nós.`}</p>
-
                 <h4 class="card-title" style="margin-top: 1.5rem;">Biografia:</h4>
                 <p><strong>${santo.titulo || santo.nome}</strong></p>
                 <p>${santo.biografia}</p>
