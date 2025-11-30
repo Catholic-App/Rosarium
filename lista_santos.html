@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Santos - Rosarium</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <button class="btn-back" onclick="goBack()">← Voltar</button>
+      <div class="header-title">
+        <div class="header-logo">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m6.364 1.636l-.707-.707M21 12h-1m1.364 6.364l-.707.707M12 21v1m-6.364-1.636l.707.707M3 12h1M4.636 4.636l.707.707" />
+          </svg>
+        </div>
+        <span>Lista de Santos</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo -->
+  <div class="page-container">
+    <div class="page-content container-md">
+      <h1 class="page-title">Lista de Santos por Mês</h1>
+
+      <!-- Container para a lista de santos -->
+      <div id="lista-santos-container" class="card">
+        <!-- Gerado por JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script src="santo_do_dia.js"></script>
+  <script>
+    // A função initListaSantos() em santo_do_dia.js será chamada automaticamente
+    // após o carregamento dos dados dos santos.
+  </script>
+</body>
+</html>

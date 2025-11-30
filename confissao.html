@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confissão - Rosarium</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <button class="btn-back" onclick="goBack()">← Voltar</button>
+      <div class="header-title">
+        <div class="header-logo">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5.581m0 0H9.581m5.419 0C13.798 16.435 11.722 14 9 14c-2.722 0-4.798 2.435-5.581 5" />
+          </svg>
+        </div>
+        <span>Confissão</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo -->
+  <div class="page-container">
+    <div class="page-content container-md">
+      <!-- Tela de PIN -->
+      <div id="pin-screen" class="hidden">
+        <div style="max-width: 400px; margin: 4rem auto;">
+          <div class="card">
+            <h2 class="card-title" style="text-align: center; margin-bottom: 2rem;">Confissão Privada</h2>
+            <p style="text-align: center; margin-bottom: 1.5rem; color: var(--muted-foreground);">Digite seu PIN de 4 dígitos</p>
+            
+            <div class="pin-input" id="pin-input">
+              <input type="text" class="pin-digit" maxlength="1" onkeyup="handlePinInput(event, 0)">
+              <input type="text" class="pin-digit" maxlength="1" onkeyup="handlePinInput(event, 1)">
+              <input type="text" class="pin-digit" maxlength="1" onkeyup="handlePinInput(event, 2)">
+              <input type="text" class="pin-digit" maxlength="1" onkeyup="handlePinInput(event, 3)">
+            </div>
+            
+            <button class="btn" onclick="verifyPin()" style="width: 100%; margin-top: 1.5rem;">Entrar</button>
+          </div>
+        </div>
+      </div>
+
+	      <!-- Tela de Confissão -->
+	      <div id="confissao-screen" class="hidden">
+	        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+	          <div>
+	            <h1 class="page-title" style="margin: 0;">Exame de Consciência</h1>
+	            <p class="page-description" style="margin-top: 0.25rem;">Prepare-se para a confissão sacramental</p>
+	          </div>
+	          <button class="btn btn-outline" onclick="showPinSettings()">PIN</button>
+	        </div>
+
+        <!-- Contra Deus -->
+        <div class="card" style="margin-bottom: 2rem;">
+          <h3 class="card-title">Pecados Contra Deus</h3>
+          <div class="card-content">
+            <div class="checkbox">
+              <input type="checkbox" id="pecado-1">
+              <label for="pecado-1">Falta de fé ou dúvidas sobre Deus</label>
+            </div>
+            <div class="checkbox">
+              <input type="checkbox" id="pecado-2">
+              <label for="pecado-2">Blasfêmia ou desrespeito a Deus</label>
+            </div>
+            <div class="checkbox">
+              <input type="checkbox" id="pecado-3">
+              <label for="pecado-3">Não rezar ou negligenciar a oração</label>
+            </div>
+            <div class="checkbox">
+              <input type="checkbox" id="pecado-4">
+              <label for="pecado-4">Desejo de vingança ou ódio</label>
+            </div>
+            <div class="checkbox">
+              <input type="checkbox" id="pecado-5">
+              <label for="pecado-5">Soberba ou vanglória</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contra o Próximo -->
+        <div class="card" style="margin-bottom: 2rem;">
+          <h3 class="card-title">Pecados Contra o Próximo</h3>
+          <div class="card-content">
+            <div class="checkbox">
+              <input type="checkbox" id="pecado-6">
+              <label for="pecado-6">Mentira ou calúnia</label>
+            </div>
+            <div class="checkbox">
+              <input type="checkbox" id="pecado-7">
+              <label for="pecado-7">Roubo ou apropriação indébita</label>
+            </div>
+            <div class="checkbox">
+              <input type="checkbox" id="pecado-8">
+              <label for="pecado-8">Julgamento ou condenação do próximo</label>
+            </div>
+            <div class="checkbox">
+              <input type="checkbox" id="pecado-9">
+              <label for="pecado-9">Falta de caridade ou amor</label>
+            </div>
+            <div class="checkbox">
+              <input type="checkbox" id="pecado-10">
+              <label for="pecado-10">Violência ou agressão</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contra Si Mesmo -->
+        <div class="card" style="margin-bottom: 2rem;">
+          <h3 class="card-title">Pecados Contra Si Mesmo</h3>
+          <div class="card-content">
+            <div class="checkbox">
+              <input type="checkbox" id="pecado-11">
+              <label for="pecado-11">Gula ou excesso no comer/beber</label>
+            </div>
+            <div class="checkbox">
+              <input type="checkbox" id="pecado-12">
+              <label for="pecado-12">Luxúria ou pensamentos impuros</label>
+            </div>
+            <div class="checkbox">
+              <input type="checkbox" id="pecado-13">
+              <label for="pecado-13">Preguiça ou negligência</label>
+            </div>
+            <div class="checkbox">
+              <input type="checkbox" id="pecado-14">
+              <label for="pecado-14">Ira ou raiva descontrolada</label>
+            </div>
+            <div class="checkbox">
+              <input type="checkbox" id="pecado-15">
+              <label for="pecado-15">Inveja ou ciúme</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Anotações -->
+        <div class="card" style="margin-bottom: 2rem;">
+          <h3 class="card-title">Anotações Pessoais</h3>
+          <textarea class="input" id="confissao-notas" placeholder="Escreva suas reflexões e pontos importantes..."></textarea>
+        </div>
+
+	        <!-- Botões -->
+	        <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+	          <button class="btn" onclick="saveConfissao()" style="flex: 1;">Salvar Confissão</button>
+	          <button class="btn btn-outline" onclick="logout()" style="flex: 1;">Sair</button>
+	        </div>
+	      </div>
+	
+	      <!-- Tela de Configurações de PIN -->
+	      <div id="pin-settings-screen" class="hidden">
+	        <div class="card" style="max-width: 400px; margin: 0 auto;">
+	          <h2 class="card-title">Configurações de PIN</h2>
+	          
+	          <div class="form-group">
+	            <label class="label">Novo PIN (4 dígitos):</label>
+	            <input type="password" class="input" id="new-pin" maxlength="4" placeholder="Novo PIN">
+	          </div>
+	          
+	          <div class="form-group">
+	            <label class="label">Confirmar Novo PIN:</label>
+	            <input type="password" class="input" id="confirm-pin" maxlength="4" placeholder="Confirmar PIN">
+	          </div>
+	          
+	          <button class="btn" onclick="changePin()" style="width: 100%; margin-top: 1rem;">Alterar PIN</button>
+	          
+	          <button class="btn btn-outline" onclick="resetPinToDefault()" style="width: 100%; margin-top: 0.5rem;">Resetar para 1234</button>
+	          
+	          <button class="btn btn-outline" onclick="cancelPinSettings()" style="width: 100%; margin-top: 1rem;">Voltar</button>
+	        </div>
+	      </div>
+
+        <!-- Aviso -->
+        <div class="card" style="background-color: rgba(var(--accent), 0.1); border-color: var(--accent);">
+          <p style="color: var(--accent-foreground); font-size: var(--font-size-sm);">
+            <strong>⚠️ Importante:</strong> Este exame de consciência é uma preparação pessoal. A confissão sacramental deve ser feita com um padre na Igreja.
+          </p>
+        </div>
+
+        <!-- Histórico -->
+        <div class="card" style="margin-top: 2rem;">
+          <h3 class="card-title">Histórico de Confissões</h3>
+          <div class="items-list" id="confissao-list">
+            <!-- Gerado por JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    let isLoggedIn = false;
+
+    function init() {
+      showPinScreen();
+    }
+
+	    function showPinScreen() {
+	      document.getElementById('pin-screen').classList.remove('hidden');
+	      document.getElementById('confissao-screen').classList.add('hidden');
+	      document.getElementById('pin-settings-screen').classList.add('hidden');
+	      isLoggedIn = false;
+	    }
+
+    function handlePinInput(event, index) {
+      const inputs = document.querySelectorAll('.pin-digit');
+      const value = event.target.value;
+      
+      if (value.length > 1) {
+        event.target.value = value.slice(-1);
+      }
+      
+      if (value && index < 3) {
+        inputs[index + 1].focus();
+      }
+      
+      if (event.key === 'Backspace' && !value && index > 0) {
+        inputs[index - 1].focus();
+      }
+      
+      if (event.key === 'Enter') {
+        verifyPin();
+      }
+    }
+
+    function verifyPin() {
+      const inputs = document.querySelectorAll('.pin-digit');
+      const pin = Array.from(inputs).map(input => input.value).join('');
+      
+      if (pin.length !== 4) {
+        alert('Digite um PIN de 4 dígitos');
+        return;
+      }
+      
+      if (PIN.verify(pin)) {
+        isLoggedIn = true;
+        showConfissaoScreen();
+      } else {
+        alert('PIN incorreto');
+        inputs.forEach(input => input.value = '');
+        inputs[0].focus();
+      }
+    }
+
+	    function showConfissaoScreen() {
+	      document.getElementById('pin-screen').classList.add('hidden');
+	      document.getElementById('confissao-screen').classList.remove('hidden');
+	      document.getElementById('pin-settings-screen').classList.add('hidden');
+	      loadConfissoes();
+	    }
+
+    function saveConfissao() {
+      const pecados = [];
+      for (let i = 1; i <= 15; i++) {
+        if (document.getElementById(`pecado-${i}`).checked) {
+          pecados.push(i);
+        }
+      }
+      
+      const notas = document.getElementById('confissao-notas').value;
+      
+      if (pecados.length === 0 && !notas) {
+        alert('Preencha pelo menos um item');
+        return;
+      }
+      
+      Confissao.saveConfissao({
+        pecados,
+        notas
+      });
+      
+      alert('Confissão salva com sucesso!');
+      
+      // Limpar formulário
+      document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+      document.getElementById('confissao-notas').value = '';
+      
+      loadConfissoes();
+    }
+
+    function loadConfissoes() {
+      const confissoes = Confissao.getConfissoes();
+      const list = document.getElementById('confissao-list');
+      list.innerHTML = '';
+      
+      if (confissoes.length === 0) {
+        list.innerHTML = '<p style="padding: 1rem; text-align: center; color: var(--muted-foreground);">Nenhuma confissão registrada</p>';
+        return;
+      }
+      
+      confissoes.slice(-5).reverse().forEach(confissao => {
+        const item = document.createElement('div');
+        item.className = 'item';
+        item.innerHTML = `
+          <div class="item-content">
+            <div class="item-title">${new Date(confissao.data).toLocaleDateString('pt-BR')}</div>
+            <div class="item-description">${confissao.pecados.length} pecado(s) examinado(s)</div>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+	    function logout() {
+	      isLoggedIn = false;
+	      showPinScreen();
+	    }
+	
+	    function showPinSettings() {
+	      document.getElementById('confissao-screen').classList.add('hidden');
+	      document.getElementById('pin-settings-screen').classList.remove('hidden');
+	      document.getElementById('new-pin').value = '';
+	      document.getElementById('confirm-pin').value = '';
+	    }
+	
+	    function cancelPinSettings() {
+	      document.getElementById('pin-settings-screen').classList.add('hidden');
+	      document.getElementById('confissao-screen').classList.remove('hidden');
+	    }
+	
+	    function changePin() {
+	      const newPin = document.getElementById('new-pin').value.trim();
+	      const confirmPin = document.getElementById('confirm-pin').value.trim();
+	      
+	      if (newPin.length !== 4 || confirmPin.length !== 4) {
+	        alert('O PIN deve ter 4 dígitos.');
+	        return;
+	      }
+	      
+	      if (newPin !== confirmPin) {
+	        alert('Os PINs não coincidem.');
+	        return;
+	      }
+	      
+	      PIN.setPin(newPin);
+	      alert('PIN alterado com sucesso!');
+	      cancelPinSettings();
+	    }
+	
+	    function resetPinToDefault() {
+	      if (confirm('Deseja realmente resetar o PIN para o padrão (1234)?')) {
+	        PIN.resetPin();
+	        alert('PIN resetado para 1234.');
+	        cancelPinSettings();
+	      }
+	    }
+
+    // Inicializar
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
