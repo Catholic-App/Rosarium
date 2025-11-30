@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orações - Rosarium</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <button class="btn-back" onclick="goBack()">← Voltar</button>
+      <div class="header-title">
+        <div class="header-logo">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m6.364 1.636l-.707-.707M21 12h-1m1.364 6.364l-.707.707M12 21v1m-6.364-1.636l.707.707M3 12h1M4.636 4.636l.707.707" />
+          </svg>
+        </div>
+        <span>Orações</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <div class="page-container">
+    <div class="page-content container-md">
+      
+      <!-- Seção: Busca e Filtros -->
+      <section class="oracoes-search">
+        <div class="search-container">
+          <input 
+            type="text" 
+            id="search-input" 
+            class="input" 
+            placeholder="Buscar orações..." 
+            onkeyup="buscarOracoes()"
+          >
+        </div>
+        
+        <div class="filter-buttons">
+          <button class="filter-btn active" onclick="filtrarOracoes('todas')">Todas</button>
+          <button class="filter-btn" onclick="filtrarOracoes('basicas')">Básicas</button>
+          <button class="filter-btn" onclick="filtrarOracoes('maria')">Nossa Senhora</button>
+          <button class="filter-btn" onclick="filtrarOracoes('santos')">Santos</button>
+          <button class="filter-btn" onclick="filtrarOracoes('favoritas')">❤️ Favoritas</button>
+        </div>
+      </section>
+
+      <!-- Lista de Orações -->
+      <section class="oracoes-list" id="oracoes-container">
+        <!-- Gerado por JavaScript -->
+      </section>
+
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    let oracoesFiltradas = [];
+    let filtroAtual = 'todas';
+
+    const oracoes = [
+      // Orações Básicas
+      {
+        id: 1,
+        titulo: "Sinal da Cruz",
+        categoria: "basicas",
+        texto: "Em nome do Pai, do Filho e do Espírito Santo. Amém.",
+        descricao: "Oração fundamental do cristianismo"
+      },
+      {
+        id: 2,
+        titulo: "Pai Nosso",
+        categoria: "basicas",
+        texto: "Pai nosso, que estais nos céus, santificado seja o vosso nome, venha a nós o vosso reino, seja feita a vossa vontade, assim na terra como no céu. O pão nosso de cada dia nos dai hoje, perdoai-nos as nossas dívidas, assim como nós perdoamos aos nossos devedores, e não nos deixeis cair em tentação, mas livrai-nos do mal. Amém.",
+        descricao: "Oração ensinada por Jesus"
+      },
+      {
+        id: 3,
+        titulo: "Ave Maria",
+        categoria: "basicas",
+        texto: "Ave Maria, cheia de graça, o Senhor é convosco, bendita sois vós entre as mulheres, e bendito é o fruto do vosso ventre, Jesus. Santa Maria, Mãe de Deus, rogai por nós pecadores, agora e na hora da nossa morte. Amém.",
+        descricao: "Saudação à Mãe de Deus"
+      },
+      {
+        id: 4,
+        titulo: "Glória ao Pai",
+        categoria: "basicas",
+        texto: "Glória seja ao Pai, e ao Filho, e ao Espírito Santo. Como era no princípio, agora e sempre, por todos os séculos dos séculos. Amém.",
+        descricao: "Doxologia cristã"
+      },
+      {
+        id: 5,
+        titulo: "Credo",
+        categoria: "basicas",
+        texto: "Creio em Deus Pai todo-poderoso, criador do céu e da terra; e em Jesus Cristo, seu único Filho, nosso Senhor, que foi concebido pelo poder do Espírito Santo, nasceu da Virgem Maria, padeceu sob Pôncio Pilatos, foi crucificado, morto e sepultado; desceu à mansão dos mortos; ressuscitou ao terceiro dia; subiu aos céus, e está sentado à direita de Deus Pai todo-poderoso, donde há de vir a julgar os vivos e os mortos. Creio no Espírito Santo, na santa Igreja Católica, na comunhão dos santos, na remissão dos pecados, na ressurreição da carne, na vida eterna. Amém.",
+        descricao: "Profissão de fé cristã"
+      },
+      {
+        id: 6,
+        titulo: "Ó Meu Jesus",
+        categoria: "basicas",
+        texto: "Ó meu Jesus, perdoai-nos, livrai-nos do fogo do inferno, levai as almas todas ao céu, especialmente as que mais precisarem da vossa misericórdia. Amém.",
+        descricao: "Oração da Coroa da Divina Misericórdia"
+      },
+
+      // Orações a Nossa Senhora
+      {
+        id: 7,
+        titulo: "Salve Rainha",
+        categoria: "maria",
+        texto: "Salve, Rainha, Mãe de misericórdia, vida, doçura, esperança nossa, salve! A vós bradamos os degredados filhos de Eva. A vós suspiramos, gemendo e chorando neste vale de lágrimas. Eia, pois, advogada nossa, esses vossos olhos misericordiosos a nós volvei! E depois deste desterro, mostrai-nos Jesus, bendito fruto do vosso ventre, ó clemente, ó piedosa, ó doce sempre Virgem Maria!",
+        descricao: "Antífona mariana tradicional"
+      },
+      {
+        id: 8,
+        titulo: "Memorare",
+        categoria: "maria",
+        texto: "Lembrai-vos, ó puríssima Virgem Maria, que nunca se ouviu dizer que alguém tenha recorrido à vossa proteção, implorado vosso auxílio e pedido vosso patrocínio, que não tenha sido por vós consolado. Animado por esta confiança, ó Mãe de misericórdia, a vós recorro e, gemendo sob o peso dos meus pecados, me prostro aos vossos pés. Não desprezeis, ó Mãe do Verbo, as minhas súplicas, antes acolhei-as benignamente. Amém.",
+        descricao: "Oração de confiança em Maria"
+      },
+      {
+        id: 9,
+        titulo: "Deus Vos Salve",
+        categoria: "maria",
+        texto: "Deus vos salve, Virgem, Filha de Deus Pai! Deus vos salve, Virgem, Mãe de Deus Filho! Deus vos salve, Virgem, Esposa do Divino Espírito Santo! Deus vos salve, Virgem, Templo e Sacrário da Santíssima Trindade!",
+        descricao: "Saudação à Santíssima Trindade em Maria"
+      },
+      {
+        id: 10,
+        titulo: "Oração a Nossa Senhora de Fátima",
+        categoria: "maria",
+        texto: "Ó minha Mãe, Rainha do Rosário e Mãe de misericórdia! Entrego-vos o meu coração e toda a minha vida. Guiai-me sempre pelo caminho de Jesus. Protegei-me com o vosso manto sagrado. Obtende-me do vosso Filho a graça de viver santamente e morrer em paz. Amém.",
+        descricao: "Devoção a Nossa Senhora de Fátima"
+      },
+
+      // Orações aos Santos
+      {
+        id: 11,
+        titulo: "Oração a São José",
+        categoria: "santos",
+        texto: "Glorioso São José, modelo de virtudes, protetor das famílias, rogai por nós! Que vossa paciência e vossa fidelidade nos sirvam de exemplo. Obtende-nos do Senhor a graça de viver em paz e harmonia. Amém.",
+        descricao: "Protetor das famílias"
+      },
+      {
+        id: 12,
+        titulo: "Oração a Santo Antônio",
+        categoria: "santos",
+        texto: "Glorioso Santo Antônio, vós que sois tão poderoso junto a Deus, alcançai-me a graça que vos peço. Vós que encontrastes o que estava perdido, ajudai-me a encontrar o que procuro. Rogai por mim junto ao trono de Deus. Amém.",
+        descricao: "Santo das coisas perdidas"
+      },
+      {
+        id: 13,
+        titulo: "Oração a São Francisco",
+        categoria: "santos",
+        texto: "Senhor, fazei de mim um instrumento da vossa paz. Onde houver ódio, que eu leve o amor. Onde houver ofensa, que eu leve o perdão. Onde houver discórdia, que eu leve a união. Onde houver dúvida, que eu leve a fé. Onde houver desespero, que eu leve a esperança. Onde houver trevas, que eu leve a luz. Onde houver tristeza, que eu leve a alegria. Amém.",
+        descricao: "Oração da paz"
+      },
+      {
+        id: 14,
+        titulo: "Oração a Santa Terezinha",
+        categoria: "santos",
+        texto: "Pequena Santa Terezinha, vós que ensinastes o caminho da infância espiritual, ajudai-me a confiar como uma criança nos braços de Deus. Que eu possa fazer as pequenas coisas com grande amor. Rogai por mim. Amém.",
+        descricao: "Caminho da infância espiritual"
+      },
+      {
+        id: 15,
+        titulo: "Oração a São Padre Pio",
+        categoria: "santos",
+        texto: "Querido Padre Pio, vós que sofrastes com Cristo e fostes instrumento de sua misericórdia, alcançai-me a graça de amar o sofrimento e de servir aos pobres com alegria. Rogai por mim junto a Jesus. Amém.",
+        descricao: "Intercessor da misericórdia"
+      }
+    ];
+
+    function init() {
+      renderizarOracoes(oracoes);
+    }
+
+    function renderizarOracoes(lista) {
+      const container = document.getElementById('oracoes-container');
+      
+      if (lista.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 2rem;">Nenhuma oração encontrada.</p>';
+        return;
+      }
+
+      container.innerHTML = lista.map(oracao => `
+        <div class="oracao-card">
+          <div class="oracao-header">
+            <h3 class="oracao-titulo">${oracao.titulo}</h3>
+            <button class="btn-favorito-oracao" onclick="toggleFavoritoOracao(${oracao.id})" id="fav-${oracao.id}">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 20px; height: 20px;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            </button>
+          </div>
+          <p class="oracao-descricao">${oracao.descricao}</p>
+          <p class="oracao-texto" style="white-space: pre-wrap;">${oracao.texto}</p>
+        </div>
+      `).join('');
+
+      // Atualizar estado dos botões de favorito
+      lista.forEach(oracao => {
+        atualizarBotaoFavoritoOracao(oracao.id);
+      });
+    }
+
+    function buscarOracoes() {
+      const termo = document.getElementById('search-input').value.toLowerCase();
+      
+      let resultado = oracoes.filter(oracao => {
+        const match = oracao.titulo.toLowerCase().includes(termo) ||
+                     oracao.descricao.toLowerCase().includes(termo) ||
+                     oracao.texto.toLowerCase().includes(termo);
+        
+        if (filtroAtual === 'todas') return match;
+        if (filtroAtual === 'favoritas') {
+          const isFav = localStorage.getItem(`oracao-fav-${oracao.id}`) === 'true';
+          return match && isFav;
+        }
+        return match && oracao.categoria === filtroAtual;
+      });
+
+      renderizarOracoes(resultado);
+    }
+
+    function filtrarOracoes(categoria) {
+      filtroAtual = categoria;
+      
+      // Atualizar botões de filtro
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+
+      buscarOracoes();
+    }
+
+    function toggleFavoritoOracao(id) {
+      const isFav = localStorage.getItem(`oracao-fav-${id}`) === 'true';
+      localStorage.setItem(`oracao-fav-${id}`, !isFav);
+      atualizarBotaoFavoritoOracao(id);
+    }
+
+    function atualizarBotaoFavoritoOracao(id) {
+      const btn = document.getElementById(`fav-${id}`);
+      const isFav = localStorage.getItem(`oracao-fav-${id}`) === 'true';
+      
+      if (btn) {
+        if (isFav) {
+          btn.classList.add('favorito-ativo');
+          btn.style.color = 'var(--destructive)';
+        } else {
+          btn.classList.remove('favorito-ativo');
+          btn.style.color = 'var(--text-secondary)';
+        }
+      }
+    }
+
+    function goBack() {
+      window.history.back();
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+
+  <style>
+    .oracoes-search {
+      margin-bottom: 2rem;
+    }
+
+    .search-container {
+      margin-bottom: 1rem;
+    }
+
+    .filter-buttons {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 0.5rem 1rem;
+      background-color: var(--secondary);
+      color: var(--secondary-foreground);
+      border: none;
+      border-radius: 2rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .filter-btn:hover {
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+    }
+
+    .filter-btn.active {
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+    }
+
+    .oracoes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .oracao-card {
+      background-color: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .oracao-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-color: var(--primary);
+    }
+
+    .oracao-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.75rem;
+      gap: 1rem;
+    }
+
+    .oracao-titulo {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--foreground);
+      margin: 0;
+    }
+
+    .btn-favorito-oracao {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .btn-favorito-oracao:hover {
+      color: var(--destructive);
+      transform: scale(1.2);
+    }
+
+    .btn-favorito-oracao.favorito-ativo {
+      color: var(--destructive);
+    }
+
+    .oracao-descricao {
+      color: var(--muted-foreground);
+      font-size: 0.9rem;
+      font-style: italic;
+      margin: 0 0 1rem 0;
+    }
+
+    .oracao-texto {
+      color: var(--foreground);
+      line-height: 1.8;
+      margin: 0;
+    }
+  </style>
+</body>
+</html>
