@@ -65,7 +65,7 @@ function displaySantoDoDia(date) {
         container.innerHTML = `
             <div class="santo-header-card" style="text-align: center; margin-bottom: 1.5rem;">
                 <div class="santo-image-circle" style="width: 150px; height: 150px; border-radius: 50%; background-color: var(--primary); margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                    <img src="assets/santos/${santo.imagem}" alt="${santo.nome}" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img src="assets${santo.imagem}" alt="${santo.nome}" style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
                 <h3 class="card-title" style="margin-bottom: 0.25rem;">${santo.titulo || santo.nome}</h3>
                 <p class="text-sm text-muted-foreground">${dateText}</p>
