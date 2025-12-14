@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cantos e Ladainhas - Rosarium</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <button class="btn-back" onclick="goBack()">← Voltar</button>
+      <div class="header-title">
+        <div class="header-logo">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.12 2-2.5 2S4 20.105 4 19s1.12-2 2.5-2 2.5 0.895 2.5 2zm12-3c0 1.105-1.12 2-2.5 2s-2.5-0.895-2.5-2 1.12-2 2.5-2 2.5 0.895 2.5 2zM12 6v13" />
+          </svg>
+        </div>
+        <span>Cantos e Ladainhas</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <div class="page-container">
+    <div class="page-content container-md">
+      
+      <!-- Seção: Busca e Filtros -->
+      <section class="oracoes-search">
+        <div class="search-container">
+          <input 
+            type="text" 
+            id="search-input" 
+            class="input" 
+            placeholder="Buscar cantos e ladainhas..." 
+            onkeyup="buscarCantos()"
+          >
+        </div>
+        
+        <div class="filter-buttons">
+          <button class="filter-btn active" onclick="filtrarCantos('todas')">Todas</button>
+          <button class="filter-btn" onclick="filtrarCantos('cantos')">Cantos</button>
+          <button class="filter-btn" onclick="filtrarCantos('ladainhas')">Ladainhas</button>
+          <button class="filter-btn" onclick="filtrarCantos('maria')">Nossa Senhora</button>
+          <button class="filter-btn" onclick="filtrarCantos('favoritas')">❤️ Favoritas</button>
+        </div>
+      </section>
+
+      <!-- Lista de Orações -->
+      <section class="oracoes-list" id="cantos-container">
+        <!-- Gerado por JavaScript -->
+      </section>
+
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    let cantosFiltrados = [];
+    let filtroAtual = 'todas';
+
+    const cantos = [
+      // Cantos e Ladainhas
+      // Cantos
+      {
+        id: 1,
+        titulo: "Pescador de Homens",
+        categoria: "cantos",
+        texto: "Tu tens vindo à praia, não buscaste nem sábios nem ricos, só queres que eu te siga. Senhor, me olhaste nos olhos, a sorrir, disseste o meu nome. Na praia, eu deixei o meu barco, junto a ti, buscarei outro mar.",
+        descricao: "Canto de vocação popular"
+      },
+      {
+        id: 2,
+        titulo: "Hino a Nossa Senhora Aparecida",
+        categoria: "cantos",
+        texto: "Viva a Mãe de Deus e nossa, sem pecado concebida! Viva a Virgem Imaculada, a Senhora Aparecida! Aqui estão vossos devotos, cheios de fé incendida, de conforto e de esperança, ó Senhora Aparecida! Virgem Santa, Virgem Bela, Mãe amável, Mãe querida, amparai-nos, socorrei-nos, ó Senhora Aparecida!",
+        descricao: "Hino da Padroeira do Brasil"
+      },
+      {
+        id: 3,
+        titulo: "Oração pela Paz (São Francisco)",
+        categoria: "cantos",
+        texto: "Senhor, fazei de mim um instrumento de vossa paz. Onde houver ódio, que eu leve o amor. Onde houver ofensa, que eu leve o perdão. Onde houver discórdia, que eu leve a união. Onde houver dúvida, que eu leve a fé. Onde houver desespero, que eu leve a esperança. Onde houver trevas, que eu leve a luz. Onde houver tristeza, que eu leve a alegria. Ó Mestre, fazei que eu procure mais consolar que ser consolado, compreender que ser compreendido, amar que ser amado. Pois é dando que se recebe, é perdoando que se é perdoado, e é morrendo que se vive para a vida eterna.",
+        descricao: "Canto baseado na Oração de São Francisco"
+      },
+      // Ladainhas
+      {
+        id: 4,
+        titulo: "Ladainha de Nossa Senhora (Lauretana)",
+        categoria: "ladainhas",
+        texto: "Senhor, tende piedade de nós. Cristo, tende piedade de nós. Senhor, tende piedade de nós. Cristo, ouvi-nos. Cristo, atendei-nos. Deus Pai do Céu, tende piedade de nós. Deus Filho, Redentor do mundo, tende piedade de nós. Deus Espírito Santo, tende piedade de nós. Santíssima Trindade, que sois um só Deus, tende piedade de nós. Santa Maria, rogai por nós. Santa Mãe de Deus, rogai por nós. Santa Virgem das Virgens, rogai por nós. Mãe de Jesus Cristo, rogai por nós. Mãe da divina graça, rogai por nós. Mãe puríssima, rogai por nós. Mãe castíssima, rogai por nós. Mãe Imaculada, rogai por nós. Mãe intacta, rogai por nós. Mãe amável, rogai por nós. Mãe admirável, rogai por nós. Mãe do bom conselho, rogai por nós. Mãe do Criador, rogai por nós. Mãe do Salvador, rogai por nós. Virgem prudentíssima, rogai por nós. Virgem venerável, rogai por nós. Virgem louvável, rogai por nós. Virgem poderosa, rogai por nós. Virgem clemente, rogai por nós. Virgem fiel, rogai por nós. Espelho de justiça, rogai por nós. Sede de sabedoria, rogai por nós. Causa da nossa alegria, rogai por nós. Vaso espiritual, rogai por nós. Vaso honorífico, rogai por nós. Vaso insigne de devoção, rogai por nós. Rosa mística, rogai por nós. Torre de David, rogai por nós. Torre de marfim, rogai por nós. Casa de ouro, rogai por nós. Arca da Aliança, rogai por nós. Porta do Céu, rogai por nós. Estrela da manhã, rogai por nós. Saúde dos enfermos, rogai por nós. Refúgio dos pecadores, rogai por nós. Consoladora dos aflitos, rogai por nós. Auxílio dos cristãos, rogai por nós. Rainha dos Anjos, rogai por nós. Rainha dos Patriarcas, rogai por nós. Rainha dos Profetas, rogai por nós. Rainha dos Apóstolos, rogai por nós. Rainha dos Mártires, rogai por nós. Rainha dos Confessores, rogai por nós. Rainha das Virgens, rogai por nós. Rainha de todos os Santos, rogai por nós. Rainha concebida sem pecado original, rogai por nós. Rainha elevada ao Céu, rogai por nós. Rainha do Sacratíssimo Rosário, rogai por nós. Rainha da Paz, rogai por nós. Cordeiro de Deus, que tirais o pecado do mundo, perdoai-nos, Senhor. Cordeiro de Deus, que tirais o pecado do mundo, ouvi-nos, Senhor. Cordeiro de Deus, que tirais o pecado do mundo, tende piedade de nós. Rogai por nós, Santa Mãe de Deus. Para que sejamos dignos das promessas de Cristo. Oremos: Concedei a vossos servos, Senhor Deus, gozar de saúde da alma e do corpo, e pela gloriosa intercessão da bem-aventurada sempre Virgem Maria, livrai-nos da tristeza presente e dai-nos a eterna alegria. Por Cristo, nosso Senhor. Amém.",
+        descricao: "Ladainha Mariana mais conhecida"
+      },
+      {
+        id: 5,
+        titulo: "Ladainha de Todos os Santos",
+        categoria: "ladainhas",
+        texto: "Senhor, tende piedade de nós. Cristo, tende piedade de nós. Senhor, tende piedade de nós. Santa Maria, Mãe de Deus, rogai por nós. São Miguel, rogai por nós. Santos Anjos de Deus, rogai por nós. São João Batista, rogai por nós. São José, rogai por nós. São Pedro e São Paulo, rogai por nós. Santo André, rogai por nós. São João, rogai por nós. Santa Maria Madalena, rogai por nós. Santo Estêvão, rogai por nós. Santo Inácio de Antioquia, rogai por nós. São Lourenço, rogai por nós. Santas Perpétua e Felicidade, rogai por nós. Santa Inês, rogai por nós. São Gregório, rogai por nós. Santo Agostinho, rogai por nós. Santo Atanásio, rogai por nós. São Basílio, rogai por nós. São Martinho, rogai por nós. São Bento, rogai por nós. São Francisco e São Domingos, rogai por nós. São Francisco Xavier, rogai por nós. São João Maria Vianney, rogai por nós. Santa Catarina de Sena, rogai por nós. Santa Teresa de Jesus, rogai por nós. Todos os Santos e Santas de Deus, rogai por nós. Sede-nos propício, livrai-nos, Senhor. De todo o mal, livrai-nos, Senhor. De todo o pecado, livrai-nos, Senhor. Da morte eterna, livrai-nos, Senhor. Pela vossa Encarnação, livrai-nos, Senhor. Pela vossa Morte e Ressurreição, livrai-nos, Senhor. Pela vinda do Espírito Santo, livrai-nos, Senhor. Nós pecadores, vos rogamos, ouvi-nos. Para que nos perdoeis, vos rogamos, ouvi-nos. Para que nos conserveis e governeis na vossa santa Igreja, vos rogamos, ouvi-nos. Jesus, Filho de Deus vivo, vos rogamos, ouvi-nos. Cristo, ouvi-nos. Cristo, atendei-nos. Senhor, tende piedade de nós. Cristo, tende piedade de nós. Senhor, tende piedade de nós.",
+        descricao: "Ladainha de intercessão"
+      },
+      {
+        id: 6,
+        titulo: "Ladainha de Todos os Santos",
+        categoria: "ladainhas",
+        texto: "Senhor, tende piedade de nós. Cristo, tende piedade de nós. Senhor, tende piedade de nós. Jesus Cristo, ouvi-nos. Jesus Cristo, atendei-nos. Deus pai do ceu, tende piedade de nós. Deus filho, redentor do mundo, tende piedade de nós. Deus Espírito Santo, tende piedade de nós. Santíssima Trindade, que sois um só Deus, tende piedade de nós. Santa Maria, rogai por nós. Santa Mãe de Deus, rogai por nós. Santa Virgem das virgens, rogai por nós. São Miguel, rogai por nós. São Gabriel, rogai por nós. São Rafael, rogai por nós. Todos os santos Anjos e Arcanjos, rogai por nós. Todos as santas ordens de Espíritos bem-aventurados, rogai por nós. São João Batista, rogai por nós. São José, rogai por nós. Todos os santos patriarcas e profetas, rogai por nós. São Pedro, rogai por nós. São Paulo, rogai por nós. Santo André, rogai por nós. São Thiago, rogai por nós. São João, rogai por nós. São Tomé, rogai por nós. São Thiago, rogai por nós. São Felipe, rogai por nós. São Bartolomeu, rogai por nós. São Mateus, rogai por nós. São Simão, rogai por nós. São Tadeu, rogai por nós. São Matias, rogai por nós. São Barnabé, rogai por nós. São Lucas, rogai por nós. São Marcos, rogai por nós. Todos os santos apóstolos e evangelistas, rogai por nós. Todos os santos Discípulos do Senhor, rogai por nós. Todos os santos inocentes, rogai por nós. São Estevão, rogai por nós. São Lorenço, rogai por nós. São Vicente, rogai por nós. Santos Fabiano e Sebastião, rogai por nós. Santos João e Paulo, rogai por nós. Santos Cosme e Damião, rogai por nós. Santos Gervásio e protasio, rogai por nós. Todos os santos Mártires, rogai por nós. São Silvestre, rogai por nós. São Gregório, rogai por nós. Santo Ambrósio, rogai por nós. São Angostinho, rogai por nós. São Jerônimo, rogai por nós. São Martim, rogai por nós. São Nicolau, rogai por nós. Todos os santos pontífices e confessores, rogai por nós. Todos os santos doutores, rogai por nós. Santo Antônio, rogai por nós. São Bento, rogai por nós. São Bernardo, rogai por nós. São Domingos, rogai por nós. São Francisco, rogai por nós. Todos os santos sacerdotes e levitas, rogai por nós. Todos os santos Monges e eremitas, rogai por nós. Santa Maria Madalena, rogai por nós. Santa Águeda, rogai por nós. Santa Lúcia, rogai por nós. Santa Inês, rogai por nós. Santa Cecília, rogai por nós. Santa Anastásia, rogai por nós. Todas as santas virgens e viúvas, rogai por nós. Todos os santos e santas de Deus, intercedei por nós. Sêde propício, perdoai-nos Senhor. Sêde propício, ouvi-nos Senhor. De todo o mal, livrai-nos Senhor. De todo o pecado, livrai-nos Senhor. De vossa ira, livrai-nos Senhor. Da morte repentina e imprevista, livrai-nos Senhor. Das ciladas do demônio, livrai-nos Senhor. De toda a ira, ódio e má vontade, livrai-nos Senhor. Do espírito da fornicação, livrai-nos Senhor. Do raio e da tempestade, livrai-nos Senhor. Do flagelo do terremoto, livrai-nos Senhor. Da peste da fome e da guerra, livrai-nos Senhor. Da morte eterna, livrai-nos Senhor. Pelo mistério de vossa santa encarnação, livrai-nos Senhor. Pela vossa vinda, livrai-nos Senhor. Pelo vosso nascimento, livrai-nos Senhor. Por vosso batismo e santo jejum, livrai-nos Senhor. Por vossa cruz e paixão, livrai-nos Senhor. Por vossa morte e sepultura, livrai-nos Senhor. Por vossa santa ressurreição, livrai-nos Senhor. Por vossa admirável ascensão, livrai-nos Senhor. Pela vinda do Espírito Santo Consolador, livrai-nos Senhor. No dia do juízo, livrai-nos Senhor. Pecadores que somos, nós vos rogamos: ouvi-nos. Que nos perdoeis, nós vos rogamos: ouvi-nos. Que vos digneis conduzir-nos ao verdadeiro arrependimento, nós vos rogamos: ouvi-nos. Que vos digneis governar e conservar vossa santa Igreja, nós vos rogamos: ouvi-nos. Que vos digneis conservar na santa religião o Sumo Pontífice e todas as ordens da Igreja, nós vos rogamos: ouvi-nos. Que vos digneis humilhar os inimigos da santa Igreja, nós vos rogamos: ouvi-nos. Que vos digneis conceder a paz e a concórdia a todos os povos cristãos, nós vos rogamos: ouvi-nos. Que vos digneis chamar à unidade da Igreja todos os que erram e reconduzir à luz do Evangelho todos os infiéis, nós vos rogamos: ouvi-nos. Que vos digneis confortar-nos e guardar-nos em vosso santo serviço, nós vos rogamos: ouvi-nos. Que vos digneis elevar nossos espíritos aos desejos celestes, nós vos rogamos: ouvi-nos. Que vos digneis recompensar com bens eternos a todos os nossos benfeitores, nós vos rogamos: ouvi-nos. Que vos digneis livrar a nós, e a nossos irmãos, do suplício eterno, nós vos rogamos: ouvi-nos. Que vos digneis dar e conservar os frutos da terra, nós vos rogamos: ouvi-nos. Que vos digneis conceder o descanso eterno a todos os fiéis defuntos, nós vos rogamos: ouvi-nos. Que vos digneis ouvir-nos, nós vos rogamos: ouvi-nos. Cordeiro de Deus, que tirais os pecados do mundo, perdoai-nos Senhor. Cordeiro de Deus, que tirais os pecados do mundo, ouvi-nos Senhor. Cordeiro de Deus, que tirais os pecados do mundo, tende piedade de nós. Cristo, ouvi-nos. Cristo, atendei-nos. Senhor, tende piedade de nós. Cristo, tende piedade de nós. Senhor, tende piedade de nós.",
+        descricao: "Ladainha tradicional da Igreja Católica, usada em diversas ocasiões solenes"
+      },
+      {
+        id: 7,
+        titulo: "Ladainha de Nossa Senhora (Lauretana)",
+        categoria: "ladainhas",
+        texto: "Senhor, tende piedade de nós. Cristo, tende piedade de nós. Senhor, tende piedade de nós. Jesus Cristo, ouvi-nos. Jesus Cristo, atendei-nos. Deus Pai dos Céus, tende piedade de nós. Deus Filho, Redentor do mundo, tende piedade de nós. Deus Espírito Santo, tende piedade de nós. Santíssima Trindade, que sois um só Deus, tende piedade de nós. Santa Maria, rogai por nós. Santa Mãe de Deus, rogai por nós. Santa Virgem das Virgens, rogai por nós. Mãe de Jesus Cristo, rogai por nós. Mãe da divina graça, rogai por nós. Mãe puríssima, rogai por nós. Mãe castíssima, rogai por nós. Mãe sempre Virgem, rogai por nós. Mãe imaculada, rogai por nós. Mãe intacta, rogai por nós. Mãe amável, rogai por nós. Mãe admirável, rogai por nós. Mãe do bom conselho, rogai por nós. Mãe do Criador, rogai por nós. Mãe do Salvador, rogai por nós. Virgem prudentíssima, rogai por nós. Virgem venerável, rogai por nós. Virgem louvável, rogai por nós. Virgem poderosa, rogai por nós. Virgem clemente, rogai por nós. Virgem fiel, rogai por nós. Espelho de justiça, rogai por nós. Sede de sabedoria, rogai por nós. Causa da nossa alegria, rogai por nós. Vaso espiritual, rogai por nós. Vaso honorífico, rogai por nós. Vaso insigne de devoção, rogai por nós. Rosa mística, rogai por nós. Torre de David, rogai por nós. Torre de marfim, rogai por nós. Casa de ouro, rogai por nós. Arca da aliança, rogai por nós. Porta do céu, rogai por nós. Estrela da manhã, rogai por nós. Saúde dos enfermos, rogai por nós. Refúgio dos pecadores, rogai por nós. Consoladora dos aflitos, rogai por nós. Auxílio dos cristãos, rogai por nós. Rainha dos Anjos, rogai por nós. Rainha dos Patriarcas, rogai por nós. Rainha dos Profetas, rogai por nós. Rainha dos Apóstolos, rogai por nós. Rainha dos Mártires, rogai por nós. Rainha dos Confessores, rogai por nós. Rainha das Virgens, rogai por nós. Rainha de todos os Santos, rogai por nós. Rainha concebida sem pecado original, rogai por nós. Rainha elevada ao Céu, rogai por nós. Rainha do Sacratíssimo Rosário, rogai por nós. Rainha da Paz, rogai por nós. Cordeiro de Deus, que tirais os pecados do mundo, perdoai-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, ouvi-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, tende piedade de nós. Rogai por nós, Santa Mãe de Deus. Para que sejamos dignos das promessas de Cristo. Oremos: Concedei a vossos servos, nós vos pedimos, Senhor Deus, que gozemos de perpétua saúde da alma e do corpo; e que, pela gloriosa intercessão da bem-aventurada sempre Virgem Maria, sejamos livres da tristeza presente e gozemos da eterna alegria. Por Cristo, Senhor nosso. Amém.",
+        descricao: "Ladainha em honra à Virgem Maria, também conhecida como Ladainha Lauretana"
+      },
+      {
+        id: 8,
+        titulo: "Ladainha do Sagrado Coração de Jesus",
+        categoria: "ladainhas",
+        texto: "Senhor, tende piedade de nós. Cristo, tende piedade de nós. Senhor, tende piedade de nós. Jesus Cristo, ouvi-nos. Jesus Cristo, atendei-nos. Deus Pai dos Céus, tende piedade de nós. Deus Filho, Redentor do mundo, tende piedade de nós. Deus Espírito Santo, tende piedade de nós. Santíssima Trindade, que sois um só Deus, tende piedade de nós. Coração de Jesus, Filho do Pai Eterno, tende piedade de nós. Coração de Jesus, formado pelo Espírito Santo no seio da Virgem Mãe, tende piedade de nós. Coração de Jesus, unido substancialmente ao Verbo de Deus, tende piedade de nós. Coração de Jesus, de majestade infinita, tende piedade de nós. Coração de Jesus, templo santo de Deus, tende piedade de nós. Coração de Jesus, tabernáculo do Altíssimo, tende piedade de nós. Coração de Jesus, casa de Deus e porta do céu, tende piedade de nós. Coração de Jesus, fornalha ardente de caridade, tende piedade de nós. Coração de Jesus, receptáculo de justiça e de amor, tende piedade de nós. Coração de Jesus, cheio de bondade e de amor, tende piedade de nós. Coração de Jesus, abismo de todas as virtudes, tende piedade de nós. Coração de Jesus, digníssimo de todo o louvor, tende piedade de nós. Coração de Jesus, Rei e centro de todos os corações, tende piedade de nós. Coração de Jesus, no qual estão todos os tesouros da sabedoria e da ciência, tende piedade de nós. Coração de Jesus, no qual habita toda a plenitude da divindade, tende piedade de nós. Coração de Jesus, no qual o Pai pôs toda a sua complacência, tende piedade de nós. Coração de Jesus, de cuja plenitude todos nós recebemos, tende piedade de nós. Coração de Jesus, desejo das colinas eternas, tende piedade de nós. Coração de Jesus, paciente e de muita misericórdia, tende piedade de nós. Coração de Jesus, rico para todos os que vos invocam, tende piedade de nós. Coração de Jesus, fonte de vida e de santidade, tende piedade de nós. Coração de Jesus, propiciação por nossos pecados, tende piedade de nós. Coração de Jesus, saturado de opróbrios, tende piedade de nós. Coração de Jesus, moído por causa de nossos crimes, tende piedade de nós. Coração de Jesus, obediente até à morte, tende piedade de nós. Coração de Jesus, transpassado pela lança, tende piedade de nós. Coração de Jesus, fonte de toda a consolação, tende piedade de nós. Coração de Jesus, nossa vida e ressurreição, tende piedade de nós. Coração de Jesus, nossa paz e reconciliação, tende piedade de nós. Coração de Jesus, vítima dos pecadores, tende piedade de nós. Coração de Jesus, salvação dos que em vós esperam, tende piedade de nós. Coração de Jesus, esperança dos que morrem em vós, tende piedade de nós. Coração de Jesus, delícia de todos os santos, tende piedade de nós. Cordeiro de Deus, que tirais os pecados do mundo, perdoai-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, ouvi-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, tende piedade de nós. Jesus, manso e humilde de coração. Fazei o nosso coração semelhante ao vosso. Oremos: Deus onipotente e eterno, olhai para o Coração de vosso Filho diletíssimo e para os louvores e satisfações que ele vos ofereceu em nome dos pecadores; e, aplacado, perdoai àqueles que imploram a vossa misericórdia, em nome do vosso mesmo Filho Jesus Cristo, que convosco vive e reina na unidade do Espírito Santo, por todos os séculos dos séculos. Amém.",
+        descricao: "Ladainha em honra ao Sagrado Coração de Jesus"
+      },
+      {
+        id: 9,
+        titulo: "Ladainha de São José",
+        categoria: "ladainhas",
+        texto: "Senhor, tende piedade de nós. Cristo, tende piedade de nós. Senhor, tende piedade de nós. Jesus Cristo, ouvi-nos. Jesus Cristo, atendei-nos. Deus Pai dos Céus, tende piedade de nós. Deus Filho, Redentor do mundo, tende piedade de nós. Deus Espírito Santo, tende piedade de nós. Santíssima Trindade, que sois um só Deus, tende piedade de nós. Santa Maria, rogai por nós. São José, rogai por nós. Ilustre descendente de Davi, rogai por nós. Luz dos Patriarcas, rogai por nós. Esposo da Mãe de Deus, rogai por nós. Casto guarda da Virgem, rogai por nós. Sustentador do Filho de Deus, rogai por nós. Zeloso defensor de Cristo, rogai por nós. Chefe da Sagrada Família, rogai por nós. José justíssimo, rogai por nós. José castíssimo, rogai por nós. José prudentíssimo, rogai por nós. José fortíssimo, rogai por nós. José obedientíssimo, rogai por nós. José fidelíssimo, rogai por nós. Espelho de paciência, rogai por nós. Amante da pobreza, rogai por nós. Modelo dos operários, rogai por nós. Glória da vida doméstica, rogai por nós. Guarda das virgens, rogai por nós. Sustentáculo das famílias, rogai por nós. Consolação dos infelizes, rogai por nós. Esperança dos doentes, rogai por nós. Patrono dos moribundos, rogai por nós. Terror dos demônios, rogai por nós. Protetor da Santa Igreja, rogai por nós. Cordeiro de Deus, que tirais os pecados do mundo, perdoai-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, ouvi-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, tende piedade de nós. Ele o constituiu senhor de sua casa. E fê-lo príncipe de todos os seus bens. Oremos: Ó Deus, que por inefável providência vos dignastes escolher a São José para esposo de vossa Mãe Santíssima, concedei-nos que, aquele mesmo que veneramos como protetor na terra, mereçamos tê-lo como intercessor no céu. Por Cristo, Senhor nosso. Amém.",
+        descricao: "Ladainha em honra a São José, Patrono da Igreja Universal"
+      },
+      {
+        id: 10,
+        titulo: "Ladainha do Santíssimo Nome de Jesus",
+        categoria: "ladainhas",
+        texto: "Senhor, tende piedade de nós. Cristo, tende piedade de nós. Senhor, tende piedade de nós. Jesus, ouvi-nos. Jesus, atendei-nos. Deus Pai dos Céus, tende piedade de nós. Deus Filho, Redentor do mundo, tende piedade de nós. Deus Espírito Santo, tende piedade de nós. Santíssima Trindade, que sois um só Deus, tende piedade de nós. Jesus, Filho de Deus vivo, tende piedade de nós. Jesus, esplendor do Pai, tende piedade de nós. Jesus, pureza da luz eterna, tende piedade de nós. Jesus, Rei da glória, tende piedade de nós. Jesus, sol de justiça, tende piedade de nós. Jesus, Filho da Virgem Maria, tende piedade de nós. Jesus amável, tende piedade de nós. Jesus admirável, tende piedade de nós. Jesus, Deus forte, tende piedade de nós. Jesus, Pai do futuro século, tende piedade de nós. Jesus, Anjo do grande conselho, tende piedade de nós. Jesus poderosíssimo, tende piedade de nós. Jesus pacientíssimo, tende piedade de nós. Jesus obedientíssimo, tende piedade de nós. Jesus, manso e humilde de coração, tende piedade de nós. Jesus, amante da castidade, tende piedade de nós. Jesus, amante nosso, tende piedade de nós. Jesus, Deus da paz, tende piedade de nós. Jesus, autor da vida, tende piedade de nós. Jesus, exemplar das virtudes, tende piedade de nós. Jesus, zelador das almas, tende piedade de nós. Jesus, nosso Deus, tende piedade de nós. Jesus, nosso refúgio, tende piedade de nós. Jesus, Pai dos pobres, tende piedade de nós. Jesus, tesouro dos fiéis, tende piedade de nós. Jesus, bom Pastor, tende piedade de nós. Jesus, luz verdadeira, tende piedade de nós. Jesus, sabedoria eterna, tende piedade de nós. Jesus, bondade infinita, tende piedade de nós. Jesus, nosso caminho e nossa vida, tende piedade de nós. Jesus, alegria dos Anjos, tende piedade de nós. Jesus, Rei dos Patriarcas, tende piedade de nós. Jesus, Mestre dos Apóstolos, tende piedade de nós. Jesus, Doutor dos Evangelistas, tende piedade de nós. Jesus, fortaleza dos Mártires, tende piedade de nós. Jesus, luz dos Confessores, tende piedade de nós. Jesus, pureza das Virgens, tende piedade de nós. Jesus, coroa de todos os Santos, tende piedade de nós. Sede-nos propício, perdoai-nos, Jesus. Sede-nos propício, ouvi-nos, Jesus. De todo o mal, livrai-nos, Jesus. De todo o pecado, livrai-nos, Jesus. De vossa ira, livrai-nos, Jesus. Das ciladas do demônio, livrai-nos, Jesus. Do espírito da fornicação, livrai-nos, Jesus. Da morte eterna, livrai-nos, Jesus. Da negligência de vossas inspirações, livrai-nos, Jesus. Pelo mistério de vossa santa Encarnação, livrai-nos, Jesus. Pela vossa Natividade, livrai-nos, Jesus. Pela vossa Infância, livrai-nos, Jesus. Pela vossa vida mais santa, livrai-nos, Jesus. Pelos vossos trabalhos, livrai-nos, Jesus. Pela vossa agonia e paixão, livrai-nos, Jesus. Pela vossa Cruz e desamparo, livrai-nos, Jesus. Pela vossa morte e sepultura, livrai-nos, Jesus. Pela vossa Ressurreição, livrai-nos, Jesus. Pela vossa Ascensão, livrai-nos, Jesus. Pela vossa instituição do Santíssimo Sacramento, livrai-nos, Jesus. Pelas vossas alegrias, livrai-nos, Jesus. Pela vossa glória, livrai-nos, Jesus. Cordeiro de Deus, que tirais os pecados do mundo, perdoai-nos, Jesus. Cordeiro de Deus, que tirais os pecados do mundo, ouvi-nos, Jesus. Cordeiro de Deus, que tirais os pecados do mundo, tende piedade de nós. Jesus, ouvi-nos. Jesus, atendei-nos. Oremos: Senhor Jesus Cristo, que dissestes: Pedi e recebereis; buscai e achareis; batei e abrir-se-vos-á; nós vos rogamos que concedais a nós, que vos pedimos, o afeto do vosso divino amor, a fim de que vos amemos de todo o coração, e que por palavras, obras e exemplos, nunca deixemos de vos louvar. Vós que viveis e reinais pelos séculos dos séculos. Amém.",
+        descricao: "Ladainha em honra ao Santíssimo Nome de Jesus"
+      },
+      {
+        id: 11,
+        titulo: "Ladainha do Espírito Santo",
+        categoria: "ladainhas",
+        texto: "Senhor, tende piedade de nós. Cristo, tende piedade de nós. Senhor, tende piedade de nós. Jesus Cristo, ouvi-nos. Jesus Cristo, atendei-nos. Deus Pai dos Céus, tende piedade de nós. Deus Filho, Redentor do mundo, tende piedade de nós. Deus Espírito Santo, tende piedade de nós. Santíssima Trindade, que sois um só Deus, tende piedade de nós. Espírito Santo, que procedeis do Pai e do Filho, tende piedade de nós. Espírito do Senhor, que encheis o universo, tende piedade de nós. Espírito de sabedoria e de entendimento, tende piedade de nós. Espírito de conselho e de fortaleza, tende piedade de nós. Espírito de ciência e de piedade, tende piedade de nós. Espírito do temor de Deus, tende piedade de nós. Espírito de graça e de misericórdia, tende piedade de nós. Espírito de força, de amor e de sobriedade, tende piedade de nós. Espírito de fé, de esperança e de caridade, tende piedade de nós. Espírito de humildade e de paciência, tende piedade de nós. Espírito de paz e de doçura, tende piedade de nós. Espírito de santidade e de pureza, tende piedade de nós. Espírito Consolador, tende piedade de nós. Espírito Santificador, tende piedade de nós. Espírito que habitais em nós, tende piedade de nós. Espírito que nos ensinais todas as coisas, tende piedade de nós. Espírito que dais testemunho de Jesus Cristo, tende piedade de nós. Espírito que nos guiais à verdade, tende piedade de nós. Espírito que nos inspirais a oração, tende piedade de nós. Espírito que nos ajudais em nossa fraqueza, tende piedade de nós. Espírito que intercedeis por nós, tende piedade de nós. Espírito que nos selais para o dia da redenção, tende piedade de nós. Sede-nos propício, perdoai-nos, Senhor. Sede-nos propício, ouvi-nos, Senhor. De todo o mal, livrai-nos, Senhor. De todo o pecado, livrai-nos, Senhor. Das tentações e ciladas do demônio, livrai-nos, Senhor. Da presunção e do desespero, livrai-nos, Senhor. Da obstinação e da impenitência, livrai-nos, Senhor. Da impureza da mente e do corpo, livrai-nos, Senhor. Da falta de amor e de caridade, livrai-nos, Senhor. Pela vossa vinda ao seio de Maria, livrai-nos, Senhor. Pela vossa descida sobre Jesus no Jordão, livrai-nos, Senhor. Pela vossa vinda sobre os Apóstolos no Cenáculo, livrai-nos, Senhor. Pela vossa presença em nós, livrai-nos, Senhor. Nós vos rogamos, ouvi-nos. Para que vivamos segundo o Espírito, nós vos rogamos, ouvi-nos. Para que sejamos templos do Espírito Santo, nós vos rogamos, ouvi-nos. Para que não entristeçamos o Espírito Santo, nós vos rogamos, ouvi-nos. Para que sejamos dóceis às vossas inspirações, nós vos rogamos, ouvi-nos. Para que nos concedais a perseverança final, nós vos rogamos, ouvi-nos. Cordeiro de Deus, que tirais os pecados do mundo, enviai-nos o Espírito Santo. Cordeiro de Deus, que tirais os pecados do mundo, infundi em nós o Espírito Santo. Cordeiro de Deus, que tirais os pecados do mundo, dai-nos o Espírito Santo. Oremos: Ó Deus, que instruístes os corações dos vossos fiéis com a luz do Espírito Santo, concedei-nos que, pelo mesmo Espírito, conheçamos o que é reto e gozemos sempre de sua consolação. Por Cristo, Senhor nosso. Amém.",
+        descricao: "Ladainha em honra ao Espírito Santo"
+      },
+      {
+        id: 12,
+        titulo: "Ladainha da Humildade",
+        categoria: "ladainhas",
+        texto: "Ó Jesus, manso e humilde de coração, ouvi-me. Do desejo de ser estimado, livrai-me, Jesus. Do desejo de ser amado, livrai-me, Jesus. Do desejo de ser procurado, livrai-me, Jesus. Do desejo de ser honrado, livrai-me, Jesus. Do desejo de ser louvado, livrai-me, Jesus. Do desejo de ser preferido, livrai-me, Jesus. Do desejo de ser consultado, livrai-me, Jesus. Do desejo de ser aprovado, livrai-me, Jesus. Do temor de ser humilhado, livrai-me, Jesus. Do temor de ser desprezado, livrai-me, Jesus. Do temor de ser repreendido, livrai-me, Jesus. Do temor de ser caluniado, livrai-me, Jesus. Do temor de ser esquecido, livrai-me, Jesus. Do temor de ser ridicularizado, livrai-me, Jesus. Do temor de ser injuriado, livrai-me, Jesus. Do temor de ser posposto, livrai-me, Jesus. Que os outros sejam mais amados do que eu, Jesus, dai-me a graça de desejá-lo. Que os outros sejam mais estimados do que eu, Jesus, dai-me a graça de desejá-lo. Que os outros possam crescer na opinião do mundo e eu diminua, Jesus, dai-me a graça de desejá-lo. Que os outros sejam escolhidos e eu posto de lado, Jesus, dai-me a graça de desejá-lo. Que os outros sejam louvados e eu despercebido, Jesus, dai-me a graça de desejá-lo. Que os outros sejam preferidos a mim em todas as coisas, Jesus, dai-me a graça de desejá-lo. Que os outros se tornem mais santos do que eu, contanto que eu me torne tão santo quanto posso, Jesus, dai-me a graça de desejá-lo. Oremos: Ó Jesus, que, sendo Deus, vos humilhastes até à morte de Cruz, ensinai-nos a amar a humildade e a desprezar a vaidade do mundo, para que, seguindo os vossos passos, mereçamos ser exaltados no céu. Vós que viveis e reinais pelos séculos dos séculos. Amém.",
+        descricao: "Ladainha para pedir a virtude da humildade"
+      },
+      {
+        id: 13,
+        titulo: "Ladainha do Preciosíssimo Sangue de Jesus",
+        categoria: "ladainhas",
+        texto: "Senhor, tende piedade de nós. Cristo, tende piedade de nós. Senhor, tende piedade de nós. Jesus Cristo, ouvi-nos. Jesus Cristo, atendei-nos. Deus Pai dos Céus, tende piedade de nós. Deus Filho, Redentor do mundo, tende piedade de nós. Deus Espírito Santo, tende piedade de nós. Santíssima Trindade, que sois um só Deus, tende piedade de nós. Sangue de Cristo, Sangue do Filho Unigênito do Pai Eterno, salvai-nos. Sangue de Cristo, Sangue do Verbo de Deus encarnado, salvai-nos. Sangue de Cristo, Sangue do Novo e Eterno Testamento, salvai-nos. Sangue de Cristo, que na agonia jorrou na terra, salvai-nos. Sangue de Cristo, derramado na flagelação, salvai-nos. Sangue de Cristo, que manou na coroação de espinhos, salvai-nos. Sangue de Cristo, derramado na Cruz, salvai-nos. Sangue de Cristo, preço da nossa salvação, salvai-nos. Sangue de Cristo, sem o qual não pode haver perdão, salvai-nos. Sangue de Cristo, que nos purificais de todo o pecado, salvai-nos. Sangue de Cristo, bebida e banquete das almas, salvai-nos. Sangue de Cristo, rio de misericórdia, salvai-nos. Sangue de Cristo, vencedor dos demônios, salvai-nos. Sangue de Cristo, fortaleza dos mártires, salvai-nos. Sangue de Cristo, virtude dos confessores, salvai-nos. Sangue de Cristo, que faz germinar as virgens, salvai-nos. Sangue de Cristo, socorro dos que estão em perigo, salvai-nos. Sangue de Cristo, alívio dos que sofrem, salvai-nos. Sangue de Cristo, consolação na morte, salvai-nos. Sangue de Cristo, paz e doçura dos corações, salvai-nos. Sangue de Cristo, penhor da vida eterna, salvai-nos. Sangue de Cristo, que livrais as almas do Purgatório, salvai-nos. Sangue de Cristo, digníssimo de toda a honra e glória, salvai-nos. Cordeiro de Deus, que tirais os pecados do mundo, perdoai-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, ouvi-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, tende piedade de nós. V. Remistes-nos, Senhor, com o vosso Sangue. R. E fizestes de nós um reino para o nosso Deus. Oremos: Deus eterno e onipotente, que constituístes o vosso Filho Unigênito Redentor do mundo e quisestes ser aplacado com o seu Sangue, concedei-nos, nós vos pedimos, que, venerando o preço da nossa salvação, sejamos defendidos na terra dos males da vida presente e gozemos no céu da eterna bem-aventurança. Pelo mesmo Cristo, Senhor nosso. Amém.",
+        descricao: "Ladainha em honra ao Sangue de Jesus Cristo"
+      },
+      {
+        id: 14,
+        titulo: "Ladainha de São Miguel Arcanjo",
+        categoria: "ladainhas",
+        texto: "Senhor, tende piedade de nós. Cristo, tende piedade de nós. Senhor, tende piedade de nós. Jesus Cristo, ouvi-nos. Jesus Cristo, atendei-nos. Deus Pai dos Céus, tende piedade de nós. Deus Filho, Redentor do mundo, tende piedade de nós. Deus Espírito Santo, tende piedade de nós. Santíssima Trindade, que sois um só Deus, tende piedade de nós. Santa Maria, Rainha dos Anjos, rogai por nós. São Miguel, rogai por nós. São Miguel, Príncipe da Igreja de Jesus Cristo, rogai por nós. São Miguel, ornamento do Céu, rogai por nós. São Miguel, terror dos infernos, rogai por nós. São Miguel, chefe e príncipe dos exércitos do Senhor, rogai por nós. São Miguel, porta-estandarte da salvação, rogai por nós. São Miguel, anjo do grande conselho, rogai por nós. São Miguel, que ofereceis a Deus as almas dos justos, rogai por nós. São Miguel, nosso auxílio em todas as adversidades, rogai por nós. São Miguel, defensor da causa de Deus, rogai por nós. São Miguel, nosso guia e consolador, rogai por nós. São Miguel, que tirais as almas do Purgatório, rogai por nós. São Miguel, nosso Príncipe, rogai por nós. São Miguel, nosso Patrono, rogai por nós. Cordeiro de Deus, que tirais os pecados do mundo, perdoai-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, ouvi-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, tende piedade de nós. V. Rogai por nós, glorioso São Miguel, Príncipe da Igreja de Jesus Cristo. R. Para que sejamos dignos de suas promessas. Oremos: Senhor Jesus Cristo, dignai-vos santificar-nos com uma bênção sempre nova e concedei-nos, por intercessão de São Miguel Arcanjo, a graça de vivermos na vossa paz e de alcançarmos a glória eterna. Vós que viveis e reinais pelos séculos dos séculos. Amém.",
+        descricao: "Ladainha em honra a São Miguel Arcanjo"
+      },
+      {
+        id: 15,
+        titulo: "Ladainha de São Francisco de Assis",
+        categoria: "ladainhas",
+        texto: "Senhor, tende piedade de nós. Cristo, tende piedade de nós. Senhor, tende piedade de nós. Jesus Cristo, ouvi-nos. Jesus Cristo, atendei-nos. Deus Pai dos Céus, tende piedade de nós. Deus Filho, Redentor do mundo, tende piedade de nós. Deus Espírito Santo, tende piedade de nós. Santíssima Trindade, que sois um só Deus, tende piedade de nós. Santa Maria, rogai por nós. São Francisco, rogai por nós. São Francisco, imitador de Cristo, rogai por nós. São Francisco, espelho de santidade, rogai por nós. São Francisco, amante da pobreza, rogai por nós. São Francisco, arauto do Grande Rei, rogai por nós. São Francisco, serafim de amor, rogai por nós. São Francisco, estigmatizado de Cristo, rogai por nós. São Francisco, amigo dos pobres, rogai por nós. São Francisco, protetor dos animais, rogai por nós. São Francisco, pacificador, rogai por nós. São Francisco, restaurador da Igreja, rogai por nós. São Francisco, modelo de penitência, rogai por nós. São Francisco, nosso Pai e Patrono, rogai por nós. Cordeiro de Deus, que tirais os pecados do mundo, perdoai-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, ouvi-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, tende piedade de nós. V. Rogai por nós, São Francisco. R. Para que sejamos dignos das promessas de Cristo. Oremos: Ó Deus, que concedestes a São Francisco de Assis a graça de imitar a Cristo em sua pobreza e humildade, concedei-nos, por sua intercessão, a graça de seguir os seus passos e de alcançar a perfeição evangélica. Por Cristo, Senhor nosso. Amém.",
+        descricao: "Ladainha em honra a São Francisco de Assis"
+      },
+      {
+        id: 16,
+        titulo: "Ladainha de Santa Teresinha do Menino Jesus",
+        categoria: "ladainhas",
+        texto: "Senhor, tende piedade de nós. Cristo, tende piedade de nós. Senhor, tende piedade de nós. Jesus Cristo, ouvi-nos. Jesus Cristo, atendei-nos. Deus Pai dos Céus, tende piedade de nós. Deus Filho, Redentor do mundo, tende piedade de nós. Deus Espírito Santo, tende piedade de nós. Santíssima Trindade, que sois um só Deus, tende piedade de nós. Santa Maria, rogai por nós. Santa Teresinha do Menino Jesus, rogai por nós. Santa Teresinha, flor de santidade, rogai por nós. Santa Teresinha, modelo de infância espiritual, rogai por nós. Santa Teresinha, que fizestes da vossa vida um ato de amor, rogai por nós. Santa Teresinha, que prometestes fazer chover rosas, rogai por nós. Santa Teresinha, Doutora da Igreja, rogai por nós. Santa Teresinha, Patrona das Missões, rogai por nós. Santa Teresinha, que nos ensinais o caminho da confiança e do abandono, rogai por nós. Santa Teresinha, nossa intercessora no céu, rogai por nós. Cordeiro de Deus, que tirais os pecados do mundo, perdoai-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, ouvi-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, tende piedade de nós. V. Rogai por nós, Santa Teresinha do Menino Jesus. R. Para que sejamos dignos das promessas de Cristo. Oremos: Ó Deus, que vos dignastes inflamar a alma de Santa Teresinha do Menino Jesus com o Espírito de amor e de penitência, concedei-nos, por sua intercessão, a graça de seguir o seu caminho de infância espiritual e de alcançar a glória eterna. Por Cristo, Senhor nosso. Amém.",
+        descricao: "Ladainha em honra a Santa Teresinha do Menino Jesus"
+      },
+      {
+        id: 17,
+        titulo: "Ladainha de Santa Rita de Cássia",
+        categoria: "ladainhas",
+        texto: "Senhor, tende piedade de nós. Cristo, tende piedade de nós. Senhor, tende piedade de nós. Jesus Cristo, ouvi-nos. Jesus Cristo, atendei-nos. Deus Pai dos Céus, tende piedade de nós. Deus Filho, Redentor do mundo, tende piedade de nós. Deus Espírito Santo, tende piedade de nós. Santíssima Trindade, que sois um só Deus, tende piedade de nós. Santa Maria, rogai por nós. Santa Rita de Cássia, rogai por nós. Santa Rita, modelo de esposa e mãe, rogai por nós. Santa Rita, exemplo de viúva, rogai por nós. Santa Rita, rosa de Cássia, rogai por nós. Santa Rita, advogada dos casos desesperados, rogai por nós. Santa Rita, refúgio nas horas de dor, rogai por nós. Santa Rita, estigmatizada de Cristo, rogai por nós. Santa Rita, nossa protetora, rogai por nós. Cordeiro de Deus, que tirais os pecados do mundo, perdoai-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, ouvi-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, tende piedade de nós. V. Rogai por nós, Santa Rita de Cássia. R. Para que sejamos dignos das promessas de Cristo. Oremos: Ó Deus, que vos dignastes conceder a Santa Rita de Cássia a graça de imitar a Cristo em sua paixão, concedei-nos, por sua intercessão, a graça de suportar com paciência os sofrimentos desta vida e de alcançar a glória eterna. Por Cristo, Senhor nosso. Amém.",
+        descricao: "Ladainha em honra a Santa Rita de Cássia, a santa dos impossíveis"
+      },
+      {
+        id: 18,
+        titulo: "Ladainha de Santo Antônio de Pádua",
+        categoria: "ladainhas",
+        texto: "Senhor, tende piedade de nós. Cristo, tende piedade de nós. Senhor, tende piedade de nós. Jesus Cristo, ouvi-nos. Jesus Cristo, atendei-nos. Deus Pai dos Céus, tende piedade de nós. Deus Filho, Redentor do mundo, tende piedade de nós. Deus Espírito Santo, tende piedade de nós. Santíssima Trindade, que sois um só Deus, tende piedade de nós. Santa Maria, rogai por nós. Santo Antônio de Pádua, rogai por nós. Santo Antônio, lírio de pureza, rogai por nós. Santo Antônio, vaso de santidade, rogai por nós. Santo Antônio, martelo dos hereges, rogai por nós. Santo Antônio, doutor da Igreja, rogai por nós. Santo Antônio, restaurador dos costumes, rogai por nós. Santo Antônio, consolador dos aflitos, rogai por nós. Santo Antônio, achador das coisas perdidas, rogai por nós. Santo Antônio, nosso intercessor, rogai por nós. Cordeiro de Deus, que tirais os pecados do mundo, perdoai-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, ouvi-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, tende piedade de nós. V. Rogai por nós, Santo Antônio de Pádua. R. Para que sejamos dignos das promessas de Cristo. Oremos: Ó Deus, que vos dignastes conceder a Santo Antônio de Pádua a graça de pregar o Evangelho e de operar milagres, concedei-nos, por sua intercessão, a graça de vivermos na fé e na caridade. Por Cristo, Senhor nosso. Amém.",
+        descricao: "Ladainha em honra a Santo Antônio de Pádua"
+      },
+      {
+        id: 19,
+        titulo: "Ladainha de São João Batista",
+        categoria: "ladainhas",
+        texto: "Senhor, tende piedade de nós. Cristo, tende piedade de nós. Senhor, tende piedade de nós. Jesus Cristo, ouvi-nos. Jesus Cristo, atendei-nos. Deus Pai dos Céus, tende piedade de nós. Deus Filho, Redentor do mundo, tende piedade de nós. Deus Espírito Santo, tende piedade de nós. Santíssima Trindade, que sois um só Deus, tende piedade de nós. Santa Maria, rogai por nós. São João Batista, rogai por nós. São João Batista, precursor do Senhor, rogai por nós. São João Batista, voz que clama no deserto, rogai por nós. São João Batista, batizador de Cristo, rogai por nós. São João Batista, mártir da verdade, rogai por nós. São João Batista, modelo de penitência, rogai por nós. São João Batista, nosso protetor, rogai por nós. Cordeiro de Deus, que tirais os pecados do mundo, perdoai-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, ouvi-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, tende piedade de nós. V. Rogai por nós, São João Batista. R. Para que sejamos dignos das promessas de Cristo. Oremos: Ó Deus, que elevastes São João Batista à glória de ser o precursor de vosso Filho, concedei-nos, por sua intercessão, a graça de preparar os nossos corações para a vinda do Senhor. Por Cristo, Senhor nosso. Amém.",
+        descricao: "Ladainha em honra a São João Batista"
+      },
+      {
+        id: 20,
+        titulo: "Ladainha de São Pedro e São Paulo",
+        categoria: "ladainhas",
+        texto: "Senhor, tende piedade de nós. Cristo, tende piedade de nós. Senhor, tende piedade de nós. Jesus Cristo, ouvi-nos. Jesus Cristo, atendei-nos. Deus Pai dos Céus, tende piedade de nós. Deus Filho, Redentor do mundo, tende piedade de nós. Deus Espírito Santo, tende piedade de nós. Santíssima Trindade, que sois um só Deus, tende piedade de nós. Santa Maria, rogai por nós. São Pedro, rogai por nós. São Paulo, rogai por nós. São Pedro, pedra da Igreja, rogai por nós. São Paulo, vaso de eleição, rogai por nós. São Pedro, pescador de homens, rogai por nós. São Paulo, apóstolo dos gentios, rogai por nós. São Pedro e São Paulo, colunas da Igreja, rogai por nós. São Pedro e São Paulo, nossos protetores, rogai por nós. Cordeiro de Deus, que tirais os pecados do mundo, perdoai-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, ouvi-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, tende piedade de nós. V. Rogai por nós, São Pedro e São Paulo. R. Para que sejamos dignos das promessas de Cristo. Oremos: Ó Deus, que santificastes este dia com o martírio dos vossos Apóstolos Pedro e Paulo, concedei à vossa Igreja que, em tudo siga os ensinamentos daqueles que a fundaram. Por Cristo, Senhor nosso. Amém.",
+        descricao: "Ladainha em honra aos Apóstolos São Pedro e São Paulo"
+      },
+      {
+        id: 21,
+        titulo: "Ladainha de São Judas Tadeu",
+        categoria: "ladainhas",
+        texto: "Senhor, tende piedade de nós. Cristo, tende piedade de nós. Senhor, tende piedade de nós. Jesus Cristo, ouvi-nos. Jesus Cristo, atendei-nos. Deus Pai dos Céus, tende piedade de nós. Deus Filho, Redentor do mundo, tende piedade de nós. Deus Espírito Santo, tende piedade de nós. Santíssima Trindade, que sois um só Deus, tende piedade de nós. Santa Maria, rogai por nós. São Judas Tadeu, rogai por nós. São Judas Tadeu, parente de Jesus, rogai por nós. São Judas Tadeu, apóstolo de Cristo, rogai por nós. São Judas Tadeu, patrono dos casos desesperados, rogai por nós. São Judas Tadeu, auxílio dos aflitos, rogai por nós. São Judas Tadeu, nosso intercessor, rogai por nós. Cordeiro de Deus, que tirais os pecados do mundo, perdoai-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, ouvi-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, tende piedade de nós. V. Rogai por nós, São Judas Tadeu. R. Para que sejamos dignos das promessas de Cristo. Oremos: Ó Deus, que nos concedestes a graça de venerar a São Judas Tadeu, vosso Apóstolo, concedei-nos, por sua intercessão, a graça de alcançarmos o que vos pedimos em nossas necessidades. Por Cristo, Senhor nosso. Amém.",
+        descricao: "Ladainha em honra a São Judas Tadeu"
+      },
+      {
+        id: 22,
+        titulo: "Ladainha de São Sebastião",
+        categoria: "ladainhas",
+        texto: "Senhor, tende piedade de nós. Cristo, tende piedade de nós. Senhor, tende piedade de nós. Jesus Cristo, ouvi-nos. Jesus Cristo, atendei-nos. Deus Pai dos Céus, tende piedade de nós. Deus Filho, Redentor do mundo, tende piedade de nós. Deus Espírito Santo, tende piedade de nós. Santíssima Trindade, que sois um só Deus, tende piedade de nós. Santa Maria, rogai por nós. São Sebastião, rogai por nós. São Sebastião, mártir de Cristo, rogai por nós. São Sebastião, defensor da fé, rogai por nós. São Sebastião, protetor contra a peste, a fome e a guerra, rogai por nós. São Sebastião, nosso intercessor, rogai por nós. Cordeiro de Deus, que tirais os pecados do mundo, perdoai-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, ouvi-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, tende piedade de nós. V. Rogai por nós, São Sebastião. R. Para que sejamos dignos das promessas de Cristo. Oremos: Ó Deus, que nos concedestes a graça de venerar a São Sebastião, vosso mártir, concedei-nos, por sua intercessão, a graça de sermos fortes na fé e de resistirmos às tentações do mundo. Por Cristo, Senhor nosso. Amém.",
+        descricao: "Ladainha em honra a São Sebastião"
+      },
+      {
+        id: 23,
+        titulo: "Ladainha de São Jorge",
+        categoria: "ladainhas",
+        texto: "Senhor, tende piedade de nós. Cristo, tende piedade de nós. Senhor, tende piedade de nós. Jesus Cristo, ouvi-nos. Jesus Cristo, atendei-nos. Deus Pai dos Céus, tende piedade de nós. Deus Filho, Redentor do mundo, tende piedade de nós. Deus Espírito Santo, tende piedade de nós. Santíssima Trindade, que sois um só Deus, tende piedade de nós. Santa Maria, rogai por nós. São Jorge, rogai por nós. São Jorge, mártir de Cristo, rogai por nós. São Jorge, defensor da fé, rogai por nós. São Jorge, protetor contra o mal, rogai por nós. São Jorge, nosso intercessor, rogai por nós. Cordeiro de Deus, que tirais os pecados do mundo, perdoai-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, ouvi-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, tende piedade de nós. V. Rogai por nós, São Jorge. R. Para que sejamos dignos das promessas de Cristo. Oremos: Ó Deus, que nos concedestes a graça de venerar a São Jorge, vosso mártir, concedei-nos, por sua intercessão, a graça de sermos fortes na fé e de resistirmos às tentações do mundo. Por Cristo, Senhor nosso. Amém.",
+        descricao: "Ladainha em honra a São Jorge"
+      },
+      {
+        id: 24,
+        titulo: "Ladainha de São Bento",
+        categoria: "ladainhas",
+        texto: "Senhor, tende piedade de nós. Cristo, tende piedade de nós. Senhor, tende piedade de nós. Jesus Cristo, ouvi-nos. Jesus Cristo, atendei-nos. Deus Pai dos Céus, tende piedade de nós. Deus Filho, Redentor do mundo, tende piedade de nós. Deus Espírito Santo, tende piedade de nós. Santíssima Trindade, que sois um só Deus, tende piedade de nós. Santa Maria, rogai por nós. São Bento, rogai por nós. São Bento, patriarca dos monges do Ocidente, rogai por nós. São Bento, modelo de vida monástica, rogai por nós. São Bento, protetor contra o mal, rogai por nós. São Bento, nosso intercessor, rogai por nós. Cordeiro de Deus, que tirais os pecados do mundo, perdoai-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, ouvi-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, tende piedade de nós. V. Rogai por nós, São Bento. R. Para que sejamos dignos das promessas de Cristo. Oremos: Ó Deus, que constituístes São Bento, abade, um insigne mestre na escola do vosso serviço, concedei-nos, por sua intercessão, a graça de vos amar sobre todas as coisas e de vivermos na vossa paz. Por Cristo, Senhor nosso. Amém.",
+        descricao: "Ladainha em honra a São Bento"
+      },
+      {
+        id: 25,
+        titulo: "Ladainha de São Francisco Xavier",
+        categoria: "ladainhas",
+        texto: "Senhor, tende piedade de nós. Cristo, tende piedade de nós. Senhor, tende piedade de nós. Jesus Cristo, ouvi-nos. Jesus Cristo, atendei-nos. Deus Pai dos Céus, tende piedade de nós. Deus Filho, Redentor do mundo, tende piedade de nós. Deus Espírito Santo, tende piedade de nós. Santíssima Trindade, que sois um só Deus, tende piedade de nós. Santa Maria, rogai por nós. São Francisco Xavier, rogai por nós. São Francisco Xavier, apóstolo das Índias, rogai por nós. São Francisco Xavier, modelo de missionário, rogai por nós. São Francisco Xavier, nosso intercessor, rogai por nós. Cordeiro de Deus, que tirais os pecados do mundo, perdoai-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, ouvi-nos, Senhor. Cordeiro de Deus, que tirais os pecados do mundo, tende piedade de nós. V. Rogai por nós, São Francisco Xavier. R. Para que sejamos dignos das promessas de Cristo. Oremos: Ó Deus, que vos dignastes chamar São Francisco Xavier para pregar o Evangelho aos povos da Índia e do Japão, concedei-nos, por sua intercessão, a graça de sermos missionários do Evangelho e de levarmos a palavra de Deus a todos os povos. Por Cristo, Senhor nosso. Amém.",
+        descricao: "Ladainha em honra a São Francisco Xavier"
+      },
+      {
+        id: 26,
+        titulo: "Canto: Pelas Mãos de Maria",
+        categoria: "cantos",
+        texto: "Pelas mãos de Maria, a graça de Deus nos vem. Pelas mãos de Maria, o amor de Jesus nos tem. Maria, Mãe de Deus, rogai por nós. Maria, Mãe da Igreja, rogai por nós. Maria, nossa Mãe, rogai por nós. Amém.",
+        descricao: "Canto mariano popular"
+      },
+      {
+        id: 27,
+        titulo: "Canto: Oração pela Família",
+        categoria: "cantos",
+        texto: "Que nenhuma família comece em qualquer de repente. Que nenhuma família termine por falta de amor. Que o casal não se separe por brigar, mas que brigue por amor. Que o marido e mulher não se traiam, nem traiam seus filhos. Que o ciúme não mate a certeza do amor entre os dois. Que no lar não se ouça a palavra 'jamais' ou 'nunca' ou 'não'. Que o sim de um ao outro seja de cabeça e de coração. Que a família comece e termine sabendo onde vai. E que o homem carregue nos ombros a graça de um pai. Que a mulher seja um céu de ternura, aconchego e calor. E que os filhos conheçam a força que brota do amor. Que ninguém interfira no lar e na vida dos dois. Que ninguém os obrigue a viver sem nenhum ideal. Mas que a força do amor os proteja de todo o mal. Que a família não acabe e não se acabe no amor. Amém.",
+        descricao: "Canto popular de oração pela família"
+      },
+      {
+        id: 28,
+        titulo: "Canto: O Senhor é meu Pastor",
+        categoria: "cantos",
+        texto: "O Senhor é meu Pastor, nada me faltará. Em verdes prados ele me faz repousar. Conduz-me às águas refrescantes, restaura a minha alma. Guia-me pelas veredas da justiça, por amor do seu nome. Ainda que eu caminhe por vales tenebrosos, não temerei mal algum. Porque Tu estás comigo, o teu bordão e o teu cajado me dão segurança. Preparas para mim a mesa à vista dos meus inimigos. Unges com óleo a minha cabeça, a minha taça transborda. A felicidade e a graça me acompanharão todos os dias da minha vida. E habitarei na casa do Senhor por longos dias. Amém.",
+        descricao: "Canto baseado no Salmo 23"
+      },
+      {
+        id: 29,
+        titulo: "Canto: Hino a São José",
+        categoria: "cantos",
+        texto: "A vós, São José, recorremos em nossa tribulação. E, depois de ter implorado o auxílio de vossa Santíssima Esposa, cheios de confiança, solicitamos também o vosso patrocínio. Pelo laço de caridade que vos uniu à Imaculada Virgem Maria, Mãe de Deus, e pelo amor paternal com que abraçastes o Menino Jesus, ardentemente vos suplicamos que lanceis um olhar benigno sobre a herança que Jesus Cristo conquistou com seu Sangue, e nos ajudeis com o vosso poder em nossas necessidades. Protegei, ó guarda providente da Divina Família, a eleita descendência de Jesus Cristo. Afugentai para longe de nós, ó Pai amantíssimo, a peste do erro e do vício. Assisti-nos do céu, ó nosso fortíssimo sustentáculo, na luta contra o poder das trevas; e assim como outrora salvastes da morte a vida ameaçada do Menino Jesus, assim também defendei agora a Santa Igreja de Deus das ciladas de seus inimigos e de toda a adversidade. Amparai a cada um de nós com o vosso constante patrocínio, a fim de que, a vosso exemplo e sustentados com o vosso auxílio, possamos viver virtuosamente, morrer piedosamente e obter no céu a eterna bem-aventurança. Amém.",
+        descricao: "Hino de súplica a São José"
+      },
+      {
+        id: 30,
+        titulo: "Canto: Louvor e Glória",
+        categoria: "cantos",
+        texto: "Louvor e glória a Ti, Senhor, Cristo, Palavra de Deus, Cristo, Palavra de Deus. (Aleluia, Aleluia, Aleluia).",
+        descricao: "Canto de aclamação ao Evangelho"
+      },
+      {
+        id: 31,
+        titulo: "Canto: Onde o Amor e a Caridade",
+        categoria: "cantos",
+        texto: "Onde o amor e a caridade, Deus aí está. Congregou-nos num só corpo o amor de Cristo. Exultemos e alegremo-nos n'Ele. Temamos e amemos o Deus vivo. E com sincero coração nos amemos. Onde o amor e a caridade, Deus aí está. Quando, pois, estamos juntos, Não sejamos de espírito divididos. Cesse a contenda maligna, Cesse o litígio. E no meio de nós esteja Cristo Deus. Onde o amor e a caridade, Deus aí está. Juntos com os bem-aventurados, Contemplemos gloriosamente a Vossa face, ó Cristo Deus. Seja esta a alegria pura e imensa, Pelos séculos dos séculos. Amém.",
+        descricao: "Canto para a celebração da caridade e união"
+      },
+      {
+        id: 32,
+        titulo: "Canto: Pão e Vinho",
+        categoria: "cantos",
+        texto: "Pão e vinho, pão e vinho, Sobre o altar se transformarão. No Corpo e Sangue de Jesus, Para a nossa salvação. É o milagre do amor, Que se renova a cada dia. É Jesus que se faz pão, Para ser a nossa vida. Amém.",
+        descricao: "Canto de Ofertório/Comunhão"
+      },
+      {
+        id: 33,
+        titulo: "Canto: Cordeiro de Deus",
+        categoria: "cantos",
+        texto: "Cordeiro de Deus, que tirais o pecado do mundo, tende piedade de nós. Cordeiro de Deus, que tirais o pecado do mundo, tende piedade de nós. Cordeiro de Deus, que tirais o pecado do mundo, dai-nos a paz.",
+        descricao: "Canto litúrgico do Cordeiro de Deus"
+      },
+      {
+        id: 34,
+        titulo: "Canto: Santo",
+        categoria: "cantos",
+        texto: "Santo, Santo, Santo, Senhor Deus do universo. O céu e a terra proclamam a vossa glória. Hosana nas alturas. Bendito o que vem em nome do Senhor. Hosana nas alturas.",
+        descricao: "Canto litúrgico do Santo"
+      },
+      {
+        id: 35,
+        titulo: "Canto: Glória a Deus nas Alturas",
+        categoria: "cantos",
+        texto: "Glória a Deus nas alturas, e paz na terra aos homens por Ele amados. Senhor Deus, Rei dos céus, Deus Pai todo-poderoso. Nós vos louvamos, nós vos bendizemos, nós vos adoramos, nós vos glorificamos, nós vos damos graças por vossa imensa glória. Senhor Jesus Cristo, Filho unigênito, Senhor Deus, Cordeiro de Deus, Filho de Deus Pai. Vós que tirais o pecado do mundo, tende piedade de nós. Vós que tirais o pecado do mundo, acolhei a nossa súplica. Vós que estais à direita do Pai, tende piedade de nós. Só vós sois o Santo, só vós o Senhor, só vós o Altíssimo, Jesus Cristo, com o Espírito Santo, na glória de Deus Pai. Amém.",
+        descricao: "Canto litúrgico do Glória"
+      },
+      {
+        id: 36,
+        titulo: "Canto: Kyrie Eleison",
+        categoria: "cantos",
+        texto: "Senhor, tende piedade de nós. Cristo, tende piedade de nós. Senhor, tende piedade de nós.",
+        descricao: "Canto litúrgico do Kyrie"
+      },
+      {
+        id: 37,
+        titulo: "Canto: Salve Rainha",
+        categoria: "cantos",
+        texto: "Salve, Rainha, Mãe de misericórdia, vida, doçura e esperança nossa, salve! A vós bradamos, os degredados filhos de Eva. A vós suspiramos, gemendo e chorando neste vale de lágrimas. Eia, pois, advogada nossa, esses vossos olhos misericordiosos a nós volvei. E depois deste desterro, mostrai-nos Jesus, bendito fruto do vosso ventre. Ó clemente, ó piedosa, ó doce Virgem Maria. Rogai por nós, Santa Mãe de Deus. Para que sejamos dignos das promessas de Cristo. Amém.",
+        descricao: "Canto mariano baseado na oração Salve Rainha"
+      },
+      {
+        id: 38,
+        titulo: "Canto: Magnificat",
+        categoria: "cantos",
+        texto: "A minha alma glorifica o Senhor, meu espírito exulta de alegria em Deus, meu Salvador. Porque olhou para a humildade de sua serva, de hoje em diante me chamarão bem-aventurada todas as gerações. O Poderoso fez em mim maravilhas, e Santo é o seu nome. A sua misericórdia se estende de geração em geração sobre aqueles que o temem. Manifestou o poder do seu braço, dispersou os soberbos. Derrubou os poderosos de seus tronos e exaltou os humildes. Encheu de bens os famintos e despediu os ricos de mãos vazias. Acolheu Israel, seu servo, lembrado da sua misericórdia, conforme prometera a nossos pais, em favor de Abraão e de sua descendência, para sempre. Glória ao Pai, ao Filho e ao Espírito Santo. Como era no princípio, agora e sempre. Amém.",
+        descricao: "Canto baseado no Cântico de Maria (Lucas 1, 46-55)"
+      },
+      {
+        id: 39,
+        titulo: "Canto: Hosana ao Filho de Davi",
+        categoria: "cantos",
+        texto: "Hosana ao Filho de Davi! Bendito o que vem em nome do Senhor! Rei de Israel, Hosana nas alturas!",
+        descricao: "Canto de entrada para o Domingo de Ramos"
+      },
+      {
+        id: 40,
+        titulo: "Canto: Oração de São Francisco (Canto)",
+        categoria: "cantos",
+        texto: "Senhor, fazei de mim um instrumento de vossa paz. Onde houver ódio, que eu leve o amor. Onde houver ofensa, que eu leve o perdão. Onde houver discórdia, que eu leve a união. Onde houver dúvida, que eu leve a fé. Onde houver desespero, que eu leve a esperança. Onde houver trevas, que eu leve a luz. Onde houver tristeza, que eu leve a alegria. Ó Mestre, fazei que eu procure mais consolar que ser consolado, compreender que ser compreendido, amar que ser amado. Pois é dando que se recebe, é perdoando que se é perdoado, e é morrendo que se vive para a vida eterna.",
+        descricao: "Canto baseado na Oração de São Francisco"
+      },
+      {
+        id: 41,
+        titulo: "Canto: Vinde, Espírito Santo",
+        categoria: "cantos",
+        texto: "Vinde, Espírito Santo, Enchei os corações dos vossos fiéis e acendei neles o fogo do vosso amor. Enviai o vosso Espírito e tudo será criado, e renovareis a face da terra. Oremos: Ó Deus, que instruístes os corações dos vossos fiéis com a luz do Espírito Santo, concedei-nos que, pelo mesmo Espírito, conheçamos o que é reto e gozemos sempre de sua consolação. Por Cristo, Senhor nosso. Amém.",
+        descricao: "Canto de invocação ao Espírito Santo"
+      },
+      {
+        id: 42,
+        titulo: "Canto: Tão Sublime Sacramento",
+        categoria: "cantos",
+        texto: "Tão sublime Sacramento Adoremos neste altar. Pois o Antigo Testamento Deu ao Novo o seu lugar. Venha a fé por suplemento Os sentidos completar. Ao eterno Pai cantemos e a Jesus, o Salvador. Ao Espírito exaltemos, Na Trindade, eterno amor. Ao Deus uno e trino demos A alegria do louvor. Amém.",
+        descricao: "Canto de adoração eucarística (Tantum Ergo)"
+      },
+      {
+        id: 43,
+        titulo: "Canto: Dai-nos a Paz",
+        categoria: "cantos",
+        texto: "Dai-nos a paz, Senhor, a vossa paz. Que o mundo não pode dar. Dai-nos a paz, Senhor, a vossa paz. Que só em vós podemos encontrar.",
+        descricao: "Canto para o rito da Paz"
+      },
+      {
+        id: 44,
+        titulo: "Canto: Eu Sou o Pão da Vida",
+        categoria: "cantos",
+        texto: "Eu sou o Pão da Vida, quem vem a mim não terá mais fome. Quem crê em mim não terá mais sede. Ninguém pode vir a mim, se o Pai não o atrair. E eu o ressuscitarei, eu o ressuscitarei, eu o ressuscitarei no último dia.",
+        descricao: "Canto de Comunhão"
+      },
+      {
+        id: 45,
+        titulo: "Canto: Barca de Pedro",
+        categoria: "cantos",
+        texto: "Tu te abeiraste da praia, não buscaste nem sábios nem ricos. Somente queres que eu te siga. Senhor, Tu me olhaste nos olhos, a sorrir, pronunciaste meu nome. Lá na praia, eu larguei o meu barco, junto a Ti, buscarei outro mar.",
+        descricao: "Canto vocacional popular"
+      },
+      {
+        id: 46,
+        titulo: "Canto: Maria de Nazaré",
+        categoria: "cantos",
+        texto: "Maria de Nazaré, Maria me cativou. Fez mais forte a minha fé e por filho me adotou. Às vezes eu paro e penso e, sem querer, me vejo a rezar. E o meu coração se enche de paz começo a cantar. Maria de Nazaré...",
+        descricao: "Canto mariano popular"
+      },
+      {
+        id: 47,
+        titulo: "Canto: Um Novo Sol Brilhou",
+        categoria: "cantos",
+        texto: "Um novo sol brilhou, uma nova história começou. O amor de Deus nos alcançou, a vida nova nos chamou. Aleluia, Aleluia, Cristo ressuscitou!",
+        descricao: "Canto de Páscoa/Ressurreição"
+      },
+      {
+        id: 48,
+        titulo: "Canto: Pelos Prados e Campinas",
+        categoria: "cantos",
+        texto: "Pelos prados e campinas verdejantes eu vou, é o Senhor que me leva a descansar. Em rios de águas puras e serenas ele me conduz, e as forças de minh'alma vem restaurar.",
+        descricao: "Canto baseado no Salmo 23"
+      },
+      {
+        id: 49,
+        titulo: "Canto: Vós Sois o Caminho",
+        categoria: "cantos",
+        texto: "Vós sois o caminho, a verdade e a vida. Vós sois a luz que ilumina o meu ser. Vós sois a força que me faz caminhar. Vós sois o amor que me faz amar.",
+        descricao: "Canto de Comunhão"
+      },
+      {
+        id: 50,
+        titulo: "Canto: Quem nos separará?",
+        categoria: "cantos",
+        texto: "Quem nos separará? Do amor de Cristo, quem nos separará? Seja a tribulação, angústia, perseguição, perigo, espada ou fome. Em tudo somos mais que vencedores, graças àquele que nos amou.",
+        descricao: "Canto baseado em Romanos 8:35-37"
+      },
+      {
+        id: 51,
+        titulo: "Canto: Senhor, Põe Teus Anjos Aqui",
+        categoria: "cantos",
+        texto: "Senhor, põe teus anjos aqui, Senhor, põe teus anjos aqui. Com a espada desembainhada, Senhor, põe teus anjos aqui.",
+        descricao: "Canto de invocação e proteção"
+      },
+      {
+        id: 52,
+        titulo: "Canto: Oração de Santo Inácio de Loyola",
+        categoria: "cantos",
+        texto: "Tomai, Senhor, e recebei toda a minha liberdade, a minha memória, o meu entendimento e toda a minha vontade. Tudo o que tenho e possuo, Vós mo destes; a Vós, Senhor, o restituo. Tudo é Vosso, disponde de tudo, inteiramente à Vossa santa vontade. Dai-me somente o Vosso amor e a Vossa graça, que isto me basta. Amém.",
+        descricao: "Canto baseado na oração de Santo Inácio"
+      },
+      {
+        id: 53,
+        titulo: "Canto: Vem, Espírito Santo",
+        categoria: "cantos",
+        texto: "Vem, Espírito Santo, vem, Espírito Santo, vem, Espírito Santo, vem iluminar. Nossas mentes, nossos corações, nossas vidas, nosso ser. Vem, Espírito Santo, vem nos transformar.",
+        descricao: "Canto de invocação ao Espírito Santo"
+      },
+      {
+        id: 54,
+        titulo: "Canto: Jesus Cristo Está Passando Por Aqui",
+        categoria: "cantos",
+        texto: "Jesus Cristo está passando por aqui. Jesus Cristo está passando por aqui. Quando Ele passa, tudo se transforma, a tristeza vai, a alegria vem. Quando Ele passa, tudo se transforma, a alegria vem para você e para mim também.",
+        descricao: "Canto de louvor e alegria"
+      },
+      {
+        id: 55,
+        titulo: "Canto: Ninguém Te Ama Como Eu",
+        categoria: "cantos",
+        texto: "Tenho andado tão sozinho por um caminho que só eu conheço. Tenho chorado tanto que até a minha alma se secou. Mas eu te digo: Ninguém te ama como eu, ninguém te ama como eu. Olhe para a cruz, essa é a minha minha grande prova. Ninguém te ama como eu.",
+        descricao: "Canto popular sobre o amor de Jesus"
+      }
+    ];
+
+    function init() {
+      renderizarCantos(cantos);
+    }
+
+    function renderizarCantos(lista) {
+      const container = document.getElementById('cantos-container');
+      
+      if (lista.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 2rem;">Nenhum canto ou ladainha encontrado.</p>';
+        return;
+      }
+
+      container.innerHTML = lista.map(canto => `
+        <div class="oracao-card">
+          <div class="oracao-header">
+           <h3 class="oracao-titulo">${canto.titulo}</h3>
+           <button class="btn-favorito-oracao" onclick="toggleFavoritoCanto(${canto.id})" id="fav-${canto.id}">             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 20px; height: 20px;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            </button>
+          </div>
+          <p class="oracao-descricao">${canto.descricao}</p>          <p class="oracao-texto" style="white-space: pre-wrap;">${canto.texto}</p>        </div>
+      `).join('');
+
+      // Atualizar estado dos botões de favorito
+    lista.forEach(canto => {
+        atualizarBotaoFavoritoCanto(canto.id);
+      });    }
+
+    function buscarCantos() {      const termo = document.getElementById('search-input').value.toLowerCase();
+      
+      let resultado = cantos.filter(canto => {    const match = canto.titulo.toLowerCase().includes(termo) ||
+                     canto.descricao.toLowerCase().includes(termo) ||
+                     canto.texto.toLowerCase().includes(termo);
+        
+        if (filtroAtual === 'todas') return match;
+if (filtroAtual === 'favoritas') {
+          const isFav = localStorage.getItem(`canto-fav-${canto.id}`) === 'true';
+          return match && isFav;
+        }
+        return match && canto.categoria === filtroAtual;
+      });
+
+      renderizarCantos(resultado);
+    }
+
+    function filtrarCantos(categoria) {      filtroAtual = categoria;
+      
+      // Atualizar botões de filtro
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+
+      buscarCantos();
+    }
+
+  function toggleFavoritoCanto(id) {
+      const isFav = localStorage.getItem(`canto-fav-${id}`) === 'true';
+      localStorage.setItem(`canto-fav-${id}`, !isFav);
+      atualizarBotaoFavoritoCanto(id);
+    }    function atualizarBotaoFavoritoCanto(id) {
+      const btn = document.getElementById(`fav-${id}`);
+      const isFav = localStorage.getItem(`canto-fav-${id}`) === 'true';
+      
+      if (btn) {
+        if (isFav) {
+          btn.classList.add('favorito-ativo');
+          btn.style.color = 'var(--destructive)';
+        } else {
+          btn.classList.remove('favorito-ativo');
+          btn.style.color = 'var(--text-secondary)';
+        }
+      }
+    }    function goBack() {
+      window.history.back();
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+
+  <style>
+    .oracoes-search {
+      margin-bottom: 2rem;
+    }
+
+    .search-container {
+      margin-bottom: 1rem;
+    }
+
+    .filter-buttons {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 0.5rem 1rem;
+      background-color: var(--secondary);
+      color: var(--secondary-foreground);
+      border: none;
+      border-radius: 2rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .filter-btn:hover {
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+    }
+
+    .filter-btn.active {
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+    }
+
+    .oracoes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .oracao-card {
+      background-color: var(--card);
+      border: 1px solid var(--primary); /* Contorno azul */
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .oracao-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-color: var(--primary);
+    }
+
+    .oracao-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.75rem;
+      gap: 1rem;
+    }
+
+    .oracao-titulo {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--foreground);
+      margin: 0;
+    }
+
+    .btn-favorito-oracao {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .btn-favorito-oracao:hover {
+      color: var(--destructive);
+      transform: scale(1.2);
+    }
+
+    .btn-favorito-oracao.favorito-ativo {
+      color: var(--destructive);
+    }
+
+    .oracao-descricao {
+      color: var(--muted-foreground);
+      font-size: 0.9rem;
+      font-style: italic;
+      margin: 0 0 1rem 0;
+    }
+
+    .oracao-texto {
+      color: var(--foreground);
+      line-height: 1.8;
+      margin: 0;
+    }
+  </style>
+</body>
+</html>

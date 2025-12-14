@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orações - Rosarium</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <button class="btn-back" onclick="goBack()">← Voltar</button>
+      <div class="header-title">
+<div class="header-logo">
+	          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+	            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.5v15m7.5-7.5h-15" />
+	          </svg>
+	        </div>
+        <span>Orações</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <div class="page-container">
+    <div class="page-content container-md">
+      
+      <!-- Seção: Busca e Filtros -->
+      <section class="oracoes-search">
+        <div class="search-container">
+          <input 
+            type="text" 
+            id="search-input" 
+            class="input" 
+            placeholder="Buscar orações..." 
+            onkeyup="buscarOracoes()"
+          >
+        </div>
+        
+        <div class="filter-buttons">
+          <button class="filter-btn active" onclick="filtrarOracoes('todas')">Todas</button>
+          <button class="filter-btn" onclick="filtrarOracoes('basicas')">Básicas</button>
+          <button class="filter-btn" onclick="filtrarOracoes('maria')">Nossa Senhora</button>
+          <button class="filter-btn" onclick="filtrarOracoes('santos')">Santos</button>
+          <button class="filter-btn" onclick="filtrarOracoes('favoritas')">❤️ Favoritas</button>
+        </div>
+      </section>
+
+      <!-- Lista de Orações -->
+      <section class="oracoes-list" id="oracoes-container">
+        <!-- Gerado por JavaScript -->
+      </section>
+
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    let oracoesFiltradas = [];
+    let filtroAtual = 'todas';
+
+    const oracoes = [
+      // Orações Básicas
+      {
+        id: 1,
+        titulo: "Sinal da Cruz",
+        categoria: "basicas",
+        texto: "Em nome do Pai, do Filho e do Espírito Santo. Amém.",
+        descricao: "Oração fundamental do cristianismo"
+      },
+      {
+        id: 2,
+        titulo: "Pai Nosso",
+        categoria: "basicas",
+        texto: "Pai nosso, que estais nos céus, santificado seja o vosso nome, venha a nós o vosso reino, seja feita a vossa vontade, assim na terra como no céu. O pão nosso de cada dia nos dai hoje, perdoai-nos as nossas dívidas, assim como nós perdoamos aos nossos devedores, e não nos deixeis cair em tentação, mas livrai-nos do mal. Amém.",
+        descricao: "Oração ensinada por Jesus"
+      },
+      {
+        id: 3,
+        titulo: "Ave Maria",
+        categoria: "basicas",
+        texto: "Ave, Maria, cheia de graça, o Senhor é convosco, bendita sois vós entre as mulheres, e bendito é o fruto do vosso ventre, Jesus. Santa Maria, Mãe de Deus, rogai por nós pecadores, agora e na hora da nossa morte. Amém.",
+        descricao: "Saudação à Mãe de Deus"
+      },
+      {
+        id: 4,
+        titulo: "Glória ao Pai",
+        categoria: "basicas",
+        texto: "Glória seja ao Pai, e ao Filho, e ao Espírito Santo. Como era no princípio, agora e sempre, por todos os séculos dos séculos. Amém.",
+        descricao: "Doxologia cristã"
+      },
+      {
+        id: 5,
+        titulo: "Credo",
+        categoria: "basicas",
+        texto: "Creio em Deus Pai todo-poderoso, criador do céu e da terra; e em Jesus Cristo, seu único Filho, nosso Senhor, que foi concebido pelo poder do Espírito Santo, nasceu da Virgem Maria, padeceu sob Pôncio Pilatos, foi crucificado, morto e sepultado; desceu à mansão dos mortos; ressuscitou ao terceiro dia; subiu aos céus, e está sentado à direita de Deus Pai todo-poderoso, donde há de vir a julgar os vivos e os mortos. Creio no Espírito Santo, na santa Igreja Católica, na comunhão dos santos, na remissão dos pecados, na ressurreição da carne, na vida eterna. Amém.",
+        descricao: "Profissão de fé cristã"
+      },
+      {
+        id: 6,
+        titulo: "Ó Meu Jesus",
+        categoria: "basicas",
+        texto: "Ó meu Jesus, perdoai-nos, livrai-nos do fogo do inferno, levai as almas todas ao céu, especialmente as que mais precisarem da vossa misericórdia. Amém.",
+        descricao: "Oração da Coroa da Divina Misericórdia"
+      },
+
+      // Orações a Nossa Senhora
+      {
+        id: 7,
+        titulo: "Salve Rainha",
+        categoria: "maria",
+        texto: "Salve, Rainha, Mãe de misericórdia, vida, doçura, esperança nossa, salve! A vós bradamos os degredados filhos de Eva. A vós suspiramos, gemendo e chorando neste vale de lágrimas. Eia, pois, advogada nossa, esses vossos olhos misericordiosos a nós volvei! E depois deste desterro, mostrai-nos Jesus, bendito fruto do vosso ventre, ó clemente, ó piedosa, ó doce sempre Virgem Maria!",
+        descricao: "Antífona mariana tradicional"
+      },
+      {
+        id: 8,
+        titulo: "Memorare",
+        categoria: "maria",
+        texto: "Lembrai-vos, ó puríssima Virgem Maria, que nunca se ouviu dizer que alguém tenha recorrido à vossa proteção, implorado vosso auxílio e pedido vosso patrocínio, que não tenha sido por vós consolado. Animado por esta confiança, ó Mãe de misericórdia, a vós recorro e, gemendo sob o peso dos meus pecados, me prostro aos vossos pés. Não desprezeis, ó Mãe do Verbo, as minhas súplicas, antes acolhei-as benignamente. Amém.",
+        descricao: "Oração de confiança em Maria"
+      },
+      {
+        id: 9,
+        titulo: "Deus Vos Salve",
+        categoria: "maria",
+        texto: "Deus vos salve, Virgem, Filha de Deus Pai! Deus vos salve, Virgem, Mãe de Deus Filho! Deus vos salve, Virgem, Esposa do Divino Espírito Santo! Deus vos salve, Virgem, Templo e Sacrário da Santíssima Trindade!",
+        descricao: "Saudação à Santíssima Trindade em Maria"
+      },
+      {
+        id: 10,
+        titulo: "Oração a Nossa Senhora de Fátima",
+        categoria: "maria",
+        texto: "Ó minha Mãe, Rainha do Rosário e Mãe de misericórdia! Entrego-vos o meu coração e toda a minha vida. Guiai-me sempre pelo caminho de Jesus. Protegei-me com o vosso manto sagrado. Obtende-me do vosso Filho a graça de viver santamente e morrer em paz. Amém.",
+        descricao: "Devoção a Nossa Senhora de Fátima"
+      },
+
+      // Orações aos Santos
+      {
+        id: 11,
+        titulo: "Oração a São José",
+        categoria: "santos",
+        texto: "Glorioso São José, modelo de virtudes, protetor das famílias, rogai por nós! Que vossa paciência e vossa fidelidade nos sirvam de exemplo. Obtende-nos do Senhor a graça de viver em paz e harmonia. Amém.",
+        descricao: "Protetor das famílias"      },
+      {
+        id: 21,
+        titulo: "Oração a São Miguel Arcanjo",
+        categoria: "santos",
+        texto: "São Miguel Arcanjo, defendei-nos no combate, sede o nosso refúgio contra as maldades e ciladas do demônio. Ordene-lhe Deus, instantemente o pedimos, e vós, Príncipe da milícia celeste, pela virtude divina, precipitai no inferno a Satanás e aos outros espíritos malignos que andam pelo mundo para a perdição das almas. Amém.",
+        descricao: "Oração de proteção contra o mal"
+      },
+      {
+        id: 22,
+        titulo: "Oração a São Gabriel Arcanjo",
+        categoria: "santos",
+        texto: "São Gabriel Arcanjo, vós que sois chamado a força de Deus e fostes escolhido para anunciar à Virgem Maria o mistério da Encarnação, obtende-nos a graça de acolher a Palavra de Deus com fé e obediência. Amém.",
+        descricao: "Oração ao Anjo da Anunciação"
+      },
+      {
+        id: 23,
+        titulo: "Oração a São Rafael Arcanjo",
+        categoria: "santos",
+        texto: "São Rafael Arcanjo, vós que sois o companheiro e protetor dos viajantes, guiai-nos em nossas jornadas e livrai-nos de todo perigo. Curai as nossas enfermidades da alma e do corpo. Amém.",
+        descricao: "Oração ao Anjo da Cura"
+      },
+      {
+        id: 24,
+        titulo: "Oração de São Francisco de Assis (Oração da Paz)",
+        categoria: "santos",
+        texto: "Senhor, fazei de mim um instrumento da vossa paz. Onde houver ódio, que eu leve o amor. Onde houver ofensa, que eu leve o perdão. Onde houver discórdia, que eu leve a união. Onde houver dúvida, que eu leve a fé. Onde houver desespero, que eu leve a esperança. Onde houver trevas, que eu leve a luz. Onde houver tristeza, que eu leve a alegria. Ó Mestre, fazei que eu procure mais consolar que ser consolado, compreender que ser compreendido, amar que ser amado. Pois é dando que se recebe, é perdoando que se é perdoado, e é morrendo que se vive para a vida eterna.",
+        descricao: "Oração da Paz"
+      },
+      {
+        id: 25,
+        titulo: "Oração de Santo Agostinho",
+        categoria: "santos",
+        texto: "Tarde te amei, beleza tão antiga e tão nova, tarde te amei! Eis que estavas dentro de mim e eu te procurava fora. Estavas comigo e eu não estava em ti. Retinham-me longe de ti as coisas que não existiriam se em ti não existissem. Tu me chamaste, gritaste e rompeste a minha surdez. Brilhaste, resplandeceste e afugentaste a minha cegueira. Exalaste teu perfume e eu respirei, e agora suspiro por ti. Saboreei-te, e agora tenho fome e sede de ti. Tocaste-me, e agora ardo por tua paz. Amém.",
+        descricao: "Oração de conversão e amor a Deus"
+      },
+      {
+        id: 26,
+        titulo: "Oração de Santa Teresa D'Ávila",
+        categoria: "santos",
+        texto: "Nada te perturbe, nada te espante, tudo passa, Deus não muda. A paciência tudo alcança. Quem a Deus tem, nada lhe falta. Só Deus basta. Amém.",
+        descricao: "Oração da paciência e confiança"
+      },
+      {
+        id: 27,
+        titulo: "Oração de São João da Cruz",
+        categoria: "santos",
+        texto: "Ó chamas de amor viva, que ternamente feres do meu ser o mais profundo centro! Já que não és mais esquiva, acaba de uma vez, rompe a tela do doce encontro! Amém.",
+        descricao: "Oração do amor místico"
+      },
+      {
+        id: 28,
+        titulo: "Oração a São Judas Tadeu",
+        categoria: "santos",
+        texto: "São Judas Tadeu, glorioso Apóstolo, fiel servo e amigo de Jesus, o nome do traidor foi a causa de que fôsseis esquecido por muitos, mas a Igreja vos honra e invoca universalmente como o Patrono dos casos desesperados, das causas perdidas. Rogai por mim, que sou tão miserável; fazei uso, eu vos imploro, desse particular privilégio que vos foi concedido de trazer ajuda visível e rápida onde o auxílio é quase nulo. Vinde em meu socorro neste grande momento de aflição para que eu possa receber as consolações e socorro do céu em todas as minhas necessidades, tribulações e sofrimentos, particularmente (mencionar a graça desejada), e para que eu possa bendizer a Deus convosco e com todos os eleitos, por toda a eternidade. Eu vos prometo, ó bendito São Judas Tadeu, lembrar-me sempre deste grande favor e nunca deixar de vos honrar como meu especial e poderoso Patrono e fazer tudo o que estiver ao meu alcance para incentivar a devoção para convosco. Amém.",
+        descricao: "Patrono das causas desesperadas"
+      },
+      {
+        id: 29,
+        titulo: "Oração a São Bento (Medalha)",
+        categoria: "santos",
+        texto: "A Cruz Sagrada seja a minha luz, não seja o dragão o meu guia. Retira-te, satanás! Nunca me aconselhes coisas vãs. É mau o que tu me ofereces, bebe tu mesmo o teu veneno! Amém.",
+        descricao: "Oração da Medalha de São Bento"
+      },
+      {
+        id: 30,
+        titulo: "Oração a São Charbel Makhlouf",
+        categoria: "santos",
+        texto: "Ó Deus, fonte de toda a santidade, que manifestastes o poder da vossa graça em São Charbel, monge e eremita, concedei-nos, por sua intercessão, a graça de vivermos na solidão do coração e de vos amarmos sobre todas as coisas. Amém.",
+        descricao: "Oração ao santo eremita libanês"
+      },
+      {
+        id: 31,
+        titulo: "Oração a Nossa Senhora do Rosário de Fátima",
+        categoria: "maria",
+        texto: "Santíssima Virgem Maria, Rainha do Rosário e Mãe de misericórdia, que vos dignastes manifestar em Fátima a ternura de vosso Imaculado Coração, trazendo-nos mensagens de salvação, e chamando-nos à conversão e à penitência. Concedei-nos a graça de vivermos em paz com Deus e com os irmãos, e de alcançarmos a vida eterna. Amém.",
+        descricao: "Oração a Nossa Senhora de Fátima"
+      },
+      {
+        id: 32,
+        titulo: "Oração a Nossa Senhora das Graças (Medalha Milagrosa)",
+        categoria: "maria",
+        texto: "Ó Maria concebida sem pecado, rogai por nós que recorremos a vós. Amém.",
+        descricao: "Jaculatória da Medalha Milagrosa"
+      },
+      {
+        id: 33,
+        titulo: "Oração a Nossa Senhora Desatadora dos Nós",
+        categoria: "maria",
+        texto: "Virgem Maria, Mãe do belo amor, Mãe que jamais deixa de vir em socorro a um filho aflito, Mãe cujas mãos não param de servir seus amados filhos, pois são movidas pelo amor divino e a imensa misericórdia que sai de seu coração, voltai o vosso olhar compassivo para mim e vede o emaranhado de nós que há em minha vida. Vós bem conheceis o meu desespero, a minha dor e o quanto estou amarrado por causa destes nós. Maria, Mãe que Deus encarregou de desatar os nós da vida dos seus filhos, confio hoje a fita da minha vida em vossas mãos. Ninguém, nem mesmo o Maligno, poderá tirá-la do vosso precioso amparo. Em vossas mãos não há nó que não possa ser desfeito. Mãe poderosa, por vossa graça e vossa intercessão, com vossa pureza e obediência, desatai este nó [mencionar o nó, ou genericamente, 'os nós que me afligem']. Amém.",
+        descricao: "Oração para desatar problemas e dificuldades"
+      },
+      {
+        id: 34,
+        titulo: "Oração a Nossa Senhora do Carmo",
+        categoria: "maria",
+        texto: "Ó Virgem do Carmo, Mãe de Deus e nossa Mãe, Rainha dos Anjos, refúgio dos pecadores, vós que sois a esperança dos aflitos e o auxílio dos cristãos, alcançai-nos de vosso Filho a graça de vivermos na vossa proteção e de morrermos na vossa graça. Amém.",
+        descricao: "Oração a Nossa Senhora do Carmo"
+      },
+      {
+        id: 35,
+        titulo: "Oração a Nossa Senhora de Guadalupe",
+        categoria: "maria",
+        texto: "Perfeita e sempre Virgem Santa Maria, Mãe do verdadeiro Deus, por quem se vive, Vós que na vossa santa e milagrosa imagem de Guadalupe, nos mostrastes o vosso amor e compaixão, alcançai-nos de vosso Filho a graça de vivermos na fé e na esperança. Amém.",
+        descricao: "Oração a Nossa Senhora de Guadalupe"
+      },
+      {
+        id: 36,
+        titulo: "Oração ao Espírito Santo (Veni Creator Spiritus)",
+        categoria: "basicas",
+        texto: "Vinde, Espírito Criador, as nossas almas visitai e enchei os corações com vossos dons celestiais. Vós sois chamado o Consolador, o dom do Deus Altíssimo, a fonte viva, o fogo, o amor, a unção espiritual. Amém.",
+        descricao: "Hino de invocação ao Espírito Santo"
+      },
+      {
+        id: 37,
+        titulo: "Oração ao Espírito Santo (Veni Sancte Spiritus)",
+        categoria: "basicas",
+        texto: "Vinde, Espírito Santo, e enviai do céu um raio de vossa luz. Vinde, Pai dos pobres, vinde, doador dos dons, vinde, luz dos corações. Consolador ótimo, doce hóspede da alma, doce refrigério. No trabalho, descanso, no calor, temperança, no pranto, consolo. Ó luz beatíssima, enchei o íntimo dos corações de vossos fiéis. Sem a vossa força, nada há no homem, nada de inocente. Lavai o que é sórdido, regai o que é seco, curai o que está ferido. Dobrai o que é rígido, aquecei o que é frio, dirigi o que está desviado. Dai aos vossos fiéis, que em vós confiam, os vossos sete dons. Dai o mérito da virtude, dai o porto da salvação, dai a alegria eterna. Amém.",
+        descricao: "Sequência de Pentecostes"
+      },
+      {
+        id: 38,
+        titulo: "Oração de Ação de Graças",
+        categoria: "basicas",
+        texto: "Nós Vos damos graças, ó Deus, por todos os Vossos benefícios, Vós que viveis e reinais por todos os séculos dos séculos. Amém.",
+        descricao: "Oração de agradecimento"
+      },
+      {
+        id: 39,
+        titulo: "Oração da Manhã",
+        categoria: "basicas",
+        texto: "Senhor, no silêncio deste dia que amanhece, venho pedir-te a paz, a sabedoria, a força. Quero olhar hoje o mundo com olhos cheios de amor, ser paciente, compreensivo, manso e prudente. Ver além das aparências teus filhos como Tu mesmo os vês, e assim não ver senão o bem em cada um. Cerra meus ouvidos a toda calúnia. Guarda minha língua de toda maldade. Que só de bênçãos se encha meu espírito. Que eu seja tão bondoso e alegre, que todos aqueles que se aproximarem de mim sintam a Tua presença. Reveste-me de Tua beleza, Senhor, e que no decurso deste dia eu Te revele a todos. Amém.",
+        descricao: "Oração para o início do dia"
+      },
+      {
+        id: 40,
+        titulo: "Oração da Noite",
+        categoria: "basicas",
+        texto: "Senhor, meu Deus, mais uma vez, findo o dia, venho a Ti para agradecer. Obrigado por tudo o que me deste e por tudo o que sou. Perdoa-me, Senhor, se não fui perfeito, se errei, se pequei. Perdoa-me, se ofendi alguém. Abençoa o meu descanso, o meu sono e o meu despertar. Que eu possa, amanhã, recomeçar a jornada com novo ânimo e alegria. Em nome de Jesus. Amém.",
+        descricao: "Oração para o fim do dia"
+      },
+      {
+        id: 41,
+        titulo: "Oração de São Tomás de Aquino (Antes de Estudar)",
+        categoria: "santos",
+        texto: "Criador inefável, Vós que sois a fonte da luz e da sabedoria, dignai-Vos derramar sobre as trevas da minha inteligência um raio do Vosso esplendor. Dai-me a capacidade de aprender, a memória de reter, o método e a facilidade de estudar, a sutileza de interpretar e a graça abundante de falar. Amém.",
+        descricao: "Oração para estudantes"
+      },
+      {
+        id: 42,
+        titulo: "Oração de São Tomás de Aquino (Depois de Estudar)",
+        categoria: "santos",
+        texto: "Graças Vos dou, ó Deus, fonte de toda a sabedoria, por me terdes concedido a graça de aprender. Iluminai o meu espírito para que eu possa pôr em prática o que aprendi e para que eu possa sempre buscar a Vossa verdade. Amém.",
+        descricao: "Oração de agradecimento após o estudo"
+      },
+      {
+        id: 43,
+        titulo: "Oração de São Pio de Pietrelcina",
+        categoria: "santos",
+        texto: "Fica comigo, Senhor, pois preciso da Tua presença para não Te ofender. Sabes quão facilmente Te abandono. Fica comigo, Senhor, pois sou fraco e preciso da Tua força para não cair tantas vezes. Fica comigo, Senhor, pois Tu és a minha vida, e sem Ti o fervor diminui. Fica comigo, Senhor, pois Tu és a minha luz, e sem Ti caio na escuridão. Fica comigo, Senhor, para me dares a conhecer a Tua vontade. Fica comigo, Senhor, para que eu ouça a Tua voz e Te siga. Fica comigo, Senhor, pois desejo amar-Te muito e estar sempre em Tua companhia. Fica comigo, Senhor, se queres que eu Te seja fiel. Fica comigo, Senhor, porque, por mais pobre que seja a minha alma, deseja ser para Ti um lugar de consolação, um ninho de amor. Amém.",
+        descricao: "Oração de permanência com Jesus"
+      },
+      {
+        id: 44,
+        titulo: "Oração a Santa Faustina (Jesus, eu confio em Vós)",
+        categoria: "santos",
+        texto: "Jesus, eu confio em Vós! Vós sois o Amor e a Misericórdia. Vós sois a minha esperança. Amém.",
+        descricao: "Jaculatória da Divina Misericórdia"
+      },
+      {
+        id: 45,
+        titulo: "Oração de Consagração a Nossa Senhora (São Luís Maria Grignion de Montfort)",
+        categoria: "maria",
+        texto: "Ó Jesus, Sapiência eterna e encarnada! Ó amabilíssimo e adorável Jesus, verdadeiro Deus e verdadeiro Homem, Filho único do Pai Eterno e de Maria, sempre Virgem! Eu Vos adoro no seio e nos esplendores do Vosso Pai, durante a eternidade, e no seio virginal de Maria, Vossa Mãe, no tempo da Vossa Encarnação. Eu Vos dou graças por Vos terdes aniquilado, tomando a forma de escravo, para me tirar da cruel escravidão do demônio. Eu Vos louvo e glorifico por Vos terdes submetido em tudo a Maria, Vossa Mãe Santíssima, para me tornar por Ela Vosso fiel escravo. Mas, ai de mim, criatura ingrata e infiel! Não cumpri os votos do meu Batismo; não mereço ser chamado Vosso filho nem Vosso escravo. E como não há nada em mim que não mereça a Vossa repulsa, não ouso aproximar-me por mim mesmo da Vossa Santíssima e Augustíssima Majestade. É por isso que recorro à intercessão de Vossa Mãe Santíssima, que me destes por Advogada junto de Vós, e a Ela me consagro inteiramente, como Vosso escravo, para que Ela disponha de mim, de tudo o que me pertence, sem exceção, segundo a Sua vontade, para maior glória Vossa, no tempo e na eternidade. Amém.",
+        descricao: "Consagração total a Jesus por Maria"
+      },
+      {
+        id: 46,
+        titulo: "Oração a São José (São Francisco de Sales)",
+        categoria: "santos",
+        texto: "Glorioso São José, esposo de Maria, pai adotivo de Jesus, vós que fostes o chefe da Sagrada Família, obtende-nos a graça de vivermos na paz e na caridade. Amém.",
+        descricao: "Oração a São José"
+      },
+      {
+        id: 47,
+        titulo: "Oração de São Bento (Completa)",
+        categoria: "santos",
+        texto: "A Cruz Sagrada seja a minha luz, não seja o dragão o meu guia. Retira-te, satanás! Nunca me aconselhes coisas vãs. É mau o que tu me ofereces, bebe tu mesmo o teu veneno! Vade retro Satana! Non suadeas mihi vana! Sunt mala quae libas. Ipse venena bibas! Amém.",
+        descricao: "Oração completa da Medalha de São Bento"
+      },
+      {
+        id: 48,
+        titulo: "Oração a Nossa Senhora do Perpétuo Socorro",
+        categoria: "maria",
+        texto: "Ó Mãe do Perpétuo Socorro, cujo nome inspira confiança, vinde em meu auxílio. Vós que sois a esperança dos aflitos, socorrei-me em minhas necessidades. Amém.",
+        descricao: "Oração a Nossa Senhora do Perpétuo Socorro"
+      },
+      {
+        id: 49,
+        titulo: "Oração a Nossa Senhora da Conceição Aparecida",
+        categoria: "maria",
+        texto: "Ó incomparável Senhora da Conceição Aparecida, Mãe de Deus, Rainha dos Anjos, Advogada dos pecadores, refúgio e consolação dos aflitos e atribulados, Virgem Santíssima, cheia de poder e de bondade, lançai sobre nós um olhar favorável, para que sejamos socorridos em todas as necessidades. Amém.",
+        descricao: "Oração à Padroeira do Brasil"
+      },
+      {
+        id: 50,
+        titulo: "Oração a Nossa Senhora de Lourdes",
+        categoria: "maria",
+        texto: "Ó Virgem Imaculada, Mãe de misericórdia, saúde dos enfermos, refúgio dos pecadores, consolo dos aflitos, Vós que em Lourdes vos dignastes aparecer a uma humilde menina, para nos trazer a mensagem da oração e da penitência, alcançai-nos de vosso Filho a graça de vivermos na fé e na caridade. Amém.",
+        descricao: "Oração a Nossa Senhora de Lourdes"
+      },
+      {
+        id: 51,
+        titulo: "Oração a Nossa Senhora de Nazaré",
+        categoria: "maria",
+        texto: "Virgem de Nazaré, Senhora da Luz, Mãe de Jesus, vós que sois a estrela da manhã, guiai-nos em nossas vidas e livrai-nos de todo o mal. Amém.",
+        descricao: "Oração a Nossa Senhora de Nazaré"
+      },
+      {
+        id: 52,
+        titulo: "Oração a Nossa Senhora da Penha",
+        categoria: "maria",
+        texto: "Ó Virgem Santíssima, Senhora da Penha, vós que sois a protetora dos navegantes, guiai-nos em nossas vidas e livrai-nos de todo o perigo. Amém.",
+        descricao: "Oração a Nossa Senhora da Penha"
+      },
+      {
+        id: 53,
+        titulo: "Oração a Nossa Senhora do Bom Parto",
+        categoria: "maria",
+        texto: "Ó Virgem Maria, Mãe de Deus e nossa Mãe, vós que sois a Senhora do Bom Parto, assisti-nos em nossas necessidades e alcançai-nos de vosso Filho a graça de um parto feliz. Amém.",
+        descricao: "Oração para gestantes"
+      },
+      {
+        id: 54,
+        titulo: "Oração a Nossa Senhora da Saúde",
+        categoria: "maria",
+        texto: "Ó Virgem Maria, Mãe de Deus e nossa Mãe, vós que sois a Senhora da Saúde, curai as nossas enfermidades da alma e do corpo. Amém.",
+        descricao: "Oração pela saúde"
+      },
+      {
+        id: 55,
+        titulo: "Oração a Nossa Senhora da Piedade",
+        categoria: "maria",
+        texto: "Ó Virgem Maria, Mãe de Deus e nossa Mãe, vós que sois a Senhora da Piedade, consolai-nos em nossas aflições e alcançai-nos de vosso Filho a graça da perseverança. Amém.",
+        descricao: "Oração de consolo"
+      },
+      {
+        id: 56,
+        titulo: "Oração a Nossa Senhora da Esperança",
+        categoria: "maria",
+        texto: "Ó Virgem Maria, Mãe de Deus e nossa Mãe, vós que sois a Senhora da Esperança, fortalecei-nos em nossas provações e alcançai-nos de vosso Filho a graça da confiança. Amém.",
+        descricao: "Oração de esperança"
+      },
+      {
+        id: 57,
+        titulo: "Oração a Nossa Senhora do Perpétuo Socorro",
+        categoria: "maria",
+        texto: "Ó Mãe do Perpétuo Socorro, cujo nome inspira confiança, vinde em meu auxílio. Vós que sois a esperança dos aflitos, socorrei-me em minhas necessidades. Amém.",
+        descricao: "Oração a Nossa Senhora do Perpétuo Socorro"
+      },
+      {
+        id: 58,
+        titulo: "Oração a Nossa Senhora do Bom Conselho",
+        categoria: "maria",
+        texto: "Ó Virgem Maria, Mãe de Deus e nossa Mãe, vós que sois a Senhora do Bom Conselho, guiai-nos em nossas decisões e alcançai-nos de vosso Filho a graça da sabedoria. Amém.",
+        descricao: "Oração por sabedoria"
+      },
+      {
+        id: 59,
+        titulo: "Oração a Nossa Senhora da Conceição",
+        categoria: "maria",
+        texto: "Ó Virgem Imaculada, Mãe de Deus e nossa Mãe, vós que fostes concebida sem pecado original, alcançai-nos de vosso Filho a graça de vivermos na pureza e na santidade. Amém.",
+        descricao: "Oração à Imaculada Conceição"
+      },
+      {
+        id: 60,
+        titulo: "Oração a Nossa Senhora da Glória",
+        categoria: "maria",
+        texto: "Ó Virgem Maria, Mãe de Deus e nossa Mãe, vós que fostes elevada à glória do céu, alcançai-nos de vosso Filho a graça de vivermos na esperança da vida eterna. Amém.",
+        descricao: "Oração à Assunção de Maria"
+      },
+      {
+        id: 61,
+        titulo: "Oração a São Sebastião",
+        categoria: "santos",
+        texto: "Glorioso mártir São Sebastião, vós que fostes ferido por flechas por amor a Cristo, alcançai-nos a graça de sermos fortes na fé e de resistirmos às tentações do mundo. Amém.",
+        descricao: "Oração contra a peste e a guerra"
+      },
+      {
+        id: 62,
+        titulo: "Oração a São Jorge",
+        categoria: "santos",
+        texto: "Eu andarei vestido e armado com as armas de São Jorge para que meus inimigos, tendo pés não me alcancem, tendo mãos não me peguem, tendo olhos não me vejam, e nem em pensamento eles possam me fazer mal. Amém.",
+        descricao: "Oração de proteção"
+      },
+      {
+        id: 63,
+        titulo: "Oração a São Cristóvão",
+        categoria: "santos",
+        texto: "Ó São Cristóvão, que atravessastes a correnteza do rio com o Menino Jesus nos ombros, protegei-nos em nossas viagens e livrai-nos de todo o perigo. Amém.",
+        descricao: "Oração dos viajantes"
+      },
+      {
+        id: 64,
+        titulo: "Oração a São Lázaro",
+        categoria: "santos",
+        texto: "Ó São Lázaro, vós que fostes ressuscitado por Jesus, alcançai-nos a graça de ressuscitar para uma vida nova em Cristo. Amém.",
+        descricao: "Oração pela ressurreição espiritual"
+      },
+      {
+        id: 65,
+        titulo: "Oração a São Roque",
+        categoria: "santos",
+        texto: "Ó São Roque, que vos dedicastes aos enfermos e fostes curado pela graça de Deus, curai as nossas enfermidades da alma e do corpo. Amém.",
+        descricao: "Oração contra a peste"
+      },
+      {
+        id: 66,
+        titulo: "Oração a São Cosme e São Damião",
+        categoria: "santos",
+        texto: "São Cosme e São Damião, que com o vosso amor e a vossa fé curastes os enfermos, alcançai-nos a graça de vivermos na saúde e na paz. Amém.",
+        descricao: "Oração pela saúde"
+      },
+      {
+        id: 67,
+        titulo: "Oração a São Francisco Xavier",
+        categoria: "santos",
+        texto: "Ó São Francisco Xavier, vós que fostes o Apóstolo das Índias, alcançai-nos a graça de sermos missionários do Evangelho e de levarmos a palavra de Deus a todos os povos. Amém.",
+        descricao: "Oração dos missionários"
+      },
+      {
+        id: 68,
+        titulo: "Oração a São João Batista",
+        categoria: "santos",
+        texto: "Ó São João Batista, vós que fostes o precursor de Jesus, preparai os nossos corações para a vinda do Senhor. Amém.",
+        descricao: "Oração ao precursor de Jesus"
+      },
+      {
+        id: 69,
+        titulo: "Oração a São Pedro",
+        categoria: "santos",
+        texto: "Ó São Pedro, vós que fostes a pedra sobre a qual Jesus edificou a sua Igreja, fortalecei a nossa fé e guiai-nos no caminho da salvação. Amém.",
+        descricao: "Oração ao primeiro Papa"
+      },
+      {
+        id: 70,
+        titulo: "Oração a São Paulo",
+        categoria: "santos",
+        texto: "Ó São Paulo, vós que fostes o Apóstolo dos Gentios, alcançai-nos a graça de sermos testemunhas de Cristo em todos os lugares. Amém.",
+        descricao: "Oração ao Apóstolo dos Gentios"
+      },
+      {
+        id: 12,
+        titulo: "Oração a Santo Antônio",
+        categoria: "santos",
+        texto: "Glorioso Santo Antônio, vós que sois tão poderoso junto a Deus, alcançai-me a graça que vos peço. Vós que encontrastes o que estava perdido, ajudai-me a encontrar o que procuro. Rogai por mim junto ao trono de Deus. Amém.",
+        descricao: "Santo das coisas perdidas"
+      },
+      {
+        id: 13,
+        titulo: "Oração a São Francisco",
+        categoria: "santos",
+        texto: "Senhor, fazei de mim um instrumento da vossa paz. Onde houver ódio, que eu leve o amor. Onde houver ofensa, que eu leve o perdão. Onde houver discórdia, que eu leve a união. Onde houver dúvida, que eu leve a fé. Onde houver desespero, que eu leve a esperança. Onde houver trevas, que eu leve a luz. Onde houver tristeza, que eu leve a alegria. Amém.",
+        descricao: "Oração da paz"
+      },
+      {
+        id: 14,
+        titulo: "Oração a Santa Terezinha",
+        categoria: "santos",
+        texto: "Pequena Santa Terezinha, vós que ensinastes o caminho da infância espiritual, ajudai-me a confiar como uma criança nos braços de Deus. Que eu possa fazer as pequenas coisas com grande amor. Rogai por mim. Amém.",
+        descricao: "Caminho da infância espiritual"
+      },
+      {
+        id: 15,
+        titulo: "Oração a São Padre Pio",
+        categoria: "santos",
+        texto: "Querido Padre Pio, vós que sofrastes com Cristo e fostes instrumento de sua misericórdia, alcançai-me a graça de amar o sofrimento e de servir aos pobres com alegria. Rogai por mim junto a Jesus. Amém.",
+        descricao: "Intercessor da misericórdia"
+      },
+      // Novas Orações Básicas
+      {
+        id: 16,
+        titulo: "Ato de Contrição",
+        categoria: "basicas",
+        texto: "Senhor Jesus Cristo, Deus e homem verdadeiro, Criador e Redentor meu, por serdes Vós quem sois, sumamente bom e digno de ser amado sobre todas as coisas, e porque Vos amo e estimo, pesa-me, Senhor, de todo o meu coração, de Vos ter ofendido, e proponho firmemente, ajudado com o auxílio de Vossa divina graça, emendar-me e nunca mais Vos tornar a ofender. Espero alcançar o perdão de minhas culpas pela Vossa infinita misericórdia. Amém.",
+        descricao: "Oração para o sacramento da Penitência"
+      },
+      // Novas Orações a Nossa Senhora
+      {
+        id: 17,
+        titulo: "Magnificat (Cântico de Maria)",
+        categoria: "maria",
+        texto: "A minha alma glorifica o Senhor, e o meu espírito exulta em Deus, meu Salvador. Porque pôs os olhos na humildade da sua serva. Doravante todas as gerações me chamarão bem-aventurada. Porque o Todo-poderoso fez em mim maravilhas. Santo é o seu nome. A sua misericórdia se estende de geração em geração sobre aqueles que o temem. Manifestou o poder do seu braço, dispersou os soberbos. Derrubou os poderosos de seus tronos e exaltou os humildes. Encheu de bens os famintos e despediu os ricos de mãos vazias. Acolheu Israel, seu servo, lembrado da sua misericórdia, conforme prometera a nossos pais, em favor de Abraão e de sua posteridade, para sempre. Glória ao Pai, ao Filho e ao Espírito Santo. Como era no princípio, agora e sempre. Amém.",
+        descricao: "Cântico de louvor de Nossa Senhora"
+      },
+      {
+        id: 18,
+        titulo: "Oração a Nossa Senhora Desatadora dos Nós",
+        categoria: "maria",
+        texto: "Virgem Maria, Mãe do belo amor, Mãe que jamais deixa de vir em socorro a um filho aflito, Mãe cujas mãos não param de servir seus amados filhos, pois são movidas pelo amor divino e a imensa misericórdia que sai de seu coração, voltai o vosso olhar compassivo para mim e vede o emaranhado de nós que há em minha vida. Vós bem conheceis o meu desespero, a minha dor e o quanto estou amarrado por causa destes nós. Maria, Mãe que Deus encarregou de desatar os nós da vida dos seus filhos, confio hoje a fita da minha vida em vossas mãos. Ninguém, nem mesmo o Maligno, poderá tirá-la do vosso precioso amparo. Em vossas mãos não há nó que não possa ser desfeito. Mãe poderosa, por vossa graça e vossa intercessão, com vossa pureza e obediência, desatai este nó [mencionar o nó, ou genericamente, 'os nós que me afligem']. Amém.",
+        descricao: "Oração para desatar problemas e dificuldades"
+      },
+      // Novas Orações aos Santos
+      {
+        id: 19,
+        titulo: "Oração ao Anjo da Guarda",
+        categoria: "santos",
+        texto: "Santo Anjo do Senhor, meu zeloso guardador, se a ti me confiou a piedade divina, sempre me rege, guarda, governa e ilumina. Amém.",
+        descricao: "Oração de proteção ao Anjo da Guarda"
+      },
+      {
+        id: 20,
+        titulo: "Oração a São Bento",
+        categoria: "santos",
+        texto: "Ó glorioso São Bento, que servistes a Deus com fidelidade e amor, alcançai-nos a graça de vivermos na paz e na caridade. Protegei-nos contra as ciladas do inimigo e de todo o mal. Amém.",
+        descricao: "Oração de proteção contra o mal"
+      }
+    ];
+
+
+    function init() {
+      renderizarOracoes(oracoes);
+    }
+
+    function renderizarOracoes(lista) {
+      const container = document.getElementById('oracoes-container');
+      
+      if (lista.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 2rem;">Nenhuma oração encontrada.</p>';
+        return;
+      }
+
+      container.innerHTML = lista.map(oracao => `
+        <div class="oracao-card">
+          <div class="oracao-header">
+            <h3 class="oracao-titulo">${oracao.titulo}</h3>
+            <button class="btn-favorito-oracao" onclick="toggleFavoritoOracao(${oracao.id})" id="fav-${oracao.id}">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 20px; height: 20px;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            </button>
+          </div>
+          <p class="oracao-descricao">${oracao.descricao}</p>
+          <p class="oracao-texto" style="white-space: pre-wrap;">${oracao.texto}</p>
+        </div>
+      `).join('');
+
+      // Atualizar estado dos botões de favorito
+      lista.forEach(oracao => {
+        atualizarBotaoFavoritoOracao(oracao.id);
+      });
+    }
+
+    function buscarOracoes() {
+      const termo = document.getElementById('search-input').value.toLowerCase();
+      
+      let resultado = oracoes.filter(oracao => {
+        const match = oracao.titulo.toLowerCase().includes(termo) ||
+                     oracao.descricao.toLowerCase().includes(termo) ||
+                     oracao.texto.toLowerCase().includes(termo);
+        
+        if (filtroAtual === 'todas') return match;
+        if (filtroAtual === 'favoritas') {
+          const isFav = localStorage.getItem(`oracao-fav-${oracao.id}`) === 'true';
+          return match && isFav;
+        }
+        return match && oracao.categoria === filtroAtual;
+      });
+
+      renderizarOracoes(resultado);
+    }
+
+    function filtrarOracoes(categoria) {
+      filtroAtual = categoria;
+      
+      // Atualizar botões de filtro
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+
+      buscarOracoes();
+    }
+
+    function toggleFavoritoOracao(id) {
+      const isFav = localStorage.getItem(`oracao-fav-${id}`) === 'true';
+      localStorage.setItem(`oracao-fav-${id}`, !isFav);
+      atualizarBotaoFavoritoOracao(id);
+    }
+
+    function atualizarBotaoFavoritoOracao(id) {
+      const btn = document.getElementById(`fav-${id}`);
+      const isFav = localStorage.getItem(`oracao-fav-${id}`) === 'true';
+      
+      if (btn) {
+        if (isFav) {
+          btn.classList.add('favorito-ativo');
+          btn.style.color = 'var(--destructive)';
+        } else {
+          btn.classList.remove('favorito-ativo');
+          btn.style.color = 'var(--text-secondary)';
+        }
+      }
+    }
+
+    function goBack() {
+      window.history.back();
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+
+  <style>
+    .oracoes-search {
+      margin-bottom: 2rem;
+    }
+
+    .search-container {
+      margin-bottom: 1rem;
+    }
+
+    .filter-buttons {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 0.5rem 1rem;
+      background-color: var(--secondary);
+      color: var(--secondary-foreground);
+      border: none;
+      border-radius: 2rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .filter-btn:hover {
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+    }
+
+    .filter-btn.active {
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+    }
+
+    .oracoes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .oracao-card {
+      background-color: var(--card);
+      border: 1px solid var(--primary); /* Contorno azul */
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .oracao-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-color: var(--primary);
+    }
+
+    .oracao-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.75rem;
+      gap: 1rem;
+    }
+
+    .oracao-titulo {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--foreground);
+      margin: 0;
+    }
+
+    .btn-favorito-oracao {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .btn-favorito-oracao:hover {
+      color: var(--destructive);
+      transform: scale(1.2);
+    }
+
+    .btn-favorito-oracao.favorito-ativo {
+      color: var(--destructive);
+    }
+
+    .oracao-descricao {
+      color: var(--muted-foreground);
+      font-size: 0.9rem;
+      font-style: italic;
+      margin: 0 0 1rem 0;
+    }
+
+    .oracao-texto {
+      color: var(--foreground);
+      line-height: 1.8;
+      margin: 0;
+    }
+  </style>
+</body>
+</html>
